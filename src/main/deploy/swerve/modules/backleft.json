@@ -5,19 +5,19 @@
   },
   "absoluteEncoderOffset": 0,
   "drive": {
-    "type": "falcon",
+    "type": "talonfx",
     "id": 7,
-    "canbus": 0
+    "canbus": null
   },
   "angle": {
     "type": "sparkmax",
     "id": 8,
-    "canbus": 0
+    "canbus": null
   },
   "encoder": {
-    "type": "thrifty",
+    "type": "sparkmax_analog",
     "id": 9,
-    "canbus": 0
+    "canbus": null
   },
   "inverted": {
     "drive": false,

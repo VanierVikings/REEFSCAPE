@@ -7,17 +7,17 @@
   "drive": {
     "type": "talonfx",
     "id": 4,
-    "canbus": 0
+    "canbus": null
   },
   "angle": {
     "type": "sparkmax",
     "id": 5,
-    "canbus": 0
+    "canbus": null
   },
   "encoder": {
-    "type": "thrifty",
+    "type": "sparkmax_analog",
     "id": 6,
-    "canbus": 0
+    "canbus": null
   },
   "inverted": {
     "drive": false,
