@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.swervedrive;
 
-import com.pathplanner.lib.auto.AutoBuilder;
+import pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -47,7 +47,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Maximum speed of the robot in meters per second, used to limit acceleration.
    */
-  public        double      maximumSpeed = Units.feetToMeters(14.5);
+  public double maximumSpeed = Units.feetToMeters(17);
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -56,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public SwerveSubsystem(File directory)
   {
-    // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
+    // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION) 
     //  In this case the gear ratio is 12.8 motor revolutions per wheel rotation.
     //  The encoder resolution per motor revolution is 1 per motor revolution.
     double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(150/7, 4096);
@@ -200,11 +200,11 @@ public class SwerveSubsystem extends SubsystemBase
       double yInput = Math.pow(translationY.getAsDouble(), 3); // Smooth controll out
       // Make the robot move
       driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(xInput, yInput,
-                                                                      headingX.getAsDouble(),
-                                                                      headingY.getAsDouble(),
-                                                                      swerveDrive.getOdometryHeading().getRadians(),
-                                                                      swerveDrive.getMaximumVelocity()));
-    });
+      headingX.getAsDouble(),
+      headingY.getAsDouble(),
+      swerveDrive.getOdometryHeading().getRadians(),
+      swerveDrive.getMaximumVelocity()));
+});
   }
 
   /**
@@ -221,10 +221,10 @@ public class SwerveSubsystem extends SubsystemBase
     return run(() -> {
       // Make the robot move
       driveFieldOriented(swerveDrive.swerveController.getTargetSpeeds(translationX.getAsDouble(),
-                                                                      translationY.getAsDouble(),
-                                                                      rotation.getAsDouble() * Math.PI,
-                                                                      swerveDrive.getOdometryHeading().getRadians(),
-                                                                      swerveDrive.getMaximumVelocity()));
+      translationY.getAsDouble(),
+      rotation.getAsDouble() * Math.PI,
+      swerveDrive.getOdometryHeading().getRadians(),
+      swerveDrive.getMaximumVelocity()));
     });
   }
 
@@ -445,10 +445,10 @@ public class SwerveSubsystem extends SubsystemBase
     xInput = Math.pow(xInput, 3);
     yInput = Math.pow(yInput, 3);
     return swerveDrive.swerveController.getTargetSpeeds(xInput,
-                                                        yInput,
-                                                        angle.getRadians(),
-                                                        getHeading().getRadians(),
-                                                        maximumSpeed);
+    yInput,
+    angle.getRadians(),
+    getHeading().getRadians(),
+    maximumSpeed);
   }
 
   /**
