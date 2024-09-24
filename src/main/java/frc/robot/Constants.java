@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.lang.module.FindException;
+
 import com.pathplanner.lib.util.PIDConstants;
 
 import edu.wpi.first.math.geometry.Translation3d;
@@ -30,6 +32,39 @@ public final class Constants
 
     public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0, 0);
     public static final PIDConstants ANGLE_PID   = new PIDConstants(0.4, 0, 0.01);
+  }
+
+  public static final class IntakeConstants{
+    public static final int topSpeed = 1;
+    public static final int bottomSpeed = 1;
+  }
+
+  public static final class ShooterConstants{
+    public static final double kP = 1.0;
+    public static final double kI = 0.01;
+    public static final double kD = 0;
+    public static final double kS = 0;
+    public static final double kV = 0.26;
+    public static final double kA = 0.14;
+    public static final double maxRPM = 5800;
+    public static final int currentLimit = 40;
+    public static final int tolerance = 50;
+
+  }
+
+  public final class LEDConstants{
+    public static final int PWM_PORT = 1;
+    public static final int NUM_LED = 30;
+    public static final int RAINBOW_START_INDEX = 0;
+    public static final int RAINBOW_END_INDEX = 100;
+  }
+
+  public static final class DeviceIDs{
+    public static final int intakeBottom = 20;
+    public static final int intakeTop = 21;
+    public static final int shooterLeft = 22;
+    public static final int shooterRight = 23;
+
   }
 
   public static final class DrivebaseConstants
