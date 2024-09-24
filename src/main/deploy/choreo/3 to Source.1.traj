@@ -358,5 +358,15 @@
       "timestamp": 0.7611441689178068
     }
   ],
-  "eventMarkers": []
+  "eventMarkers": [
+    {
+      "timestamp": 0.2,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Prime"
+        }
+      }
+    }
+  ]
 }
