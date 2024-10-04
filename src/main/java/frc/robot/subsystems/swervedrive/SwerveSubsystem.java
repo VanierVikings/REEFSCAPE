@@ -4,12 +4,17 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
+import com.revrobotics.CANSparkMax;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,10 +24,12 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.AutonConstants;
+import frc.robot.Constants.DrivebaseConstants;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import org.photonvision.PhotonCamera;
@@ -33,6 +40,7 @@ import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
+import swervelib.parser.SwerveModuleConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -64,13 +72,13 @@ public class SwerveSubsystem extends SubsystemBase
     //  In this case the wheel diameter is 4 inches, which must be converted to meters to get meters/second.
     //  The gear ratio is 6.75 motor revolutions per wheel rotation.
     //  The encoder resolution per motor revolution is 1 per motor revolution.
-    int outputGear = 16;
-    int pinionGear = 14;
-    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3.95),(50/pinionGear)*(36/50)*(outputGear/24)*(45/15));
+
+    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(3.95),(50/DrivebaseConstants.pinionGear)*(36/50)*(DrivebaseConstants.outputGear/24)*(45/15));
     System.out.println("\"conversionFactor\": {");
     System.out.println("\t\"angle\": " + angleConversionFactor + ",");
     System.out.println("\t\"drive\": " + driveConversionFactor);
     System.out.println("}");
+    
 
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -81,9 +89,22 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
+    
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     setupPathPlanner();
+    for (swervelib.SwerveModule m : swerveDrive.getModules()){
+      CANSparkMax steeringMotor = (CANSparkMax)m.getAngleMotor().getMotor();
+      TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
+      var limitConfigs = new CurrentLimitsConfigs();
+      var talonFXConfigurator  = driveMotor.getConfigurator();
+      limitConfigs.StatorCurrentLimit = DrivebaseConstants.StatorCurrentLimitDrive;
+      limitConfigs.StatorCurrentLimitEnable = true;
+      limitConfigs.SupplyCurrentLimit = DrivebaseConstants.SupplyCurrentLimitDrive;
+      limitConfigs.SupplyCurrentLimitEnable = true;
+      talonFXConfigurator.apply(limitConfigs);
+      steeringMotor.setSmartCurrentLimit(DrivebaseConstants.SteerCurrentLimit);
+    }
   }
 
   /** 

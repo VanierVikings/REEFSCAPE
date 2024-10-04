@@ -72,6 +72,11 @@ public final class Constants
 
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
+    public static final int StatorCurrentLimitDrive = 100;
+    public static final int SupplyCurrentLimitDrive = 60;
+    public static final int SteerCurrentLimit = 35;
+    public static final int outputGear = 16;
+    public static final int pinionGear = 14;
   }
 
   public static class OperatorConstants
