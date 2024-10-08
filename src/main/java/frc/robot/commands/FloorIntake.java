@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class FloorIntake extends Command {
   private static Intake m_intake;
-  private static double speed;
 
   public FloorIntake(Intake m_intake) {
     setName("FloorIntake");

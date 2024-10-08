@@ -5,9 +5,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix6.signals.DeviceEnableValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
