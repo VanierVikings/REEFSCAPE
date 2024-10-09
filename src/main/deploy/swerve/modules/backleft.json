@@ -3,7 +3,7 @@
     "front": -11.5,
     "left": 11.5
   },
-  "absoluteEncoderOffset": 0,
+  "absoluteEncoderOffset": 63.9,
   "drive": {
     "type": "talonfx",
     "id": 7,
@@ -15,7 +15,7 @@
     "canbus": null
   },
   "encoder": {
-    "type": "sparkmax_analog",
+    "type": "sparkmax_analog5v",
     "id": 0,
     "canbus": null
   },
