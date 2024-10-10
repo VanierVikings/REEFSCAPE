@@ -79,22 +79,22 @@ public class SwerveSubsystem extends SubsystemBase
       throw new RuntimeException(e);
     }
     
-    swerveDrive.pushOffsetsToEncoders();
+    //swerveDrive.pushOffsetsToEncoders();
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     setupPathPlanner();
-    for (swervelib.SwerveModule m : swerveDrive.getModules()){
-      CANSparkMax steeringMotor = (CANSparkMax)m.getAngleMotor().getMotor();
-      TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
-      var limitConfigs = new CurrentLimitsConfigs();
-      var talonFXConfigurator  = driveMotor.getConfigurator();
-      limitConfigs.StatorCurrentLimit = DrivebaseConstants.StatorCurrentLimitDrive;
-      limitConfigs.StatorCurrentLimitEnable = true;
-      limitConfigs.SupplyCurrentLimit = DrivebaseConstants.SupplyCurrentLimitDrive;
-      limitConfigs.SupplyCurrentLimitEnable = true;
-      talonFXConfigurator.apply(limitConfigs);
-      steeringMotor.setSmartCurrentLimit(DrivebaseConstants.SteerCurrentLimit);
-    }
+    // for (swervelib.SwerveModule m : swerveDrive.getModules()){
+    //   CANSparkMax steeringMotor = (CANSparkMax)m.getAngleMotor().getMotor();
+    //   TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
+    //   var limitConfigs = new CurrentLimitsConfigs();
+    //   var talonFXConfigurator  = driveMotor.getConfigurator();
+    //   limitConfigs.StatorCurrentLimit = DrivebaseConstants.StatorCurrentLimitDrive;
+    //   limitConfigs.StatorCurrentLimitEnable = true;
+    //   limitConfigs.SupplyCurrentLimit = DrivebaseConstants.SupplyCurrentLimitDrive;
+    //   limitConfigs.SupplyCurrentLimitEnable = true;
+    //   talonFXConfigurator.apply(limitConfigs);
+    //   steeringMotor.setSmartCurrentLimit(DrivebaseConstants.SteerCurrentLimit);
+    // }
   }
 
   /** 

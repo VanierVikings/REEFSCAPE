@@ -92,7 +92,7 @@ public class RobotContainer{
         () -> driverXbox.getRawAxis(2));
 
     drivebase.setDefaultCommand(
-        !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
+        !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
 
       NamedCommands.registerCommand("Prime", new Prime(m_shooter));
       NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake));
