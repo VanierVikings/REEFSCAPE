@@ -8,6 +8,7 @@ public class FloorIntake extends Command {
   private static Intake m_intake;
 
   public FloorIntake(Intake m_intake) {
+    FloorIntake.m_intake = m_intake;
     setName("FloorIntake");
     addRequirements(m_intake);
   }

@@ -35,7 +35,7 @@ public final class Constants
   }
 
   public static final class IntakeConstants{
-    public static final int topSpeed = 1;
+    public static final int topSpeed = -1;
     public static final int bottomSpeed = 1;
   }
 
@@ -69,7 +69,6 @@ public final class Constants
 
   public static final class DrivebaseConstants
   {
-
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
     public static final int StatorCurrentLimitDrive = 100;

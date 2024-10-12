@@ -10,12 +10,11 @@ import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
 
-    DigitalInput beamBreak = new DigitalInput(0);
+    DigitalInput beamBreak = new DigitalInput(9);
     private final VictorSPX intakeBottom = new VictorSPX(DeviceIDs.intakeBottom);
     private final VictorSPX intakeTop = new VictorSPX(DeviceIDs.intakeTop);  
     public Intake() {
         intakeBottom.setInverted(true);
-
     }
 
     public void startIntake(){
@@ -31,5 +30,4 @@ public class Intake extends SubsystemBase {
     public Boolean hasNote(){
         return !beamBreak.get();
     }
-    
 }

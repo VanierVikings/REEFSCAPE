@@ -120,6 +120,7 @@ public class RobotContainer{
         Commands.deferredProxy(() -> drivebase.driveToPose(
                                    new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               ));
+    driverXbox.leftTrigger().whileTrue(new FloorIntake(m_intake));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
   }
 
