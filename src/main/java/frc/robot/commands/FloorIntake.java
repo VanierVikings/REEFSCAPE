@@ -3,20 +3,21 @@ package frc.robot.commands;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 
 public class FloorIntake extends Command {
   private static Intake m_intake;
+  private static double direction;
 
-  public FloorIntake(Intake m_intake) {
+  public FloorIntake(Intake m_intake, double direction) {
     FloorIntake.m_intake = m_intake;
+    FloorIntake.direction = direction;
     setName("FloorIntake");
     addRequirements(m_intake);
   }
 
   @Override
   public void initialize() {
-    m_intake.startIntake();
+    m_intake.startIntake(direction);
   }
 
   @Override

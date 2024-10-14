@@ -19,14 +19,12 @@ public class Shoot extends Command{
 
     @Override
     public void initialize() {
-      m_shooter.set(ShooterConstants.maxRPM);
-      m_intake.startIntake();
     }
 
     @Override
     public void execute() {
         m_shooter.set(ShooterConstants.maxRPM);
-        m_intake.startIntake();
+        m_intake.startIntake(1);
     }
   
     @Override

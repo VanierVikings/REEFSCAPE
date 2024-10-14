@@ -20,8 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimbDown;
-import frc.robot.commands.ClimbUp;
+import frc.robot.commands.Climb;
 import frc.robot.commands.FloorIntake;
 import frc.robot.commands.Prime;
 import frc.robot.commands.Shoot;
@@ -92,7 +91,7 @@ public class RobotContainer{
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * 0.5);
+        () -> driverXbox.getRightX() * 1);
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
         () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
@@ -104,7 +103,7 @@ public class RobotContainer{
 
       NamedCommands.registerCommand("Prime", new Prime(m_shooter));
       NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake));
-      NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake));
+      NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake, 1));
       autoChooser = AutoBuilder.buildAutoChooser();
 
       SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -128,11 +127,12 @@ public class RobotContainer{
     //     Commands.deferredProxy(() -> drivebase.driveToPose(
     //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
     //                           ));
-    driverXbox.rightTrigger().whileTrue(new FloorIntake(m_intake));
+    driverXbox.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
+    driverXbox.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
     driverXbox.leftTrigger().whileTrue(new Prime(m_shooter));
     driverXbox.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
-    driverXbox.a().whileTrue(new ClimbDown(m_climbers));
-    driverXbox.y().whileTrue(new ClimbUp(m_climbers));
+    driverXbox.a().whileTrue(new Climb(m_climbers, 1));
+    driverXbox.y().whileTrue(new Climb(m_climbers, -1));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
   }
 

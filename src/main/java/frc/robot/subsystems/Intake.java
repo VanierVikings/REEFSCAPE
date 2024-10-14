@@ -21,9 +21,9 @@ public class Intake extends SubsystemBase {
 
     }
 
-    public void startIntake(){
-        intakeBottom.set(VictorSPXControlMode.PercentOutput, IntakeConstants.bottomSpeed);
-        intakeTop.set(VictorSPXControlMode.PercentOutput, IntakeConstants.topSpeed);
+    public void startIntake(double direction){
+        intakeBottom.set(VictorSPXControlMode.PercentOutput, IntakeConstants.bottomSpeed * direction);
+        intakeTop.set(VictorSPXControlMode.PercentOutput, IntakeConstants.topSpeed * direction);
     }
 
 

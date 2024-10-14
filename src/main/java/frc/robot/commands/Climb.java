@@ -1,21 +1,22 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Climbers;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class ClimbDown extends Command {
+public class Climb extends Command {
     private static Climbers m_climbers;
+    private static double direction;
 
-    public ClimbDown(Climbers m_climbers){
-        ClimbDown.m_climbers = m_climbers;
-        setName("Climbers");
+    public Climb(Climbers m_climbers, double direction){
+        Climb.m_climbers = m_climbers;
+        Climb.direction = direction;
+        setName("Climb");
         addRequirements(m_climbers);
     }
 
     @Override
-    public void initialize(){
-        m_climbers.robotDown();
+    public void execute(){
+        m_climbers.winch(direction);
     }
 
     @Override
