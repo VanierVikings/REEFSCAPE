@@ -34,7 +34,7 @@ public class HoldNoteIntake extends Command {
 
   @Override
   public boolean isFinished() {
-    if (timer > 10){
+    if (timer > 12){
         return true;
     } else{
         return false;

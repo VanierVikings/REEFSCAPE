@@ -17,7 +17,7 @@ public class Climbers extends SubsystemBase{
     private final DigitalInput leftSwtich = new DigitalInput(DeviceIDs.leftClimbSwitch);
     private final DigitalInput rightSwitch = new DigitalInput(DeviceIDs.rightClimbSwitch);
     private double leftSpeed = 0.2;
-    private double rightSpeed = 0.5;
+    private double rightSpeed = 0.2;
     public Climbers(){
         leftClimbMotor.setNeutralMode(NeutralMode.Brake);
         rightClimbMotor.setNeutralMode(NeutralMode.Brake);

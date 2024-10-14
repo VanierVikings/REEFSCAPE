@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -43,7 +42,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer{
 
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve"));
+  private final SwerveSubsystem m_drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve"));
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
   private final Climbers m_climbers = new Climbers();
@@ -62,7 +61,7 @@ public class RobotContainer{
 
     // Configure the trigger bindings
     configureBindings();
-    AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
+    AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(m_drivetrain,
     () -> -MathUtil.applyDeadband(driver.getLeftY(),
                                 OperatorConstants.LEFT_Y_DEADBAND),
     () -> -MathUtil.applyDeadband(driver.getLeftX(),
@@ -79,7 +78,7 @@ public class RobotContainer{
     // controls are front-left positive
     // left stick controls translation
     // right stick controls the desired angle NOT angular rotation
-    Command driveFieldOrientedDirectAngle = drivebase.driveCommand(
+    Command driveFieldOrientedDirectAngle = m_drivetrain.driveCommand(
         () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driver.getRightX(),
@@ -90,17 +89,17 @@ public class RobotContainer{
     // controls are front-left positive
     // left stick controls translation
     // right stick controls the angular velocity of the robot
-    Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
+    Command driveFieldOrientedAnglularVelocity = m_drivetrain.driveCommand(
         () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driver.getRightX());
 
-    Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
+    Command driveFieldOrientedDirectAngleSim = m_drivetrain.simDriveCommand(
         () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
         () -> driver.getRawAxis(2));
 
-    drivebase.setDefaultCommand(
+    m_drivetrain.setDefaultCommand(
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
 
       NamedCommands.registerCommand("Prime", new Prime(m_shooter));
@@ -123,12 +122,12 @@ public class RobotContainer{
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    // driver.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    // driver.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+    driver.a().onTrue((Commands.runOnce(m_drivetrain::zeroGyro)));
+    // driver.x().onTrue(Commands.runOnce(m_drivetrain::addFakeVisionReading));
     // driver.b().whileTrue(
-    //     Commands.deferredProxy(() -> drivebase.driveToPose(
+    //     Commands.deferredProxy(() -> m_drivetrain.driveToPose(
     //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))));
-    // driver.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    // driver.x().whileTrue(Commands.runOnce(m_drivetrain::lock, m_drivetrain).repeatedly());
 
     /*
     driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
@@ -160,11 +159,11 @@ public class RobotContainer{
 
   public void setDriveMode()
   {
-    //drivebase.setDefaultCommand();
+    //m_drivetrain.setDefaultCommand();
   }
 
   public void setMotorBrake(boolean brake)
   {
-    drivebase.setMotorBrake(brake);
+    m_drivetrain.setMotorBrake(brake);
   }
 }

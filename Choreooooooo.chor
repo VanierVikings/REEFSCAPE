@@ -1345,7 +1345,7 @@
                     }
                 }
             ],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "8 to source": {
             "waypoints": [
