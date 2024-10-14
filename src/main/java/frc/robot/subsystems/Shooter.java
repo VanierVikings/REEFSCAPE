@@ -40,6 +40,8 @@ public class Shooter extends SubsystemBase {
         shooterPrimeRight.setSmartCurrentLimit(ShooterConstants.currentLimit);
         shooterPrimeLeft.setIdleMode(IdleMode.kBrake);
         shooterPrimeRight.setIdleMode(IdleMode.kBrake);
+        shooterPrimeLeft.setInverted(true);
+        shooterPrimeRight.setInverted(true);
 
         m_leftPIDController.setTolerance(ShooterConstants.tolerance);
         m_rightPIDController.setTolerance(ShooterConstants.tolerance);

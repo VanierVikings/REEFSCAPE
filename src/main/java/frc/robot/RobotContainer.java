@@ -10,7 +10,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,10 +20,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ClimbDown;
+import frc.robot.commands.ClimbUp;
 import frc.robot.commands.FloorIntake;
 import frc.robot.commands.Prime;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -41,16 +46,19 @@ public class RobotContainer{
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve"));
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
+  private final Climbers m_climbers = new Climbers();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   private final SendableChooser<Command> autoChooser;
-
+  PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer()
   {
+    PDH.setSwitchableChannel(true);
+
     // Configure the trigger bindings
     configureBindings();
     AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
@@ -114,13 +122,17 @@ public class RobotContainer{
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-    driverXbox.b().whileTrue(
-        Commands.deferredProxy(() -> drivebase.driveToPose(
-                                   new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-                              ));
-    driverXbox.leftTrigger().whileTrue(new FloorIntake(m_intake));
+    // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+    // driverXbox.b().whileTrue(
+    //     Commands.deferredProxy(() -> drivebase.driveToPose(
+    //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+    //                           ));
+    driverXbox.rightTrigger().whileTrue(new FloorIntake(m_intake));
+    driverXbox.leftTrigger().whileTrue(new Prime(m_shooter));
+    driverXbox.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
+    driverXbox.a().whileTrue(new ClimbDown(m_climbers));
+    driverXbox.y().whileTrue(new ClimbUp(m_climbers));
     // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
   }
 

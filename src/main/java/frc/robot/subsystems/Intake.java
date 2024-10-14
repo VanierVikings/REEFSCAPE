@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -10,11 +11,14 @@ import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
 
-    DigitalInput beamBreak = new DigitalInput(9);
+    DigitalInput beamBreak = new DigitalInput(0);
     private final VictorSPX intakeBottom = new VictorSPX(DeviceIDs.intakeBottom);
-    private final VictorSPX intakeTop = new VictorSPX(DeviceIDs.intakeTop);  
+    private final VictorSPX intakeTop = new VictorSPX(DeviceIDs.intakeTop);
     public Intake() {
         intakeBottom.setInverted(true);
+        intakeTop.setNeutralMode(NeutralMode.Brake);
+        intakeBottom.setNeutralMode(NeutralMode.Brake);
+
     }
 
     public void startIntake(){
@@ -22,9 +26,15 @@ public class Intake extends SubsystemBase {
         intakeTop.set(VictorSPXControlMode.PercentOutput, IntakeConstants.topSpeed);
     }
 
+
     public void stopIntake() {
         intakeBottom.set(VictorSPXControlMode.PercentOutput, 0);
         intakeTop.set(VictorSPXControlMode.PercentOutput, 0);
+    }
+
+    public void holdNote(){
+        intakeBottom.set(VictorSPXControlMode.PercentOutput, -IntakeConstants.bottomSpeed*0.2);
+        intakeTop.set(VictorSPXControlMode.PercentOutput, -IntakeConstants.topSpeed*0.2);
     }
 
     public Boolean hasNote(){

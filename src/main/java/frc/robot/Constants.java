@@ -64,6 +64,10 @@ public final class Constants
     public static final int intakeTop = 21;
     public static final int shooterLeft = 22;
     public static final int shooterRight = 23;
+    public static final int leftClimbSwitch = 8;
+    public static final int rightClimbSwitch = 9;
+    public static final int leftClimb = 24;
+    public static final int rightClimb = 25;
 
   }
 
