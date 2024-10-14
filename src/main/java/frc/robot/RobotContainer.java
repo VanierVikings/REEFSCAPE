@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -48,7 +49,8 @@ public class RobotContainer{
   private final Climbers m_climbers = new Climbers();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driver = new CommandXboxController(0);
+  final CommandXboxController operator = new CommandXboxController(1);
   private final SendableChooser<Command> autoChooser;
   PowerDistribution PDH = new PowerDistribution(1, ModuleType.kRev);
   /**
@@ -61,16 +63,16 @@ public class RobotContainer{
     // Configure the trigger bindings
     configureBindings();
     AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
-    () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
+    () -> -MathUtil.applyDeadband(driver.getLeftY(),
                                 OperatorConstants.LEFT_Y_DEADBAND),
-    () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
+    () -> -MathUtil.applyDeadband(driver.getLeftX(),
                                 OperatorConstants.LEFT_X_DEADBAND),
-    () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
+    () -> -MathUtil.applyDeadband(driver.getRightX(),
                                 OperatorConstants.RIGHT_X_DEADBAND),
-    driverXbox.getHID()::getYButtonPressed,
-    driverXbox.getHID()::getAButtonPressed,
-    driverXbox.getHID()::getXButtonPressed,
-    driverXbox.getHID()::getBButtonPressed);
+    driver.getHID()::getYButtonPressed,
+    driver.getHID()::getAButtonPressed,
+    driver.getHID()::getXButtonPressed,
+    driver.getHID()::getBButtonPressed);
 
     // Applies deadbands and inverts controls because joysticks
     // are back-right positive while robot
@@ -78,10 +80,10 @@ public class RobotContainer{
     // left stick controls translation
     // right stick controls the desired angle NOT angular rotation
     Command driveFieldOrientedDirectAngle = drivebase.driveCommand(
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX(),
-        () -> driverXbox.getRightY());
+        () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> driver.getRightX(),
+        () -> driver.getRightY());
 
     // Applies deadbands and inverts controls because joysticks
     // are back-right positive while robot
@@ -89,14 +91,14 @@ public class RobotContainer{
     // left stick controls translation
     // right stick controls the angular velocity of the robot
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRightX() * 1);
+        () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> driver.getRightX());
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
-        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> driverXbox.getRawAxis(2));
+        () -> MathUtil.applyDeadband(driver.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driver.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> driver.getRawAxis(2));
 
     drivebase.setDefaultCommand(
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
@@ -121,19 +123,28 @@ public class RobotContainer{
   {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
 
-    // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-    // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-    // driverXbox.b().whileTrue(
+    // driver.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+    // driver.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+    // driver.b().whileTrue(
     //     Commands.deferredProxy(() -> drivebase.driveToPose(
-    //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-    //                           ));
-    driverXbox.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
-    driverXbox.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
-    driverXbox.leftTrigger().whileTrue(new Prime(m_shooter));
-    driverXbox.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
-    driverXbox.a().whileTrue(new Climb(m_climbers, 1));
-    driverXbox.y().whileTrue(new Climb(m_climbers, -1));
-    // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+    //                                new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))));
+    // driver.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+
+    /*
+    driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
+    driver.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
+    driver.leftTrigger().whileTrue(new Prime(m_shooter));
+    driver.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
+    driver.a().whileTrue(new Climb(m_climbers, 1));
+    driver.y().whileTrue(new Climb(m_climbers, -1));
+    */
+
+    operator.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
+    operator.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
+    operator.leftTrigger().whileTrue(new Prime(m_shooter));
+    operator.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
+    operator.a().whileTrue(new Climb(m_climbers, 1));
+    operator.y().whileTrue(new Climb(m_climbers, -1));
   }
 
   /**
