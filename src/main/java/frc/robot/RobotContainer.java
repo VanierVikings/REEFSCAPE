@@ -109,12 +109,12 @@ public class RobotContainer {
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
 
     NamedCommands.registerCommand("Prime", new Prime(m_shooter));
-    NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake));
-    NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake, 1));
+    NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake, m_led));
+    NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake, 1, m_led));
     autoChooser = AutoBuilder.buildAutoChooser();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    m_led.setColor(Color.kAliceBlue);
+    m_led.setColor(Color.kAliceBlue, false);
   }
 
   /**
@@ -141,10 +141,10 @@ public class RobotContainer {
     // driver.x().whileTrue(Commands.runOnce(m_drivetrain::lock,
     // m_drivetrain).repeatedly());
 
-    driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
-    driver.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
+    driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1, m_led));
+    driver.rightBumper().whileTrue(new FloorIntake(m_intake, -1, m_led));
     driver.leftTrigger().whileTrue(new Prime(m_shooter));
-    driver.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
+    driver.leftBumper().whileTrue(new Shoot(m_shooter, m_intake, m_led));
     driver.a().whileTrue(new Climb(m_climbers, 1));
     driver.y().whileTrue(new Climb(m_climbers, -1));
 
