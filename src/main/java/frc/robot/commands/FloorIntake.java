@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
-
+import frc.robot.subsystems.LED.States;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +21,7 @@ public class FloorIntake extends Command {
 
   @Override
   public void initialize() {
-    m_led.setColor(Color.kLightYellow, true);
+    m_led.requestState(States.IntakeActive);
     m_intake.startIntake(direction);
   }
 
@@ -33,9 +33,9 @@ public class FloorIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     if (m_intake.hasNote()){
-      m_led.setColor(Color.kDarkRed, false);
-    } else {
-      m_led.setColor(Color.kAliceBlue, false);
+      m_led.requestState(States.IntakedNote);;
+    } else{
+      m_led.requestState(States.Default);
     }
     m_intake.stopIntake();
   }

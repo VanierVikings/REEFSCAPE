@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -30,6 +31,7 @@ import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.LED.States;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
@@ -51,7 +53,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
   private final Climbers m_climbers = new Climbers();
-  private final LED m_led = new LED();
+  private final LED m_led= LED.getInstance();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driver = new CommandXboxController(0);
@@ -64,6 +66,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     PDH.setSwitchableChannel(true);
+    
 
     // Configure the trigger bindings
     configureBindings();
@@ -108,13 +111,12 @@ public class RobotContainer {
     m_drivetrain.setDefaultCommand(
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
 
-    NamedCommands.registerCommand("Prime", new Prime(m_shooter));
+    NamedCommands.registerCommand("Prime", new Prime(m_shooter, m_led, m_intake));
     NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake, m_led));
     NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake, 1, m_led));
     autoChooser = AutoBuilder.buildAutoChooser();
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    m_led.setColor(Color.kAliceBlue, false);
   }
 
   /**
@@ -143,7 +145,7 @@ public class RobotContainer {
 
     driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1, m_led));
     driver.rightBumper().whileTrue(new FloorIntake(m_intake, -1, m_led));
-    driver.leftTrigger().whileTrue(new Prime(m_shooter));
+    driver.leftTrigger().whileTrue(new Prime(m_shooter, m_led, m_intake));
     driver.leftBumper().whileTrue(new Shoot(m_shooter, m_intake, m_led));
     driver.a().whileTrue(new Climb(m_climbers, 1));
     driver.y().whileTrue(new Climb(m_climbers, -1));
@@ -175,4 +177,13 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     m_drivetrain.setMotorBrake(brake);
   }
+
+  public void periodic() {
+    if (DriverStation.isDisabled()){
+      m_led.requestState(States.Disabled);
+    }
+  }
 }
+
+
+

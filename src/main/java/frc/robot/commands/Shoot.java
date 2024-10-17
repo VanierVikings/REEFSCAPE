@@ -3,6 +3,7 @@ package frc.robot.commands;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.States;
 import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,18 +29,17 @@ public class Shoot extends Command{
     public void execute() {
         m_shooter.set(ShooterConstants.maxRPM);
         m_intake.startIntake(1);
-        if (m_shooter.atSetpoint()){
-          m_led.setColor(Color.kLimeGreen, true);
-        } else{
-          m_led.setColor(Color.kLimeGreen, false);
-        }
     }
   
     @Override
     public void end(boolean interrupted) {
       m_shooter.stop();
       m_intake.stopIntake();
-      m_led.setColor(Color.kAliceBlue, false);
+      if (m_intake.hasNote()){
+        m_led.requestState(States.IntakedNote);
+      } else{
+        m_led.requestState(States.Default);
+      }
     }
   
     @Override
