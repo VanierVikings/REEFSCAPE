@@ -59,10 +59,8 @@ public final class Constants {
   }
 
   public final class LEDConstants {
-    public static final int PWM_PORT = 1;
-    public static final int NUM_LED = 30;
-    public static final int RAINBOW_START_INDEX = 0;
-    public static final int RAINBOW_END_INDEX = 100;
+    public static final int PWM_PORT = 0;
+    public static final int NUM_LED = 60;
   }
 
   public static final class DeviceIDs {
@@ -70,8 +68,6 @@ public final class Constants {
     public static final int intakeTop = 21;
     public static final int shooterLeft = 22;
     public static final int shooterRight = 23;
-    public static final int leftClimbSwitch = 8;
-    public static final int rightClimbSwitch = 9;
     public static final int leftClimb = 24;
     public static final int rightClimb = 25;
 

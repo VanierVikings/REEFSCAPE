@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class Climb extends Command {
     private static Climbers m_climbers;
-    private static double direction;
+    private double direction;
 
     public Climb(Climbers m_climbers, double direction){
         Climb.m_climbers = m_climbers;
-        Climb.direction = direction;
+        this.direction = direction;
         setName("Climb");
         addRequirements(m_climbers);
     }

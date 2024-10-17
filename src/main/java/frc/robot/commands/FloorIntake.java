@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class FloorIntake extends Command {
   private static Intake m_intake;
-  private static double direction;
+  private double direction;
 
   public FloorIntake(Intake m_intake, double direction) {
     FloorIntake.m_intake = m_intake;
-    FloorIntake.direction = direction;
+    this.direction = direction;
     setName("FloorIntake");
     addRequirements(m_intake);
   }
@@ -28,12 +28,10 @@ public class FloorIntake extends Command {
   @Override
   public void end(boolean interrupted) {
     m_intake.stopIntake();
-    new HoldNoteIntake(m_intake).schedule();
   }
 
   @Override
   public boolean isFinished() {
-    //return m_intake.hasNote();
-    return false;
+    return direction == 1 ? m_intake.hasNote() : false;
   }
 }
