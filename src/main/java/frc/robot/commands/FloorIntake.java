@@ -2,17 +2,16 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
-import frc.robot.subsystems.LED.States;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class FloorIntake extends Command {
   private static Intake m_intake;
-  private static LED m_led;
   private double direction;
 
-  public FloorIntake(Intake m_intake, double direction, LED m_Led) {
+  public FloorIntake(Intake m_intake, double direction) {
     FloorIntake.m_intake = m_intake;
     this.direction = direction;
     setName("FloorIntake");
@@ -21,23 +20,21 @@ public class FloorIntake extends Command {
 
   @Override
   public void initialize() {
-    m_led.requestState(States.IntakeActive);
     m_intake.startIntake(direction);
   }
 
   @Override
   public void execute(){
     SmartDashboard.putBoolean("Has Note", m_intake.hasNote());
+    LED.color = Color.kYellow;
   }
 
   @Override
   public void end(boolean interrupted) {
-    if (m_intake.hasNote()){
-      m_led.requestState(States.IntakedNote);;
-    } else{
-      m_led.requestState(States.Default);
-    }
     m_intake.stopIntake();
+    if (direction == 1) {
+      //Commands.parallel(Commands.waitSeconds(0.5), new FloorIntake(m_intake, -1));
+    }
   }
 
   @Override
