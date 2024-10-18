@@ -20,25 +20,25 @@ public class FloorIntake extends Command {
 
   @Override
   public void initialize() {
-    m_intake.startIntake(direction);
+    switch ((int)(direction)) {
+      case (1):
+        m_intake.intakeSequence(direction);
+      case(-1):
+        m_intake.intakeCommand(direction);
+    }
   }
 
   @Override
   public void execute(){
     SmartDashboard.putBoolean("Has Note", m_intake.hasNote());
-    LED.color = Color.kYellow;
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_intake.stopIntake();
-    if (direction == 1) {
-      //Commands.parallel(Commands.waitSeconds(0.5), new FloorIntake(m_intake, -1));
-    }
   }
 
   @Override
   public boolean isFinished() {
-    return direction == 1 ? m_intake.hasNote() : false;
+    return m_intake.hasNote();
   }
 }

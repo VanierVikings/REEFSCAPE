@@ -33,6 +33,8 @@ public class Shooter extends SubsystemBase {
     private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(ShooterConstants.kS,
       ShooterConstants.kV, ShooterConstants.kA);
 
+    private boolean shooterActive = false;
+
     public Shooter() {
         shooterPrimeLeft.restoreFactoryDefaults();  
         shooterPrimeRight.restoreFactoryDefaults();
@@ -50,6 +52,7 @@ public class Shooter extends SubsystemBase {
 
 
     public void set(double setpoint) {
+        shooterActive = true;
         m_leftPIDController.reset();
         m_rightPIDController.reset();
 
@@ -69,7 +72,12 @@ public class Shooter extends SubsystemBase {
     public void extend() {
     }
 
+    public boolean isShooterActive(){
+        return shooterActive;
+    }
+
     public void stop() {
+        shooterActive = false;
         shooterPrimeRight.stopMotor();
         shooterPrimeLeft.stopMotor();
     }

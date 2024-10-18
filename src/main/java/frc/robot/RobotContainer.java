@@ -27,6 +27,7 @@ import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.LED.States;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
@@ -48,7 +49,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
   private final Climbers m_climbers = new Climbers();
-  private final LED m_Led = new LED();
+  public final LED m_Led = LED.getInstance();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driver = new CommandXboxController(0);
@@ -173,8 +174,21 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     m_drivetrain.setMotorBrake(brake);
   }
-
-  public void periodic() {
+  
+  public void execute() {
+    if (DriverStation.isDisabled()){
+      m_Led.requestState(States.Disabled);
+    } if (m_shooter.atSetpoint()){
+      m_Led.requestState(States.ShooterSpeedReached);
+    } if (m_shooter.isShooterActive()){
+      m_Led.requestState(States.ShooterEnabled);
+    } if (m_intake.hasNote()){
+      m_Led.requestState(States.HasNote);
+    } if (m_intake.isIntakeActive()){
+      m_Led.requestState(States.IntakeNote);
+    } else {
+      m_Led.requestState(States.Default);
+    }
   }
 }
 

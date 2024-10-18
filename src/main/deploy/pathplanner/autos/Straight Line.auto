@@ -18,12 +18,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.05
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "2 to Center.1"
