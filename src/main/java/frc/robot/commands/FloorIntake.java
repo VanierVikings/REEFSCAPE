@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class FloorIntake extends Command {
   private static Intake m_intake;
   private double direction;
+  private int timer;
 
   public FloorIntake(Intake m_intake, double direction) {
     FloorIntake.m_intake = m_intake;
@@ -22,12 +23,16 @@ public class FloorIntake extends Command {
 
   @Override
   public void execute(){
+
     SmartDashboard.putBoolean("Has Note", m_intake.hasNote());
   }
 
   @Override
   public void end(boolean interrupted) {
     m_intake.stopIntake();
+    if (direction == 1) {
+      Commands.parallel(Commands.waitSeconds(0.5), new FloorIntake(m_intake, -1));
+    }
   }
 
   @Override
