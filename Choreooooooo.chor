@@ -862,7 +862,7 @@
                     }
                 }
             ],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "8 to source": {
             "waypoints": [
@@ -897,6 +897,15 @@
                     "x": 0.75224769115448,
                     "y": 4.438469409942627,
                     "heading": 2.097423687579858,
+                    "isInitialGuess": false,
+                    "translationConstrained": true,
+                    "headingConstrained": true,
+                    "controlIntervalCount": 40
+                },
+                {
+                    "x": -0.6561158895492554,
+                    "y": 9.864532470703125,
+                    "heading": 0,
                     "isInitialGuess": false,
                     "translationConstrained": true,
                     "headingConstrained": true,
@@ -1740,7 +1749,7 @@
                     }
                 }
             ],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "Source to 7": {
             "waypoints": [

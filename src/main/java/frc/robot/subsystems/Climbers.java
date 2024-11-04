@@ -11,7 +11,7 @@ public class Climbers extends SubsystemBase{
     private final VictorSPX leftClimbMotor = new VictorSPX(DeviceIDs.leftClimb);
     private final VictorSPX rightClimbMotor = new VictorSPX(DeviceIDs.rightClimb);
     private double leftSpeed = 0.7;
-    private double rightSpeed = 0.6;
+    private double rightSpeed = 0.75;
     public Climbers(){
         leftClimbMotor.setNeutralMode(NeutralMode.Brake);
         rightClimbMotor.setNeutralMode(NeutralMode.Brake);

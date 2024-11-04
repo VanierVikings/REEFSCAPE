@@ -18,13 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Climb;
-import frc.robot.commands.FloorIntake;
-import frc.robot.commands.Prime;
-import frc.robot.commands.Shoot;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.Climbers;
 import frc.robot.subsystems.Intake;
@@ -51,7 +48,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
   private final Climbers m_climbers = new Climbers();
-  private final LED m_led = new LED();
+  //private final LED m_led = new LED();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driver = new CommandXboxController(0);
@@ -108,13 +105,11 @@ public class RobotContainer {
     m_drivetrain.setDefaultCommand(
         !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
 
-    NamedCommands.registerCommand("Prime", new Prime(m_shooter));
-    NamedCommands.registerCommand("Shoot", new Shoot(m_shooter, m_intake));
-    NamedCommands.registerCommand("Floor Intake", new FloorIntake(m_intake, 1));
     autoChooser = AutoBuilder.buildAutoChooser();
 
+    m_intake.hasNote();
+
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    m_led.setColor(Color.kAliceBlue);
   }
 
   /**
@@ -141,12 +136,35 @@ public class RobotContainer {
     // driver.x().whileTrue(Commands.runOnce(m_drivetrain::lock,
     // m_drivetrain).repeatedly());
 
-    driver.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));
-    driver.rightBumper().whileTrue(new FloorIntake(m_intake, -1));
-    driver.leftTrigger().whileTrue(new Prime(m_shooter));
-    driver.leftBumper().whileTrue(new Shoot(m_shooter, m_intake));
-    driver.a().whileTrue(new Climb(m_climbers, 1));
-    driver.y().whileTrue(new Climb(m_climbers, -1));
+    driver.leftTrigger().whileTrue(
+            m_intake.shlurp(1).until(m_intake::hasNote)
+                // When intake finishes, push back slightly
+                .andThen(new WaitCommand(0.1))
+                .andThen(m_intake.shlurp(-1).withTimeout(0.001)
+                //
+
+        ));
+
+
+    driver.y().whileTrue(
+        m_intake.shlurp(-1)
+
+    );
+
+        driver.rightTrigger().whileTrue(
+            // Rev shooter
+            m_shooter.prime(1)
+        );
+
+        driver.x().whileTrue(
+            // Rev shooter
+            m_shooter.prime(-1)
+        );
+        
+        driver.rightBumper().whileTrue(
+            // Shoot: Intake + Prime
+            Commands.parallel(m_intake.shlurp(1), m_shooter.prime(1))
+        );
 
     /*
      * operator.rightTrigger().whileTrue(new FloorIntake(m_intake, 1));

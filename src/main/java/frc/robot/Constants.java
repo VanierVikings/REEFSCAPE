@@ -46,14 +46,14 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final double kP = 1.0;
+    public static final double kP = 1.1;
     public static final double kI = 0.01;
     public static final double kD = 0;
     public static final double kS = 0;
     public static final double kV = 0.26;
     public static final double kA = 0.14;
-    public static final double maxRPM = 5800;
-    public static final int currentLimit = 40;
+    public static final double maxRPM = 6200;
+    public static final int currentLimit = 35;
     public static final int tolerance = 50;
 
   }
@@ -76,8 +76,8 @@ public final class Constants {
   public static final class DrivebaseConstants {
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 15; // seconds
-    public static final int StatorCurrentLimitDrive = 100;
-    public static final int SupplyCurrentLimitDrive = 60;
+    public static final int StatorCurrentLimitDrive = 85;
+    public static final int SupplyCurrentLimitDrive = 50;
     public static final int SteerCurrentLimit = 35;
     public static final int outputGear = 16;
     public static final int pinionGear = 14;

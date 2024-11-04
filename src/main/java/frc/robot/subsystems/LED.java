@@ -11,19 +11,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class LED extends SubsystemBase {
-    private final AddressableLED m_led;
-    private final AddressableLEDBuffer m_ledBuffer;
-    public static Color color = Color.kDarkRed;
+    private static AddressableLED m_led;
+    private static AddressableLEDBuffer m_ledBuffer;
 
     public LED() {
-        m_led = new AddressableLED(LEDConstants.PWM_PORT);
-        m_ledBuffer = new AddressableLEDBuffer(LEDConstants.NUM_LED);
+        LED.m_led = new AddressableLED(LEDConstants.PWM_PORT);
+        LED.m_ledBuffer = new AddressableLEDBuffer(LEDConstants.NUM_LED);
         m_led.setLength(m_ledBuffer.getLength());
         m_led.setData(m_ledBuffer);
-        m_led.start();
     }
 
-    public void setColor(Color color) {
+    public static void setColor(Color color) {
+        m_led.start();
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {
             m_ledBuffer.setRGB(i, (int)(color.red* 255 ), (int)(color.green * 255), (int)(color.blue * 255));
         }
@@ -32,6 +31,5 @@ public class LED extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
     }
 }
