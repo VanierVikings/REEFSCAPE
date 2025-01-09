@@ -144,8 +144,7 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
-
-    driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
+    //driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
   }
   
   /**
