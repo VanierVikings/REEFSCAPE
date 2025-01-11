@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,7 +30,8 @@ public class Elevator extends SubsystemBase {
     private final SparkClosedLoopController elevatorClosedLoopController;
     private final Encoder elevatorEncoder;
 
-        private double L2 = 1.5; // This is only put here bc Andy has all the calculated constants (will have to be in meters)
+        private double L2Height = 1.5; // This is only put here bc Andy has all the calculated constants (will have to be in meters)
+        private double L2Angle = 0.0;
     
         public Elevator() {
         motorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
@@ -122,12 +124,29 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command moveToL2Command() {
-        return run(() -> setElevatorHeight(L2)).until(() -> isAtHeight(L2, 0.01)); // tolerance will be tuned or whatever later
+        return run(
+            () -> setElevatorHeight(L2Height))
+            .alongWith(pivotAngle())
+            .until(() -> isAtHeight(L2Height, 0.01)
+            ); // tolerance will be tuned or whatever later
            
     }
 
-    public void setPivotAngle(double targetAngle){
+    public Command pivotAngle(){
+        return run(() -> setAngle(L2Angle));
+    }
 
+    public double degreesEncoderUnits(double givenAngle){
+        return givenAngle / PivotConstants.ENCODER_TO_DEGREES;
+    }
+
+    public void setAngle(double targetAngle){
+        double encoderUnits = degreesEncoderUnits(targetAngle);
+        pivotClosedLoopController.setReference(encoderUnits, ControlType.kMAXMotionPositionControl);
     }   
+
+    public void resetDutyCycleEncoder(){
+       // pivotEncoder.reset();
+    }
 
 }
