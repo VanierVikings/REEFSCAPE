@@ -28,4 +28,32 @@ public final class Constants {
         public static final double RIGHT_X_DEADBAND = 0.1;
         public static final double TURN_CONSTANT = 6;
     }
+
+    public static class ElevatorConstants {
+        public static final int motorOneID = 9;
+        public static final int motorTwoID = 10;
+
+        public static final double MAX_VELOCITY = 1.0; 
+        public static final double MAX_ACCELERATION = 0.5; 
+        public static final double ENCODER_TO_METERS = 0.01; //distance per pulse 
+        
+        public static final double ELEVATOR_KP = 0.1;
+        public static final double ELEVATOR_KI = 0.0;
+        public static final double ELEVATOR_KD = 0.0;
+
+    }
+
+    public static class PivotConstants {
+        public static final int motorOneID = 11;
+        public static final int motorTwoID = 12;    
+
+        public static final double MAX_VELOCITY = 1.0;
+        public static final double MAX_ACCELERATION = 0.5;
+        public static final double ENCODER_TO_DEGREES = 0.0;
+
+        public static final double PIVOT_KP = 0.1;
+        public static final double PIVOT_KI = 0.0;
+        public static final double PIVOT_KD = 0.0;
+
+    } 
 }
