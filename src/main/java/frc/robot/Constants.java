@@ -55,5 +55,5 @@ public final class Constants {
         public static final double PIVOT_KI = 0.0;
         public static final double PIVOT_KD = 0.0;
 
-    } 
+    }
 }
