@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
         SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
         
         pivotMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
             .p(PivotConstants.PIVOT_KP)
             .i(PivotConstants.PIVOT_KI)
             .d(PivotConstants.PIVOT_KD)
@@ -64,8 +64,6 @@ public class Elevator extends SubsystemBase {
             .maxAcceleration(PivotConstants.MAX_ACCELERATION/ PivotConstants.ENCODER_TO_DEGREES)
             .allowedClosedLoopError(0.0/ PivotConstants.ENCODER_TO_DEGREES);
         PivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        
-        
         
         //how to make motorTwo follow motorOne?? does this work?
         //Elevator motor configuration
@@ -83,8 +81,7 @@ public class Elevator extends SubsystemBase {
         elevatorLimitSwitch.forwardLimitSwitchEnabled(true);
         
         elevatorMotorConfig.encoder
-            .positionConversionFactor(20*Math.PI*((0.85*0.85)) ); //inches for now
-
+            .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); //inches 
 
         elevatorMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) 
@@ -110,7 +107,7 @@ public class Elevator extends SubsystemBase {
         return motorOne.getEncoder().getPosition() * ElevatorConstants.ENCODER_TO_METERS;
     }
 
-    public boolean isAtHeight(double targetHeight, double tolerance) {
+    public boolean checkElevatorHeight(double targetHeight, double tolerance) {
         double currentHeight = getElevatorHeight();
         return Math.abs(currentHeight - targetHeight) < tolerance;
     }
@@ -118,22 +115,24 @@ public class Elevator extends SubsystemBase {
     
     public void resetEncoders() {
         if() {
-          elevatorEncoder.setPosition(0);
+            elevatorEncoder.setPosition(0);
         }
     }
 
-    public Command moveToL2Command() {
-        // tolerance will be tuned or whatever later
-        return run(() -> setAngle(PivotConstants.L2_ANGLE)).andThen(() -> setElevatorHeight(ElevatorConstants.L2)).until(() -> isAtHeight(ElevatorConstants.L2, 0.01)); // tolerance will be tuned or whatever later
-           
+    public double getAngle() {
+        return PivotMotorOne.getEncoder().getPosition() * PivotConstants.ENCODER_TO_DEGREES;
     }
 
-    public Command pivotAngle(){
-        return run(() -> setAngle(PivotConstants.L2_ANGLE));
-    }
+
 
     public double degreesEncoderUnits(double givenAngle){
         return givenAngle / PivotConstants.ENCODER_TO_DEGREES;
+    }
+
+
+    public boolean pivotIsAtAngle(double pivotTargetHeight, double pivotTolerance) {
+        double pivotCurrentHeight = getAngle();
+        return Math.abs(pivotCurrentHeight - pivotTargetHeight) < pivotTolerance;
     }
 
     public void setAngle(double targetAngle){
@@ -142,7 +141,34 @@ public class Elevator extends SubsystemBase {
     }   
 
     public void resetDutyCycleEncoder(){
-       // pivotEncoder.reset();
+       //pivotEncoder.
     }
 
+    public Command moveToL1Command() {
+        // tolerance will be tuned or whatever later
+        return run(
+            () -> setAngle(PivotConstants.L1_ANGLE))
+            .until(()-> pivotIsAtAngle(PivotConstants.L1_ANGLE, 0.0))
+            .andThen(() -> setElevatorHeight(ElevatorConstants.L1))
+            .until(() -> checkElevatorHeight(ElevatorConstants.L1, 0.01)); // tolerance will be tuned or whatever later
+           
+    }
+
+    public Command moveToL2Command() {
+        // tolerance will be tuned or whatever later
+        return run(
+            () -> setAngle(PivotConstants.L2_ANGLE))
+            .until(()-> pivotIsAtAngle(PivotConstants.L2_ANGLE, 0.0))
+            .andThen(() -> setElevatorHeight(ElevatorConstants.L2))
+            .until(() -> checkElevatorHeight(ElevatorConstants.L2, 0.01)); // tolerance will be tuned or whatever later
+    }
+
+    public Command moveToL3Command() {
+        // tolerance will be tuned or whatever later
+        return run(
+            () -> setAngle(PivotConstants.L3_ANGLE))
+            .until(()-> pivotIsAtAngle(PivotConstants.L3_ANGLE, 0.0))
+            .andThen(() -> setElevatorHeight(ElevatorConstants.L3))
+            .until(() -> checkElevatorHeight(ElevatorConstants.L3, 0.01)); // tolerance will be tuned or whatever later 
+    }
 }

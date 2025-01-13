@@ -35,7 +35,7 @@ public final class Constants {
 
         public static final double MAX_VELOCITY = 1.0; 
         public static final double MAX_ACCELERATION = 0.5; 
-        public static final double ENCODER_TO_METERS = 0.01; //distance per pulse 
+        public static final double ENCODER_TO_METERS = 2*20*Math.PI*0.85; //distance per pulse 
         
         public static final double ELEVATOR_KP = 0.1;
         public static final double ELEVATOR_KI = 0.0;
@@ -62,8 +62,19 @@ public final class Constants {
         public static final double L1_ANGLE = 32.74; //degrees
         public static final double L2_ANGLE = 48.70; //degrees
         public static final double L3_ANGLE = 59.55; //degrees
-
-       
-
     }
+
+    public static class EndEffectorConstants {
+        public static final int shooterMotorID = 13;
+        public static final int wristMotorID = 14;
+
+        public static final int WRIST_KI = 0;
+        public static final int WRIST_KP = 0;
+        public static final int WRIST_KD = 0;
+
+        public static final int REEF_ANGLE = 0;
+
+        public static final int WRIST_ENCODER_TO_DEGREES = 45; //degrees
+    }
+
 }
