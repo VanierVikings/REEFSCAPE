@@ -5,9 +5,13 @@
 package frc.robot;
 
 import com.pathplanner.lib.config.PIDConstants;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import swervelib.math.Matter;
 
 public final class Constants {
@@ -28,4 +32,15 @@ public final class Constants {
         public static final double RIGHT_X_DEADBAND = 0.1;
         public static final double TURN_CONSTANT = 6;
     }
+
+    public static final class IntakeConstants {
+
+    SparkMax intakePivot = new SparkMax(12, MotorType.kBrushless);
+    SparkMax intakeRollers = new SparkMax(13, MotorType.kBrushless);
+    SparkMax intakeIndexer = new SparkMax(14, MotorType.kBrushless);
+    DutyCycleEncoder angleMeasure = new DutyCycleEncoder(1);
+    DigitalInput beamBreak = new DigitalInput(9);
+
+    }
 }
+
