@@ -59,6 +59,10 @@ public final class Constants {
         public static final double PIVOT_KI = 0.0;
         public static final double PIVOT_KD = 0.0;
 
+        public static final double L1_ANGLE = 32.74; //degrees
+        public static final double L2_ANGLE = 48.70; //degrees
+        public static final double L3_ANGLE = 59.55; //degrees
+
        
 
     }

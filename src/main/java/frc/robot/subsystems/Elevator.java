@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.DutyCycle;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,10 +28,7 @@ public class Elevator extends SubsystemBase {
     private final SparkClosedLoopController pivotClosedLoopController;
     private final DutyCycleEncoder pivotEncoder;
     private final SparkClosedLoopController elevatorClosedLoopController;
-    private final Encoder elevatorEncoder;
 
-        private double L2Height = 1.5; // This is only put here bc Andy has all the calculated constants (will have to be in meters)
-        private double L2Angle = 0.0;
     private final RelativeEncoder elevatorEncoder;
     private final SparkMaxConfig elevatorMotorConfig;
     private final LimitSwitchConfig elevatorLimitSwitch;
@@ -92,7 +87,7 @@ public class Elevator extends SubsystemBase {
 
 
         elevatorMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder) 
             .p(ElevatorConstants.ELEVATOR_KP) 
             .i(ElevatorConstants.ELEVATOR_KI) 
             .d(ElevatorConstants.ELEVATOR_KD) 
@@ -121,24 +116,20 @@ public class Elevator extends SubsystemBase {
     }
 
     
-    //public void resetEncoders() {
-    //    if() {
-    //        elevatorEncoder.setPosition(0);
-    //    }
-    //}
+    public void resetEncoders() {
+        if() {
+          elevatorEncoder.setPosition(0);
+        }
+    }
 
     public Command moveToL2Command() {
-        return run(
-            () -> setElevatorHeight(L2Height))
-            .alongWith(pivotAngle())
-            .until(() -> isAtHeight(L2Height, 0.01)
-            ); // tolerance will be tuned or whatever later
-        return run(() -> setElevatorHeight(ElevatorConstants.L2)).until(() -> isAtHeight(ElevatorConstants.L2, 0.01)); // tolerance will be tuned or whatever later
+        // tolerance will be tuned or whatever later
+        return run(() -> setAngle(PivotConstants.L2_ANGLE)).andThen(() -> setElevatorHeight(ElevatorConstants.L2)).until(() -> isAtHeight(ElevatorConstants.L2, 0.01)); // tolerance will be tuned or whatever later
            
     }
 
     public Command pivotAngle(){
-        return run(() -> setAngle(L2Angle));
+        return run(() -> setAngle(PivotConstants.L2_ANGLE));
     }
 
     public double degreesEncoderUnits(double givenAngle){
