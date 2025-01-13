@@ -41,6 +41,10 @@ public final class Constants {
         public static final double ELEVATOR_KI = 0.0;
         public static final double ELEVATOR_KD = 0.0;
 
+        public static final double L1 = 84.55; //cm
+        public static final double L2 = 107.76; //cm
+        public static final double L3 = 140.33;  //cm
+
     }
 
     public static class PivotConstants {
@@ -54,6 +58,8 @@ public final class Constants {
         public static final double PIVOT_KP = 0.1;
         public static final double PIVOT_KI = 0.0;
         public static final double PIVOT_KD = 0.0;
+
+       
 
     }
 }
