@@ -1,8 +1,14 @@
+package frc.robot.subsystems;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.IntakeConstants;
 
 public class CoralIntake {
@@ -23,10 +29,10 @@ public class CoralIntake {
         intakeIndexer = new SparkMax(14, MotorType.kBrushless);
         angleMeasure = new DutyCycleEncoder(1);
         beamBreak = new DigitalInput(9);
-        pivotController = new intakePivot.getClosedLoopController();
+        pivotController = intakePivot.getClosedLoopController();
         angleMeasure = new DutyCycleEncoder(1);
         config = new SparkMaxConfig();
-        config.closedloop.maxMotion.maxVelocity(maxVel).maxAcceleration(maxAccel).allowedClosedLoopError(allowedErr);
+        config.closedLoop.maxMotion.maxVelocity(maxVel).maxAcceleration(maxAccel).allowedClosedLoopError(allowedErr);
 
     }
 
@@ -37,8 +43,7 @@ public Boolean coralGrabbed(){
 
 
 public void pivoter(double targetPosition){
-    // pivates the intake down to colllect coral
-    pivotController.setReference(targetPosition-angleMeasure.get.distance(), SparkMax.ControlType.kMAXMotionPositionControl);
+    pivotController.setReference(targetPosition-angleMeasure.get(), SparkMax.ControlType.kMAXMotionPositionControl);
 
 } 
 
