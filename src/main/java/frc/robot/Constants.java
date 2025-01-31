@@ -53,7 +53,6 @@ public final class Constants {
 
         public static final double MAX_VELOCITY = 1.0;
         public static final double MAX_ACCELERATION = 0.5;
-        public static final double ENCODER_TO_DEGREES = 0.0;
 
         public static final double PIVOT_KP = 0.1;
         public static final double PIVOT_KI = 0.0;
@@ -68,13 +67,17 @@ public final class Constants {
         public static final int shooterMotorID = 13;
         public static final int wristMotorID = 14;
 
-        public static final int WRIST_KI = 0;
-        public static final int WRIST_KP = 0;
-        public static final int WRIST_KD = 0;
+        public static final double WRIST_KI = 0;
+        public static final double WRIST_KP = 0;
+        public static final double WRIST_KD = 0;
 
-        public static final int REEF_ANGLE = 0;
+        public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
 
-        public static final int WRIST_ENCODER_TO_DEGREES = 45; //degrees
+        public static final double REEF_ANGLE = 0;
+        public static final double wristL1_Angle = 0; //must change
+        public static final double wristL2_ANGLE = 0; //must change
+        public static final double wristL3_ANGLE = 0; //must change
+        
     }
 
 }

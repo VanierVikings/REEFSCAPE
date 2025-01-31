@@ -22,6 +22,8 @@ public class EndEffector extends SubsystemBase {
     private final SparkMax wristMotor;
     private final SparkMax shooterMotor;
     private final RelativeEncoder wristEncoder;
+    private final SparkClosedLoopController wristClosedLoopController;
+    private final SparkClosedLoopController shooterClosedLoopController;
 
     
     public EndEffector() {
@@ -31,6 +33,9 @@ public class EndEffector extends SubsystemBase {
 
         
         SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
+
+        wristClosedLoopController = wristMotor.getClosedLoopController();
+        shooterClosedLoopController = shooterMotor.getClosedLoopController();
 
         wristMotorConfig.encoder
             .positionConversionFactor(EndEffectorConstants.WRIST_ENCODER_TO_DEGREES);
@@ -43,7 +48,28 @@ public class EndEffector extends SubsystemBase {
 
 
     }
+
+    public double getAngle(){
+        return wristMotor.getEncoder().getPosition(); 
+    }
+
+    public boolean atAngle(){
+        return getAngle() == EndEffectorConstants.wristL1_Angle;
+    }
+
+    public void setAngle(double targetAngle){
+        wristClosedLoopController.setReference(targetAngle, ControlType.kMAXMotionPositionControl);
+    } //Set the angle of the wrist
+
+
+    public void runShooter(double speed){
+            shooterClosedLoopController.setReference(speed, ControlType.kVelocity);//idk the control type
+    }
     
-    
+    public Command wristL1PosCommand(){
+        return run( ()-> setAngle(EndEffectorConstants.wristL1_Angle))
+        .until(()-> atAngle())
+        .andThen(runShooter(speed)).withTimeout(0.110); //speed unknown for now
+    }
     
 }

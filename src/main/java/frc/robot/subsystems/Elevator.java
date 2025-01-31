@@ -7,22 +7,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PivotConstants;
 
-import static java.lang.Math.PI;
 
 public class Elevator extends SubsystemBase {
-    private final SparkMax motorOne;
-    private final SparkMax motorTwo;
+    private final SparkMax ElevatorMotorOne;
+    private final SparkMax ElevatorMotorTwo;
     private final SparkMax PivotMotorOne;
     private final SparkMax PivotMotorTwo;
     private final SparkClosedLoopController pivotClosedLoopController;
@@ -31,11 +31,11 @@ public class Elevator extends SubsystemBase {
 
     private final RelativeEncoder elevatorEncoder;
     private final SparkMaxConfig elevatorMotorConfig;
-    private final LimitSwitchConfig elevatorLimitSwitch;
+    private final SparkLimitSwitch elevatorLimitSwitch;
     
         public Elevator() {
-        motorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
-        motorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);
+        ElevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
+        ElevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);
         
         PivotMotorOne = new SparkMax(PivotConstants.motorOneID, MotorType.kBrushless);
         PivotMotorTwo = new SparkMax(PivotConstants.motorTwoID, MotorType.kBrushless);
@@ -53,32 +53,32 @@ public class Elevator extends SubsystemBase {
         SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
         
         pivotMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .p(PivotConstants.PIVOT_KP)
             .i(PivotConstants.PIVOT_KI)
             .d(PivotConstants.PIVOT_KD)
             .outputRange(0,0);
 
         pivotMotorConfig.closedLoop.maxMotion
-            .maxVelocity(PivotConstants.MAX_VELOCITY/ PivotConstants.ENCODER_TO_DEGREES)
-            .maxAcceleration(PivotConstants.MAX_ACCELERATION/ PivotConstants.ENCODER_TO_DEGREES)
-            .allowedClosedLoopError(0.0/ PivotConstants.ENCODER_TO_DEGREES);
+            .maxVelocity(PivotConstants.MAX_VELOCITY)
+            .maxAcceleration(PivotConstants.MAX_ACCELERATION)
+            .allowedClosedLoopError(0.0);
         PivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         
-        //how to make motorTwo follow motorOne?? does this work?
         //Elevator motor configuration
         SparkMaxConfig follow = new SparkMaxConfig();
         follow.follow(9, true); 
-        motorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        ElevatorMotorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
-        elevatorClosedLoopController = motorOne.getClosedLoopController();
+        elevatorClosedLoopController = ElevatorMotorOne.getClosedLoopController();
 
-        elevatorEncoder = motorOne.getEncoder();
+        elevatorEncoder = ElevatorMotorOne.getEncoder();
 
         elevatorMotorConfig = new SparkMaxConfig();
         
-        elevatorLimitSwitch = elevatorMotorConfig.limitSwitch;
-        elevatorLimitSwitch.forwardLimitSwitchEnabled(true);
+        elevatorLimitSwitch = ElevatorMotorOne.getForwardLimitSwitch();
+
+        elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
         
         elevatorMotorConfig.encoder
             .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); //inches 
@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase {
             .maxAcceleration(ElevatorConstants.MAX_ACCELERATION / ElevatorConstants.ENCODER_TO_METERS) 
             .allowedClosedLoopError(0.01 / ElevatorConstants.ENCODER_TO_METERS); 
 
-        motorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        ElevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 }
 
     public void setElevatorHeight(double targetHeight) {
@@ -104,7 +104,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getElevatorHeight() {
-        return motorOne.getEncoder().getPosition() * ElevatorConstants.ENCODER_TO_METERS;
+        return ElevatorMotorOne.getEncoder().getPosition() * ElevatorConstants.ENCODER_TO_METERS;
     }
 
     public boolean checkElevatorHeight(double targetHeight, double tolerance) {
@@ -114,19 +114,13 @@ public class Elevator extends SubsystemBase {
 
     
     public void resetEncoders() {
-        if() {
+        if(elevatorLimitSwitch.isPressed()) {
             elevatorEncoder.setPosition(0);
         }
     }
 
     public double getAngle() {
-        return PivotMotorOne.getEncoder().getPosition() * PivotConstants.ENCODER_TO_DEGREES;
-    }
-
-
-
-    public double degreesEncoderUnits(double givenAngle){
-        return givenAngle / PivotConstants.ENCODER_TO_DEGREES;
+        return PivotMotorOne.getEncoder().getPosition();
     }
 
 
@@ -136,13 +130,9 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setAngle(double targetAngle){
-        double encoderUnits = degreesEncoderUnits(targetAngle);
-        pivotClosedLoopController.setReference(encoderUnits, ControlType.kMAXMotionPositionControl);
+        pivotClosedLoopController.setReference(targetAngle, ControlType.kMAXMotionPositionControl);
     }   
 
-    public void resetDutyCycleEncoder(){
-       //pivotEncoder.
-    }
 
     public Command moveToL1Command() {
         // tolerance will be tuned or whatever later
