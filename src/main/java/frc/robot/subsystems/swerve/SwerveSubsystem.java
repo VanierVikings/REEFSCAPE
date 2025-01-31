@@ -36,7 +36,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.swerve.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -67,7 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -85,6 +84,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param directory Directory of swerve drive config files.
    */
   public SwerveSubsystem(File directory) {
+    setupPathPlanner();
     SmartDashboard.putData("Field", m_field);
 
     // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
@@ -131,13 +131,7 @@ public class SwerveSubsystem extends SubsystemBase {
             // periodically when they are not moving.
     swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the
                                          // offsets onto it. Throws warning if not possible
-    if (visionDriveTest) {
-      setupPhotonVision();
-      // Stop the odometry thread if we are using vision that way we can synchronize
-      // updates better.
-      swerveDrive.stopOdometryThread();
-    }
-    setupPathPlanner();
+    setupLimelight();
   }
 
   /**
@@ -157,17 +151,21 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Setup the photon vision class.
    */
-  public void setupPhotonVision() {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+  public void setupLimelight() {
+    Vision.setPipelineIndex("April Tags", 0);
+    
+
+    double tx = Vision.getTX("");
+    double ty = Vision.getTY("");
+    double ta = Vision.getTA("");
+    boolean hasTarget = Vision.getTV("");
   }
 
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest) {
-      swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
-    }
+    
+    
 
     m_field.setRobotPose(getPose());
   }
@@ -248,21 +246,7 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @return A {@link Command} which will run the alignment.
    */
-  public Command aimAtTarget(Cameras camera) {
 
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent()) {
-        var result = resultO.get();
-        if (result.hasTargets()) {
-          drive(getTargetSpeeds(0,
-              0,
-              Rotation2d.fromDegrees(result.getBestTarget()
-                  .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
-  }
 
   /**
    * Get the path follower with events.
@@ -291,7 +275,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // Since AutoBuilder is configured, we can use it to build pathfinding commands
     return AutoBuilder.pathfindToPose(
         pose,
-        constraints,
+        constraints,  
         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
     );
   }
@@ -565,7 +549,7 @@ public class SwerveSubsystem extends SubsystemBase {
       //If bot faces wrong direction, remove .plus(...)
       Pose2d facingPose = new Pose2d(robotPose.getTranslation(), nearestReefTag.getRotation().plus(Rotation2d.k180deg));
       //Vroom Vroom!!
-      driveToPose(facingPose);
+      driveToPose(new Pose2d(1,1, Rotation2d.k180deg));
     }
   }
 
