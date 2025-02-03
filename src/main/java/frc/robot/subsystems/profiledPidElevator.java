@@ -27,7 +27,8 @@ public class profiledPidElevator extends SubsystemBase{
     private final SparkMax ElevatorMotorTwo;
     private final SparkMax PivotMotorOne;
     private final SparkMax PivotMotorTwo;
-    private final TrapezoidProfile.Constraints m_constraints;
+    private final ProfiledPIDController pPidOne;
+    private final ProfiledPIDController pPidTwo;
 
 
     public profiledPidElevator() {
@@ -37,7 +38,9 @@ public class profiledPidElevator extends SubsystemBase{
         PivotMotorOne = new SparkMax(PivotConstants.motorOneID, MotorType.kBrushless);
         PivotMotorTwo = new SparkMax(PivotConstants.motorTwoID, MotorType.kBrushless);
 
-        m_constraints = new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
+        pPidOne = new ProfiledPIDController(ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD, new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION));   
+        pPidTwo = new ProfiledPIDController(ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD, new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION));
+        
         
         ProfiledPIDController controller = new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD, 
@@ -57,8 +60,19 @@ public class profiledPidElevator extends SubsystemBase{
         PivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
 
-        ElevatorMotorOne.set(controller.calculate(ElevatorMotorOne.getEncoder().getPosition(), ElevatorConstants.L1));
+        TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(5, 10));
         
-        ElevatorMotorOne.set
+        var setpoint = profile.calculate(elapsedTime, TrapezoidProfile.State(elevatorEncoder.getDistance(), 0);, goalState);
+        controller.calculate(encoder.getDistance(), setpoint.position);
+        
+        
+        
+        
+    }
+
+    public void setElevatorState(double position){
+        TrapezoidProfile.State currentOne;
+        TrapezoidProfile.State nextOne;
+        
     }
 }
