@@ -74,7 +74,7 @@ public final class Constants {
         public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
 
         public static final double REEF_ANGLE = 0;
-        public static final double wristL1_Angle = 0; //must change
+        public static final double wristL1_Angle = 0; //must change due to the wrist
         public static final double wristL2_ANGLE = 0; //must change
         public static final double wristL3_ANGLE = 0; //must change
         

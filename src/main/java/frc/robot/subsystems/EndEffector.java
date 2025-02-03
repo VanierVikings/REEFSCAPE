@@ -14,8 +14,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.EndEffectorConstants;
 
 public class EndEffector extends SubsystemBase {
@@ -46,7 +44,6 @@ public class EndEffector extends SubsystemBase {
             .i(EndEffectorConstants.WRIST_KI)
             .d(EndEffectorConstants.WRIST_KD);
 
-
     }
 
     public double getAngle(){
@@ -63,7 +60,7 @@ public class EndEffector extends SubsystemBase {
 
 
     public void runShooter(double speed){
-            shooterClosedLoopController.setReference(speed, ControlType.kVelocity);//idk the control type
+        shooterClosedLoopController.setReference(speed, ControlType.kVelocity);//idk the control type
     }
     
     public Command wristL1PosCommand(){
