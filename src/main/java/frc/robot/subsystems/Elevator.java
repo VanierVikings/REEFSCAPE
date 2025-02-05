@@ -76,9 +76,11 @@ public class Elevator extends SubsystemBase {
 
         elevatorMotorConfig = new SparkMaxConfig();
         
-        elevatorLimitSwitch = ElevatorMotorOne.getForwardLimitSwitch();
+        //elevatorLimitSwitch = ElevatorMotorOne.getForwardLimitSwitch();
 
-        elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
+        //elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
+
+        //elevatorMotorConfig.limitSwitch.fo
         
         elevatorMotorConfig.encoder
             .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); //inches 
@@ -113,11 +115,11 @@ public class Elevator extends SubsystemBase {
     }
 
     
-    public void resetEncoders() {
-        if(elevatorLimitSwitch.isPressed()) {
-            elevatorEncoder.setPosition(0);
-        }
-    }
+    //public void resetEncoders() {
+    //     if(elevatorLimitSwitch.isPressed()) {
+    //         elevatorEncoder.setPosition(0);
+    //     }
+    // }
 
     public double getAngle() {
         return PivotMotorOne.getEncoder().getPosition();
@@ -131,8 +133,15 @@ public class Elevator extends SubsystemBase {
 
     public void setAngle(double targetAngle){
         pivotClosedLoopController.setReference(targetAngle, ControlType.kMAXMotionPositionControl);
-    }   
-
+    }
+       
+    public Command intake() {
+        return run(
+            () -> setElevatorHeight(0))
+            .until(() -> checkElevatorHeight(0, 0.01))
+            .andThen(() -> setAngle(0))
+            .until(() -> pivotIsAtAngle(0, 0.01));  
+    }
 
     public Command moveToL1Command() {
         // tolerance will be tuned or whatever later

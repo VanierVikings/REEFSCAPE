@@ -45,6 +45,10 @@ public final class Constants {
         public static final double L2 = 107.76; //cm
         public static final double L3 = 140.33;  //cm
 
+        public static final double goal_position = 0;
+        public static final double goal_velocity = 0;
+        public static final double time = 0;
+
     }
 
     public static class PivotConstants {
@@ -73,11 +77,27 @@ public final class Constants {
 
         public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
 
+        public static final double intakeANGLE = 0;
         public static final double REEF_ANGLE = 0;
-        public static final double wristL1_Angle = 0; //must change due to the wrist
+        public static final double wristL1_ANGLE = 0; //must change due to the wrist
         public static final double wristL2_ANGLE = 0; //must change
         public static final double wristL3_ANGLE = 0; //must change
         
+        
+
+        public static final double shooterMaxVelocity = 5676; //rpm
+        
+    }
+
+    public static class profiledPidElevatorConstants {
+        public static final double ELEVATOR_KS = 0;
+        public static final double ELEVATOR_KG = 0;
+        public static final double ELEVATOR_KV = 0;
+    }
+
+    public static class hangConstants{
+        public static final double CAGE_ANGLE = 0; //change
+
     }
 
 }
