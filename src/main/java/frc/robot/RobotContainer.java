@@ -22,6 +22,10 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
 
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.EndEffector;
+
+
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a "declarative" paradigm, very
@@ -34,6 +38,8 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  private final static Elevator m_elevator = new Elevator();
+  private final static EndEffector m_endEffector = new EndEffector();
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve/neo"));
@@ -146,7 +152,12 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
+    
     //driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
+    driverXbox.leftTrigger().whileTrue(closedAbsoluteDriveAdv);
+    driverXbox.y().onTrue(m_elevator.moveToL1Command());
+    driverXbox.a().onTrue(m_elevator.moveToL2Command());
+    
   }
 
   /**
@@ -165,5 +176,7 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);
-  }
+  }  
+  
+  
 }

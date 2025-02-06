@@ -43,6 +43,7 @@ public final class Constants {
         public static final double ELEVATOR_KI = 0.0;
         public static final double ELEVATOR_KD = 0.0;
 
+        public static final double L0 = 0; //cm
         public static final double L1 = 84.55; //cm
         public static final double L2 = 107.76; //cm
         public static final double L3 = 140.33;  //cm
@@ -50,6 +51,8 @@ public final class Constants {
         public static final double goal_position = 0;
         public static final double goal_velocity = 0;
         public static final double time = 0;
+
+        public static final int ELEVATOR_CURRENT_LIMIT = 20; //amps
 
     }
 
@@ -67,6 +70,8 @@ public final class Constants {
         public static final double L1_ANGLE = 32.74; //degrees
         public static final double L2_ANGLE = 48.70; //degrees
         public static final double L3_ANGLE = 59.55; //degrees
+
+        public static final int PIVOT_CURRENT_LIMIT = 20; //amps
     }
 
     public static class EndEffectorConstants {
@@ -84,10 +89,11 @@ public final class Constants {
         public static final double wristL1_ANGLE = 0; //must change due to the wrist
         public static final double wristL2_ANGLE = 0; //must change
         public static final double wristL3_ANGLE = 0; //must change
-        
-        
-
+    
         public static final double shooterMaxVelocity = 5676; //rpm
+
+        public static final int WRIST_CURRENT_LIMIT = 20; //amps
+        public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
         
     }
 
@@ -95,6 +101,8 @@ public final class Constants {
         public static final double ELEVATOR_KS = 0;
         public static final double ELEVATOR_KG = 0;
         public static final double ELEVATOR_KV = 0;
+
+        //public static final double ELEVATOR
     }
 
     public static class hangConstants{

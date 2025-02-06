@@ -36,7 +36,7 @@ public class profiledPidElevator extends SubsystemBase{
 
     private final RelativeEncoder elevatorEncoder;
     private final SparkMaxConfig elevatorMotorConfig;
-    private final SparkLimitSwitch elevatorLimitSwitch;
+    //private final SparkLimitSwitch elevatorLimitSwitch;
 
     public profiledPidElevator() {
         ElevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
@@ -45,9 +45,14 @@ public class profiledPidElevator extends SubsystemBase{
         PivotMotorOne = new SparkMax(PivotConstants.motorOneID, MotorType.kBrushless);
         PivotMotorTwo = new SparkMax(PivotConstants.motorTwoID, MotorType.kBrushless);
         pivotClosedLoopController = PivotMotorOne.getClosedLoopController();  
+        elevatorClosedLoopController = ElevatorMotorOne.getClosedLoopController();
+
         TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION));
 
         elevatorEncoder = ElevatorMotorOne.getEncoder();
+
+        elevatorMotorConfig = new SparkMaxConfig();
+        elevatorMotorConfig.smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT);
 
         pivotEncoder = new DutyCycleEncoder(0);
         pivotEncoder.setDutyCycleRange(0, 0);
@@ -71,7 +76,7 @@ public class profiledPidElevator extends SubsystemBase{
 
         ProfiledPIDController controller = new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD, 
-            new TrapezoidProfile.Constraints(5, 10));
+            new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION));
             
         
         SparkMaxConfig follow = new SparkMaxConfig();
@@ -120,6 +125,8 @@ public class profiledPidElevator extends SubsystemBase{
         pivotClosedLoopController.setReference(targetAngle, ControlType.kMAXMotionPositionControl);
     }
 
+
+
      public Command intake() {
         return run(
             () -> setElevatorHeight(0))
@@ -127,6 +134,22 @@ public class profiledPidElevator extends SubsystemBase{
             .andThen(() -> setAngle(0))
             .until(() -> pivotIsAtAngle(0, 0.01));  
     }
+
+    public Command extend() {
+
+        if(getAngle() >= 12){
+        
+        return run(
+            () -> setElevatorHeight(1.3462))
+            .until(() -> checkElevatorHeight(1.3462, 0.01));
+        }
+        else{
+
+        return run(
+            () -> setElevatorHeight(1.27))
+            .until(() -> checkElevatorHeight(1.27, 0.01));
+        }
+        }
 
     public Command moveToL1Command() {
         // tolerance will be tuned or whatever later
@@ -155,4 +178,11 @@ public class profiledPidElevator extends SubsystemBase{
             .andThen(() -> setElevatorHeight(ElevatorConstants.L3))
             .until(() -> checkElevatorHeight(ElevatorConstants.L3, 0.01)); // tolerance will be tuned or whatever later 
     }
+
+    public Command zeroPosition(){
+        return run(
+            () -> setAngle(ElevatorConstants.L0))
+            .until(()-> pivotIsAtAngle(ElevatorConstants.L0, 0));
+    }
+
 }

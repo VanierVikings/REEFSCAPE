@@ -29,7 +29,7 @@ public class Elevator extends SubsystemBase {
 
     private final RelativeEncoder elevatorEncoder;
     private final SparkMaxConfig elevatorMotorConfig;
-    private final SparkLimitSwitch elevatorLimitSwitch;
+    //private final SparkLimitSwitch elevatorLimitSwitch;
     
         public Elevator() {
         ElevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
@@ -49,6 +49,7 @@ public class Elevator extends SubsystemBase {
         pivotEncoder = new DutyCycleEncoder(0);
         pivotEncoder.setDutyCycleRange(0, 0);
         SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
+        pivotMotorConfig.smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT);
         
         pivotMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -73,6 +74,7 @@ public class Elevator extends SubsystemBase {
         elevatorEncoder = ElevatorMotorOne.getEncoder();
 
         elevatorMotorConfig = new SparkMaxConfig();
+        elevatorMotorConfig.smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT);
         
         //elevatorLimitSwitch = ElevatorMotorOne.getForwardLimitSwitch();
 
@@ -134,12 +136,29 @@ public class Elevator extends SubsystemBase {
     }
        
     public Command intake() {
+        
         return run(
             () -> setElevatorHeight(0))
             .until(() -> checkElevatorHeight(0, 0.01))
             .andThen(() -> setAngle(0))
             .until(() -> pivotIsAtAngle(0, 0.01));  
     }
+
+    public Command extend() {
+
+        if(getAngle() >= 12){
+        
+        return run(
+            () -> setElevatorHeight(1.3462))
+            .until(() -> checkElevatorHeight(1.3462, 0.01));
+        }
+        else{
+
+        return run(
+            () -> setElevatorHeight(1.27))
+            .until(() -> checkElevatorHeight(1.27, 0.01));
+        }
+        }
 
     public Command moveToL1Command() {
         // tolerance will be tuned or whatever later
