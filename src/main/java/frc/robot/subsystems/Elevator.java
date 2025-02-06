@@ -18,8 +18,6 @@ import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PivotConstants;
-
-
 public class Elevator extends SubsystemBase {
     private final SparkMax ElevatorMotorOne;
     private final SparkMax ElevatorMotorTwo;
@@ -171,3 +169,5 @@ public class Elevator extends SubsystemBase {
             .until(() -> checkElevatorHeight(ElevatorConstants.L3, 0.01)); // tolerance will be tuned or whatever later 
     }
 }
+
+
