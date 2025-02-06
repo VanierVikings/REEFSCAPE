@@ -24,8 +24,10 @@ public class EndEffector extends SubsystemBase {
         wristMotor = new SparkMax(EndEffectorConstants.wristMotorID, MotorType.kBrushless);
         wristEncoder = wristMotor.getEncoder();
 
-        
+        SparkMaxConfig shooterMotorConfig= new SparkMaxConfig();
+        shooterMotorConfig.smartCurrentLimit(EndEffectorConstants.SHOOTER_CURRENT_LIMIT);
         SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
+        wristMotorConfig.smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT);
 
         wristClosedLoopController = wristMotor.getClosedLoopController();
 

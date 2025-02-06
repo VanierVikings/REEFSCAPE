@@ -10,7 +10,7 @@ public Hang(){
 }
 
 public boolean isGrabbed(){
-    
+    timer.schedule()
 }
 
 
