@@ -5,6 +5,18 @@
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.Meter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.json.simple.parser.ParseException;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -15,38 +27,28 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.SwerveConstants;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-import org.json.simple.parser.ParseException;
-import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -498,7 +500,17 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
     return run(() -> {
-      swerveDrive.driveFieldOriented(velocity.get());
+      Rotation2d aprilMaan = findNearestReefTag();
+      double offset = Math.abs(findNearestReefTag().minus(getHeading()).getDegrees());
+      if(offset > 10){
+        swerveDrive.driveFieldOriented(new ChassisSpeeds(velocity.get().vxMetersPerSecond, velocity.get().vyMetersPerSecond, 0.1*swerveDrive.swerveController.headingCalculate(getHeading().getRadians(),
+        aprilMaan.getRadians())));
+        SmartDashboard.putBoolean("Aligning", true);
+      }else{
+        swerveDrive.driveFieldOriented(velocity.get());
+        SmartDashboard.putBoolean("Aligning", false);
+      }
+      SmartDashboard.putNumber("Offset", offset);
     });
   }
 
@@ -516,13 +528,15 @@ public class SwerveSubsystem extends SubsystemBase {
    * 
    * 
    */
-  public void alignNearestReefTag() {
+  public Rotation2d findNearestReefTag() {
     // SWITCH APRILTAG LAYOUT TO K2025REEFSCAPE BTW
     //Maybe move list generation out of method
     Pose2d robotPose = getPose();
     Optional<Alliance> ally = DriverStation.getAlliance(); 
     int initTag;
     int endTag;
+
+    Rotation2d result = robotPose.getRotation();
 
     if (ally.isPresent()) {
       ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
@@ -544,13 +558,16 @@ public class SwerveSubsystem extends SubsystemBase {
 
       //Find nearest reef tag
       Pose2d nearestReefTag = robotPose.nearest(reefTagPoses);
+      SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestReefTag) + 6);
 
       //Make a new pose which keeps our translational data, but faces the nearest reef tag
       //If bot faces wrong direction, remove .plus(...)
-      Pose2d facingPose = new Pose2d(robotPose.getTranslation(), nearestReefTag.getRotation().plus(Rotation2d.k180deg));
       //Vroom Vroom!!
-      driveToPose(new Pose2d(1,1, Rotation2d.k180deg));
+
+      result = nearestReefTag.getRotation();
+      
     }
+    return result;
   }
 
   /**
@@ -766,14 +783,5 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
-  }
-
-
-  /*
-   * COMMANDS
-   */
-  public Command align() {
-    SmartDashboard.putBoolean("Work?", true);
-    return this.runOnce(() -> alignNearestReefTag());
   }
 } 
