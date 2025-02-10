@@ -1,11 +1,39 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.Constants;
+import frc.robot.subsystems.swerve.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,41 +42,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import org.json.simple.parser.ParseException;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.DriveFeedforwards;
-import com.pathplanner.lib.util.swerve.SwerveSetpoint;
-import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.Constants.SwerveConstants;
+import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -78,38 +73,17 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
-  public Field2d m_field = new Field2d();
-
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
   public SwerveSubsystem(File directory) {
-    setupPathPlanner();
-    SmartDashboard.putData("Field", m_field);
-
-    // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
-    // In this case the gear ratio is 12.8 motor revolutions per wheel rotation.
-    // The encoder resolution per motor revolution is 1 per motor revolution.
-    double angleConversionFactor = SwerveMath.calculateDegreesPerSteeringRotation(12.8);
-    // Motor conversion factor is (PI * WHEEL DIAMETER IN METERS) / (GEAR RATIO *
-    // ENCODER RESOLUTION).
-    // In this case the wheel diameter is 4 inches, which must be converted to
-    // meters to get meters/second.
-    // The gear ratio is 6.75 motor revolutions per wheel rotation.
-    // The encoder resolution per motor revolution is 1 per motor revolution.
-    double driveConversionFactor = SwerveMath.calculateMetersPerRotation(Units.inchesToMeters(4), 6.75);
-    System.out.println("\"conversionFactors\": {");
-    System.out.println("\t\"angle\": {\"factor\": " + angleConversionFactor + " },");
-    System.out.println("\t\"drive\": {\"factor\": " + driveConversionFactor + " }");
-    System.out.println("}");
-
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED,
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.SwerveConstants.MAX_SPEED,
           new Pose2d(new Translation2d(Meter.of(1),
               Meter.of(4)),
               Rotation2d.fromDegrees(0)));
@@ -131,9 +105,16 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.setModuleEncoderAutoSynchronize(false,
         1); // Enable if you want to resynchronize your absolute encoders and motor encoders
             // periodically when they are not moving.
-    swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the
-                                         // offsets onto it. Throws warning if not possible
-    setupLimelight();
+    // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
+    // over the internal encoder and push the offsets onto it. Throws warning if not
+    // possible
+    if (visionDriveTest) {
+      setupPhotonVision();
+      // Stop the odometry thread if we are using vision that way we can synchronize
+      // updates better.
+      swerveDrive.stopOdometryThread();
+    }
+    setupPathPlanner();
   }
 
   /**
@@ -145,7 +126,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
     swerveDrive = new SwerveDrive(driveCfg,
         controllerCfg,
-        SwerveConstants.MAX_SPEED,
+        Constants.SwerveConstants.MAX_SPEED,
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
             Rotation2d.fromDegrees(0)));
   }
@@ -153,23 +134,17 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Setup the photon vision class.
    */
-  public void setupLimelight() {
-    Vision.setPipelineIndex("April Tags", 0);
-    
-
-    double tx = Vision.getTX("");
-    double ty = Vision.getTY("");
-    double ta = Vision.getTA("");
-    boolean hasTarget = Vision.getTV("");
+  public void setupPhotonVision() {
+    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    
-    
-
-    m_field.setRobotPose(getPose());
+    if (visionDriveTest) {
+      swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive);
+    }
   }
 
   @Override
@@ -210,9 +185,9 @@ public class SwerveSubsystem extends SubsystemBase {
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic
               // drive trains
-              SwerveConstants.autoDrivePID,
+              new PIDConstants(5.0, 0.0, 0.0),
               // Translation PID constants
-              SwerveConstants.autoRotationPID
+              new PIDConstants(5.0, 0.0, 0.0)
           // Rotation PID constants
           ),
           config,
@@ -248,7 +223,21 @@ public class SwerveSubsystem extends SubsystemBase {
    *
    * @return A {@link Command} which will run the alignment.
    */
+  public Command aimAtTarget(Cameras camera) {
 
+    return run(() -> {
+      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+      if (resultO.isPresent()) {
+        var result = resultO.get();
+        if (result.hasTargets()) {
+          drive(getTargetSpeeds(0,
+              0,
+              Rotation2d.fromDegrees(result.getBestTarget()
+                  .getYaw()))); // Not sure if this will work, more math may be required.
+        }
+      }
+    });
+  }
 
   /**
    * Get the path follower with events.
@@ -277,7 +266,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // Since AutoBuilder is configured, we can use it to build pathfinding commands
     return AutoBuilder.pathfindToPose(
         pose,
-        constraints,  
+        constraints,
         edu.wpi.first.units.Units.MetersPerSecond.of(0) // Goal end velocity in meters/sec
     );
   }
@@ -345,7 +334,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return SwerveDriveTest.generateSysIdCommand(
         SwerveDriveTest.setDriveSysIdRoutine(
             new Config(),
-            this, swerveDrive, 12),
+            this, swerveDrive, 12, true),
         3.0, 5.0, 3.0);
   }
 
@@ -500,17 +489,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Command driveFieldOriented(Supplier<ChassisSpeeds> velocity) {
     return run(() -> {
-      Rotation2d aprilMaan = findNearestReefTag();
-      double offset = Math.abs(findNearestReefTag().minus(getHeading()).getDegrees());
-      if(offset > 10){
-        swerveDrive.driveFieldOriented(new ChassisSpeeds(velocity.get().vxMetersPerSecond, velocity.get().vyMetersPerSecond, 0.1*swerveDrive.swerveController.headingCalculate(getHeading().getRadians(),
-        aprilMaan.getRadians())));
-        SmartDashboard.putBoolean("Aligning", true);
-      }else{
-        swerveDrive.driveFieldOriented(velocity.get());
-        SmartDashboard.putBoolean("Aligning", false);
-      }
-      SmartDashboard.putNumber("Offset", offset);
+      swerveDrive.driveFieldOriented(velocity.get());
     });
   }
 
@@ -521,53 +500,6 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void drive(ChassisSpeeds velocity) {
     swerveDrive.drive(velocity);
-  }
-
-  /**
-   * Rotate to face the nearest reef april tag.
-   * 
-   * 
-   */
-  public Rotation2d findNearestReefTag() {
-    // SWITCH APRILTAG LAYOUT TO K2025REEFSCAPE BTW
-    //Maybe move list generation out of method
-    Pose2d robotPose = getPose();
-    Optional<Alliance> ally = DriverStation.getAlliance(); 
-    int initTag;
-    int endTag;
-
-    Rotation2d result = robotPose.getRotation();
-
-    if (ally.isPresent()) {
-      ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
-
-      if (ally.get() == Alliance.Red) {
-        initTag = 6;
-        endTag = 12;
-      } else {
-        initTag = 17;
-        endTag = 23;
-      }
-
-      //Get poses of reef april tags based on alliance, add it to the list of reef tag poses
-      for (int i = initTag; i < endTag; i++) {
-        if(aprilTagFieldLayout.getTagPose(i).isPresent()){
-          reefTagPoses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d()); 
-        }
-      }
-
-      //Find nearest reef tag
-      Pose2d nearestReefTag = robotPose.nearest(reefTagPoses);
-      SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestReefTag) + 6);
-
-      //Make a new pose which keeps our translational data, but faces the nearest reef tag
-      //If bot faces wrong direction, remove .plus(...)
-      //Vroom Vroom!!
-
-      result = nearestReefTag.getRotation();
-      
-    }
-    return result;
   }
 
   /**
@@ -694,7 +626,7 @@ public class SwerveSubsystem extends SubsystemBase {
         headingX,
         headingY,
         getHeading().getRadians(),
-        SwerveConstants.MAX_SPEED);
+        Constants.SwerveConstants.MAX_SPEED);
   }
 
   /**
@@ -714,7 +646,7 @@ public class SwerveSubsystem extends SubsystemBase {
         scaledInputs.getY(),
         angle.getRadians(),
         getHeading().getRadians(),
-        SwerveConstants.MAX_SPEED);
+        Constants.SwerveConstants.MAX_SPEED);
   }
 
   /**
@@ -784,4 +716,49 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
-} 
+
+  public Pose2d getReefTag() {
+    // SWITCH APRILTAG LAYOUT TO K2025REEFSCAPE BTW
+    // Maybe move list generation out of method
+    Pose2d robotPose = getPose();
+    Optional<Alliance> ally = DriverStation.getAlliance();
+    int initTag;
+    int endTag;
+
+    if (ally.isPresent()) {
+      ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
+
+      if (ally.get() == Alliance.Red) {
+        initTag = 6;
+        endTag = 12;
+      } else {
+        initTag = 17;
+        endTag = 23;
+      }
+
+      // Get poses of reef april tags based on alliance, add it to the list of reef
+      // tag poses
+      for (int i = initTag; i < endTag; i++) {
+        if (aprilTagFieldLayout.getTagPose(i).isPresent()) {
+          reefTagPoses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d());
+        }
+      }
+      
+
+      // Find nearest reef tag
+      Pose2d nearestPose = robotPose.nearest(reefTagPoses);
+      SmartDashboard.putString("Alliance", ally.get().toString());
+      SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestPose) + 6);
+      SmartDashboard.putNumber("AprilTag Angle", nearestPose.getRotation().getDegrees());
+
+      // Make a new pose which keeps our translational data, but faces the nearest
+      // reef tag
+      // If bot faces wrong direction, remove .plus(...)
+      // Vroom Vroom!!
+
+      robotPose = nearestPose;
+
+    }
+    return robotPose;
+  }
+}
