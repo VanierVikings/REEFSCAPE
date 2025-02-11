@@ -748,7 +748,7 @@ public class SwerveSubsystem extends SubsystemBase {
       // Find nearest reef tag
       Pose2d nearestPose = robotPose.nearest(reefTagPoses);
       SmartDashboard.putString("Alliance", ally.get().toString());
-      SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestPose) + 6);
+      SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestPose) + (ally.get() == Alliance.Red ? 6 : 17));
       SmartDashboard.putNumber("AprilTag Angle", nearestPose.getRotation().getDegrees());
 
       // Make a new pose which keeps our translational data, but faces the nearest
