@@ -26,6 +26,7 @@ import java.io.File;
 import swervelib.SwerveInputStream;
 
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.EndEffector;
 
 
@@ -162,12 +163,22 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
-    
+   
     //driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
-    driverXbox.leftTrigger().whileTrue(closedAbsoluteDriveAdv);
-    driverXbox.y().onTrue(m_elevator.moveToL1Command());
-    driverXbox.a().onTrue(m_elevator.moveToL2Command());
-    
+    //driverXbox.leftTrigger().whileTrue(closedAbsoluteDriveAdv);
+    // driverXbox.y().onTrue(m_elevator.intake());
+    // driverXbox.a().onTrue(m_elevator.moveToL1Command());
+    // driverXbox.a().onTrue(m_elevator.moveToL2Command());
+    // driverXbox.a().onTrue(m_elevator.moveToL3Command());
+    driverXbox.b().onTrue(m_elevator.setSetpointCommand(Setpoint.rest));
+
+    driverXbox.a().onTrue(m_elevator.setSetpointCommand(Setpoint.kLevel1));
+
+    // X Button -> Elevator/Arm to level 3 position
+    driverXbox.x().onTrue(m_elevator.setSetpointCommand(Setpoint.kLevel2));
+
+    // Y Button -> Elevator/Arm to level 4 position
+    driverXbox.y().onTrue(m_elevator.setSetpointCommand(Setpoint.kLevel3));
   }
 
   /**
@@ -187,6 +198,6 @@ public class RobotContainer {
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);
   }  
-  
-  
+ 
+ 
 }

@@ -6,7 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType; 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -35,10 +35,10 @@ public final class Constants {
         public static final int motorOneID = 9;
         public static final int motorTwoID = 10;
 
-        public static final double MAX_VELOCITY = 1.0; 
-        public static final double MAX_ACCELERATION = 0.5; 
-        public static final double ENCODER_TO_METERS = 2*20*Math.PI*0.85; //distance per pulse 
-        
+        public static final double MAX_VELOCITY = 1.0;
+        public static final double MAX_ACCELERATION = 0.5;
+        public static final double ENCODER_TO_METERS = 2*20*Math.PI*0.85; //distance per pulse
+       
         public static final double ELEVATOR_KP = 0.1;
         public static final double ELEVATOR_KI = 0.0;
         public static final double ELEVATOR_KD = 0.0;
@@ -67,6 +67,7 @@ public final class Constants {
         public static final double PIVOT_KI = 0.0;
         public static final double PIVOT_KD = 0.0;
 
+        public static final double L0_ANGLE = 32.74; //degrees
         public static final double L1_ANGLE = 32.74; //degrees
         public static final double L2_ANGLE = 48.70; //degrees
         public static final double L3_ANGLE = 59.55; //degrees
@@ -89,12 +90,12 @@ public final class Constants {
         public static final double wristL1_ANGLE = 0; //must change due to the wrist
         public static final double wristL2_ANGLE = 0; //must change
         public static final double wristL3_ANGLE = 0; //must change
-    
+   
         public static final double shooterMaxVelocity = 5676; //rpm
 
         public static final int WRIST_CURRENT_LIMIT = 20; //amps
         public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
-        
+       
     }
 
     public static class profiledPidElevatorConstants {

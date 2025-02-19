@@ -10,14 +10,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PivotConstants;
@@ -36,9 +34,9 @@ public class profiledPidElevator extends SubsystemBase{
 
     private final RelativeEncoder elevatorEncoder;
     private final SparkMaxConfig elevatorMotorConfig;
-    //private final SparkLimitSwitch elevatorLimitSwitch;
 
     public profiledPidElevator() {
+
         ElevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
         ElevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);
 
@@ -56,8 +54,16 @@ public class profiledPidElevator extends SubsystemBase{
 
         pivotEncoder = new DutyCycleEncoder(0);
         pivotEncoder.setDutyCycleRange(0, 0);
+
+
+        //pivot motor confirguration
         SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
 
+        SparkMaxConfig pivotFollow = new SparkMaxConfig();
+        pivotFollow.follow(PivotConstants.motorTwoID, true);
+        PivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        //pivot MaxMotion pid
            pivotMotorConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .p(PivotConstants.PIVOT_KP)
@@ -71,30 +77,28 @@ public class profiledPidElevator extends SubsystemBase{
             .allowedClosedLoopError(0.0);
         PivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         
+
+
+        //Profile pid 
         var initialState = new TrapezoidProfile.State(elevatorEncoder.getPosition(), elevatorEncoder.getVelocity());
         var goalState = new TrapezoidProfile.State(ElevatorConstants.goal_position, ElevatorConstants.goal_velocity);
 
         ProfiledPIDController controller = new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_KP, ElevatorConstants.ELEVATOR_KI, ElevatorConstants.ELEVATOR_KD, 
             new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION));
-            
-        
-        SparkMaxConfig follow = new SparkMaxConfig();
-        follow.follow(ElevatorConstants.motorOneID, true); 
-        ElevatorMotorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-        SparkMaxConfig pivotFollow = new SparkMaxConfig();
-        pivotFollow.follow(PivotConstants.motorTwoID, true);
-        PivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-        ElevatorMotorOne.set(controller.calculate(elevatorEncoder.getPosition()));
 
         var setpoint = profile.calculate(ElevatorConstants.time, initialState, goalState);
         controller.calculate(elevatorEncoder.getPosition(), setpoint.position);   
       
-      
         final ElevatorFeedforward feedforward = new ElevatorFeedforward(profiledPidElevatorConstants.ELEVATOR_KS, profiledPidElevatorConstants.ELEVATOR_KG, profiledPidElevatorConstants.ELEVATOR_KV);
         
+
+        //Elevator motor confirguration
+        SparkMaxConfig follow = new SparkMaxConfig();
+        follow.follow(ElevatorConstants.motorOneID, true); 
+        ElevatorMotorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        ElevatorMotorOne.set(controller.calculate(elevatorEncoder.getPosition()));
     }
 
     public void setElevatorHeight(double targetHeight) {
@@ -127,7 +131,7 @@ public class profiledPidElevator extends SubsystemBase{
 
 
 
-     public Command intake() {
+    public Command intake() {
         return run(
             () -> setElevatorHeight(0))
             .until(() -> checkElevatorHeight(0, 0.01))
