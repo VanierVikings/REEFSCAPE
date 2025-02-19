@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
+
+import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
 
 /**
@@ -64,19 +66,15 @@ public class RobotContainer {
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-      () -> -driverXbox.getLeftX(),
-      () -> driverXbox.getLeftY())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(
-          2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
+  SwerveController controller = drivetrain.getSwerveController();
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftX(),
+      () -> -driverXbox.getLeftY(), () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()));
+
   // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-      .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI),
-          () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI))
-      .headingWhile(true);
+  // SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
+  //     .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI),
+  //         () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI))
+  //     .headingWhile(true);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,17 +101,17 @@ public class RobotContainer {
   private void configureBindings() {
 
     Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
-    Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(reefPoint);
     Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
     Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngle);
-    Command driveFieldOrientedDirectAngleKeyboard = drivetrain.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivetrain.driveFieldOriented(driveAngularVelocityKeyboard);
-    Command driveSetpointGenKeyboard = drivetrain.driveWithSetpointGeneratorFieldRelative(
-        driveAngularVelocityKeyboard.aim(drivetrain.reefPose).aimWhile(driverXbox.rightBumper()));
+    //Command driveFieldOrientedDirectAngleKeyboard = drivetrain.driveFieldOriented(driveDirectAngleKeyboard);
+    //Command driveFieldOrientedAnglularVelocityKeyboard = drivetrain.driveFieldOriented(driveAngularVelocityKeyboard);
+    //Command driveSetpointGenKeyboard = drivetrain.driveWithSetpointGeneratorFieldRelative(
+       // driveAngularVelocityKeyboard.aim(drivetrain.getReefTag()).aimWhile(driverXbox.rightBumper()));
 
     if (RobotBase.isSimulation()) {
-      drivetrain.setDefaultCommand(driveSetpointGenKeyboard);
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
