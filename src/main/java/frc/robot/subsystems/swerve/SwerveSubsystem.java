@@ -47,6 +47,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
+import swervelib.SwerveInputStream;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -73,6 +74,8 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
+  public Pose2d reefPose = new Pose2d();
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -81,10 +84,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
+
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.SwerveConstants.MAX_SPEED,
-          new Pose2d(new Translation2d(Meter.of(1),
+          new Pose2d(new Translation2d(Meter.of(17),
               Meter.of(4)),
               Rotation2d.fromDegrees(0)));
       // Alternative method if you don't want to supply the conversion factor via JSON
@@ -94,6 +98,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    reefPose = getReefTag();
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
@@ -145,6 +150,8 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    reefPose = getReefTag();
   }
 
   @Override
@@ -718,8 +725,6 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Pose2d getReefTag() {
-    // SWITCH APRILTAG LAYOUT TO K2025REEFSCAPE BTW
-    // Maybe move list generation out of method
     Pose2d robotPose = getPose();
     Optional<Alliance> ally = DriverStation.getAlliance();
     int initTag;
@@ -761,4 +766,4 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     return robotPose;
   }
-}
+} 
