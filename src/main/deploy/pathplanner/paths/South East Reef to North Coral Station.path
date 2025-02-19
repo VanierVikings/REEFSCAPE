@@ -1,0 +1,86 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.342602040817002,
+        "y": 2.5438456632579927
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.775637755102715,
+        "y": 0.6187181122375855
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.2161352040823066,
+        "y": 3.812340561217177
+      },
+      "prevControl": {
+        "x": 2.3156570358120736,
+        "y": 3.30082740500899
+      },
+      "nextControl": {
+        "x": 2.1166133723525395,
+        "y": 4.323853717425363
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.2161352040823066,
+        "y": 5.528539540809013
+      },
+      "prevControl": {
+        "x": 2.4250637755115516,
+        "y": 4.939062499985375
+      },
+      "nextControl": {
+        "x": 1.7852394306479487,
+        "y": 6.744281187295683
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.298341836734694,
+        "y": 6.991039540816327
+      },
+      "prevControl": {
+        "x": 1.4807261377697156,
+        "y": 6.820054258595994
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "North Coral Station"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 126.40408856307904
+  },
+  "reversed": false,
+  "folder": "Reefscape reef to station",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 122.68055474336334
+  },
+  "useDefaultConstraints": true
+}
