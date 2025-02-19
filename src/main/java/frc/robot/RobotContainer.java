@@ -110,7 +110,7 @@ public class RobotContainer {
     Command driveFieldOrientedDirectAngleKeyboard = drivetrain.driveFieldOriented(driveDirectAngleKeyboard);
     Command driveFieldOrientedAnglularVelocityKeyboard = drivetrain.driveFieldOriented(driveAngularVelocityKeyboard);
     Command driveSetpointGenKeyboard = drivetrain.driveWithSetpointGeneratorFieldRelative(
-        driveAngularVelocityKeyboard.aim(drivetrain.reefPose).aimWhile(driverXbox.rightBumper()));
+        driveAngularVelocityKeyboard.aim(drivetrain.getReefTag()).aimWhile(driverXbox.rightBumper()));
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveSetpointGenKeyboard);

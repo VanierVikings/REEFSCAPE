@@ -761,7 +761,7 @@ public class SwerveSubsystem extends SubsystemBase {
       // If bot faces wrong direction, remove .plus(...)
       // Vroom Vroom!!
 
-      robotPose = nearestPose;
+      robotPose = new Pose2d(nearestPose.getTranslation(), new Rotation2d(nearestPose.getRotation().getDegrees() + 180));
 
     }
     return robotPose;
