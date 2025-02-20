@@ -185,27 +185,44 @@ public class Elevator extends SubsystemBase {
   public Command moveToSetpoint() {
     return this.run(() -> {
       pivotClosedLoopController.setReference(pivotCurrentTarget, ControlType.kMAXMotionPositionControl);
+      elevatorClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
     });
   }
 
-  public Command setSetpointCommand(Setpoint setpoint) {
+  public Command setPivot(Setpoint setpoint) {
     return this.runOnce(
         () -> {
           switch (setpoint) {
             case rest:
               pivotCurrentTarget = PivotConstants.L0_ANGLE;
-              elevatorCurrentTarget = ElevatorConstants.L0;
               break;
             case kLevel1:
               pivotCurrentTarget = PivotConstants.L1_ANGLE;
-              elevatorCurrentTarget = ElevatorConstants.L1;
               break;
             case kLevel2:
               pivotCurrentTarget = PivotConstants.L2_ANGLE;
-              elevatorCurrentTarget = ElevatorConstants.L2;
               break;
             case kLevel3:
               pivotCurrentTarget = PivotConstants.L3_ANGLE;
+              break;
+          }
+        });
+  }
+
+  public Command setElevator(Setpoint setpoint) {
+    return this.runOnce(
+        () -> {
+          switch (setpoint) {
+            case rest:
+              elevatorCurrentTarget = ElevatorConstants.L0;
+              break;
+            case kLevel1:
+              elevatorCurrentTarget = ElevatorConstants.L1;
+              break;
+            case kLevel2:
+              elevatorCurrentTarget = ElevatorConstants.L2;
+              break;
+            case kLevel3:
               elevatorCurrentTarget = ElevatorConstants.L3;
               break;
           }
