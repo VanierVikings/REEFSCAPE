@@ -73,12 +73,6 @@ public class RobotContainer {
   SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftX(),
       () -> -driverXbox.getLeftY(), () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()));
 
-  // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-      .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI),
-          () -> Math.cos(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI))
-      .headingWhile(true);
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -107,13 +101,8 @@ public class RobotContainer {
     Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
     Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngle);
-    Command driveFieldOrientedDirectAngleKeyboard = drivetrain.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = drivetrain.driveFieldOriented(driveAngularVelocityKeyboard);
-    Command driveSetpointGenKeyboard = drivetrain.driveWithSetpointGeneratorFieldRelative(
-        driveAngularVelocityKeyboard);
 
     if (RobotBase.isSimulation()) {
-      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -125,7 +114,7 @@ public class RobotContainer {
 
     driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
     SwerveController controller = drivetrain.getSwerveController();
-    driverXbox.x().whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond, controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()))
+    driverXbox.x().whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond, controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()))
     ));
 
   }
