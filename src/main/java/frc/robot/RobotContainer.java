@@ -163,13 +163,9 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
+
+    m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
    
-    //driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
-    //driverXbox.leftTrigger().whileTrue(closedAbsoluteDriveAdv);
-    // driverXbox.y().onTrue(m_elevator.intake());
-    // driverXbox.a().onTrue(m_elevator.moveToL1Command());
-    // driverXbox.a().onTrue(m_elevator.moveToL2Command());
-    // driverXbox.a().onTrue(m_elevator.moveToL3Command());
     driverXbox.b().onTrue(m_elevator.setSetpointCommand(Setpoint.rest));
 
     driverXbox.a().onTrue(m_elevator.setSetpointCommand(Setpoint.kLevel1));
