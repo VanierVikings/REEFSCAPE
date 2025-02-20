@@ -22,6 +22,8 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
 
 import swervelib.SwerveController;
+
+import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
 
 /**
@@ -67,14 +69,10 @@ public class RobotContainer {
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-      () -> -driverXbox.getLeftX(),
-      () -> driverXbox.getLeftY())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(
-          2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
+  SwerveController controller = drivetrain.getSwerveController();
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftX(),
+      () -> -driverXbox.getLeftY(), () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()));
+
   // Derive the heading axis with math!
   SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
       .withControllerHeadingAxis(() -> Math.sin(driverXbox.getRawAxis(2) * Math.PI) * (2 * Math.PI),
@@ -89,7 +87,6 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
   }
-
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
    * created via the
@@ -116,6 +113,7 @@ public class RobotContainer {
         driveAngularVelocityKeyboard);
 
     if (RobotBase.isSimulation()) {
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);

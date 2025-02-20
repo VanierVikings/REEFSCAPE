@@ -98,8 +98,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    reefPose = getReefTag();
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
@@ -150,8 +149,6 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
-
-    reefPose = getReefTag();
   }
 
   @Override
@@ -724,7 +721,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
-  public Pose2d getReefTag() {
+  public Rotation2d getReefTag() {
     Pose2d robotPose = getPose();
     Optional<Alliance> ally = DriverStation.getAlliance();
     int initTag;
@@ -755,15 +752,18 @@ public class SwerveSubsystem extends SubsystemBase {
       SmartDashboard.putString("Alliance", ally.get().toString());
       SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestPose) + (ally.get() == Alliance.Red ? 6 : 17));
       SmartDashboard.putNumber("AprilTag Angle", nearestPose.getRotation().getDegrees());
+      SmartDashboard.putNumber("Robot Angle", robotPose.getRotation().getDegrees());
 
       // Make a new pose which keeps our translational data, but faces the nearest
       // reef tag
       // If bot faces wrong direction, remove .plus(...)
       // Vroom Vroom!!
 
-      robotPose = nearestPose;
-
+      // Translation2d relativeTrl = nearestPose.relativeTo(getPose()).getTranslation();
+      // return new Rotation2d(relativeTrl.getX(), relativeTrl.getY()).plus(swerveDrive.getOdometryHeading());
+      
+      return nearestPose.getRotation().rotateBy(Rotation2d.kCCW_Pi_2);
     }
-    return robotPose;
+    return new Rotation2d();
   }
 } 
