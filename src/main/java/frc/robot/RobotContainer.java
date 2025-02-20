@@ -4,24 +4,19 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
-
-import swervelib.SwerveController;
 
 import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
@@ -49,7 +44,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(driverXbox::getRightX)
+      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -70,8 +65,9 @@ public class RobotContainer {
       .allianceRelativeControl(false);
 
   SwerveController controller = drivetrain.getSwerveController();
-  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftX(),
-      () -> -driverXbox.getLeftY(), () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()));
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftY(),
+      () -> -driverXbox.getLeftX(),
+      () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -81,6 +77,7 @@ public class RobotContainer {
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
   }
+
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
    * created via the
@@ -95,12 +92,12 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-
-    Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
+    // Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
+    // Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
+    // Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
+    //     driveDirectAngle);
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -113,9 +110,14 @@ public class RobotContainer {
     }
 
     driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
-    SwerveController controller = drivetrain.getSwerveController();
-    driverXbox.x().whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond, controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()))
-    ));
+
+    driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
+
+    // SwerveController controller = drivetrain.getSwerveController();
+    // driverXbox.x()
+    //     .whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
+    //         drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond,
+    //         controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()))));
 
   }
 

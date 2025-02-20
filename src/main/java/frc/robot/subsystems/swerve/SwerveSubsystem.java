@@ -17,7 +17,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -47,7 +46,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
-import swervelib.SwerveInputStream;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -74,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
-  public Pose2d reefPose = new Pose2d();
+  public SwerveController controller;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -98,7 +96,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
@@ -118,6 +116,7 @@ public class SwerveSubsystem extends SubsystemBase {
       // updates better.
       swerveDrive.stopOdometryThread();
     }
+    controller = swerveDrive.getSwerveController();
     setupPathPlanner();
   }
 
@@ -721,8 +720,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
-  public Rotation2d getReefTag() {
-    Pose2d robotPose = getPose();
+  public Pose2d getReefTag() {
     Optional<Alliance> ally = DriverStation.getAlliance();
     int initTag;
     int endTag;
@@ -748,22 +746,13 @@ public class SwerveSubsystem extends SubsystemBase {
       
 
       // Find nearest reef tag
-      Pose2d nearestPose = robotPose.nearest(reefTagPoses);
+      Pose2d nearestPose = getPose().nearest(reefTagPoses);
       SmartDashboard.putString("Alliance", ally.get().toString());
       SmartDashboard.putNumber("AprilTag ID", reefTagPoses.indexOf(nearestPose) + (ally.get() == Alliance.Red ? 6 : 17));
       SmartDashboard.putNumber("AprilTag Angle", nearestPose.getRotation().getDegrees());
-      SmartDashboard.putNumber("Robot Angle", robotPose.getRotation().getDegrees());
-
-      // Make a new pose which keeps our translational data, but faces the nearest
-      // reef tag
-      // If bot faces wrong direction, remove .plus(...)
-      // Vroom Vroom!!
-
-      // Translation2d relativeTrl = nearestPose.relativeTo(getPose()).getTranslation();
-      // return new Rotation2d(relativeTrl.getX(), relativeTrl.getY()).plus(swerveDrive.getOdometryHeading());
       
-      return nearestPose.getRotation().rotateBy(Rotation2d.kCCW_Pi_2);
+      return nearestPose;
     }
-    return new Rotation2d();
+    return new Pose2d();
   }
 } 
