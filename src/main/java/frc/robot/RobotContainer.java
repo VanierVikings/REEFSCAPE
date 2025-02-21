@@ -166,15 +166,16 @@ public class RobotContainer {
 
     m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
    
-    driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest).andThen(m_elevator.setPivot(Setpoint.rest)));
+    // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
+    // .andThen(m_elevator.setPivot(Setpoint.rest)));
 
-    driverXbox.a().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(m_elevator.setElevator(Setpoint.kLevel1)));
+    // driverXbox.a().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(m_elevator.setElevator(Setpoint.kLevel1)));
 
-    // X Button -> Elevator/Arm to level 2 position
-    driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
+    // // X Button -> Elevator/Arm to level 2 position
+    // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
-    // Y Button -> Elevator/Arm to level 3 position
-    driverXbox.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)));
+    // // Y Button -> Elevator/Arm to level 3 position
+    // driverXbox.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)));
   }
 
   /**

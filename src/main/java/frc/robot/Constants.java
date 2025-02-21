@@ -39,9 +39,14 @@ public final class Constants {
         public static final double MAX_ACCELERATION = 0.5;
         public static final double ENCODER_TO_METERS = 2*20*Math.PI*0.85; //distance per pulse
        
-        public static final double ELEVATOR_KP = 0.1;
-        public static final double ELEVATOR_KI = 0.0;
-        public static final double ELEVATOR_KD = 0.0;
+        public static final double kP = 0.1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kDt = 0.02;
+
+        public static final double kS = 0.1;
+        public static final double kV = 0.0;
+        public static final double kG = 0.0;
 
         public static final double L0 = 0; //cm
         public static final double L1 = 84.55; //cm
@@ -52,7 +57,7 @@ public final class Constants {
         public static final double goal_velocity = 0;
         public static final double time = 0;
 
-        public static final int ELEVATOR_CURRENT_LIMIT = 20; //amps
+        public static final int ELEVATOR_CURRENT_LIMIT = 35; //amps
 
     }
 
@@ -63,16 +68,22 @@ public final class Constants {
         public static final double MAX_VELOCITY = 1.0;
         public static final double MAX_ACCELERATION = 0.5;
 
-        public static final double PIVOT_KP = 0.1;
-        public static final double PIVOT_KI = 0.0;
-        public static final double PIVOT_KD = 0.0;
+        public static final double kP = 0.1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kDt = 0.0;
+
+        public static final double kS = 0.1;
+        public static final double kV = 0.0;
+        public static final double kG = 0.0;
 
         public static final double L0_ANGLE = 32.74; //degrees
         public static final double L1_ANGLE = 32.74; //degrees
         public static final double L2_ANGLE = 48.70; //degrees
         public static final double L3_ANGLE = 59.55; //degrees
+        public static final double LHANG_ANGLE = 59.55; //degrees
 
-        public static final int PIVOT_CURRENT_LIMIT = 20; //amps
+        public static final int PIVOT_CURRENT_LIMIT = 35; //amps
     }
 
     public static class EndEffectorConstants {
@@ -96,14 +107,6 @@ public final class Constants {
         public static final int WRIST_CURRENT_LIMIT = 20; //amps
         public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
        
-    }
-
-    public static class profiledPidElevatorConstants {
-        public static final double ELEVATOR_KS = 0;
-        public static final double ELEVATOR_KG = 0;
-        public static final double ELEVATOR_KV = 0;
-
-        //public static final double ELEVATOR
     }
 
     public static class hangConstants{

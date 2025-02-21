@@ -1,6 +1,10 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -8,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -27,10 +32,21 @@ public class Elevator extends SubsystemBase {
   private final SparkClosedLoopController pivotClosedLoopController;
   private final SparkAbsoluteEncoder pivotEncoder;
   private final SparkClosedLoopController elevatorClosedLoopController;
+  private final TrapezoidProfile.Constraints elevatorConstraints =
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
+  private final ProfiledPIDController elevatorController =
+      new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD, elevatorConstraints, ElevatorConstants.kDt);
+  private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
+
+  private final TrapezoidProfile.Constraints pivotConstraints =
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
+  private final ProfiledPIDController pivotController =
+      new ProfiledPIDController(PivotConstants.kP, PivotConstants.kI, PivotConstants.kD, pivotConstraints, PivotConstants.kDt);
+  private final ArmFeedforward pivotFeedforward = new ArmFeedforward(PivotConstants.kS, PivotConstants.kG, PivotConstants.kV);
 
   private final RelativeEncoder elevatorEncoder;
   private final SparkMaxConfig elevatorMotorConfig;
-  // private final SparkLimitSwitch elevatorLimitSwitch;
+  private final SparkLimitSwitch elevatorLimitSwitch;
 
   private double elevatorCurrentTarget;
   private double pivotCurrentTarget;
@@ -41,7 +57,7 @@ public class Elevator extends SubsystemBase {
     kLevel1,
     kLevel2,
     kLevel3,
-    kLevel4;
+    kHang;
   }
 
   public Elevator() {
@@ -51,9 +67,9 @@ public class Elevator extends SubsystemBase {
     pivotMotorOne = new SparkMax(PivotConstants.motorOneID, MotorType.kBrushless);
     pivotMotorTwo = new SparkMax(PivotConstants.motorTwoID, MotorType.kBrushless);
 
-    elevatorCurrentTarget = ElevatorConstants.L1;
+    elevatorCurrentTarget = ElevatorConstants.L0;
     // placeholder L1 ? idk
-    pivotCurrentTarget = PivotConstants.L1_ANGLE;
+    pivotCurrentTarget = PivotConstants.L0_ANGLE;
     // Same shi same shi
 
     // Pivot motor configuration
@@ -69,9 +85,9 @@ public class Elevator extends SubsystemBase {
 
     pivotMotorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-        .p(PivotConstants.PIVOT_KP)
-        .i(PivotConstants.PIVOT_KI)
-        .d(PivotConstants.PIVOT_KD)
+        .p(PivotConstants.kP)
+        .i(PivotConstants.kI)
+        .d(PivotConstants.kD)
         .outputRange(-1, 1);
 
     pivotMotorConfig.closedLoop.maxMotion
@@ -79,12 +95,12 @@ public class Elevator extends SubsystemBase {
         .maxAcceleration(PivotConstants.MAX_ACCELERATION)
         .allowedClosedLoopError(1.0);
 
-    pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Elevator motor configuration
     SparkMaxConfig follow = new SparkMaxConfig();
     follow.follow(9, true);
-    elevatorMotorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    elevatorMotorTwo.configure(follow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevatorClosedLoopController = elevatorMotorOne.getClosedLoopController();
 
@@ -93,20 +109,18 @@ public class Elevator extends SubsystemBase {
     elevatorMotorConfig = new SparkMaxConfig();
     elevatorMotorConfig.smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT);
 
-    // elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
+    elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
 
-    // elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
-
-    // elevatorMotorConfig.limitSwitch.fo
+    elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
 
     elevatorMotorConfig.encoder
         .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); // inches
 
     elevatorMotorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(ElevatorConstants.ELEVATOR_KP)
-        .i(ElevatorConstants.ELEVATOR_KI)
-        .d(ElevatorConstants.ELEVATOR_KD)
+        .p(ElevatorConstants.kP)
+        .i(ElevatorConstants.kI)
+        .d(ElevatorConstants.kD)
         .outputRange(-1, 1);
 
     elevatorMotorConfig.closedLoop.maxMotion
@@ -114,73 +128,12 @@ public class Elevator extends SubsystemBase {
         .maxAcceleration(ElevatorConstants.MAX_ACCELERATION / ElevatorConstants.ENCODER_TO_METERS)
         .allowedClosedLoopError(0.01 / ElevatorConstants.ENCODER_TO_METERS);
 
-    elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
-
-  // public void setElevatorHeight(double targetHeight) {
-
-  // elevatorClosedLoopController.setReference(targetHeight/ElevatorConstants.ENCODER_TO_METERS,
-  // ControlType.kMAXMotionPositionControl);
-
-  // if(getAngle() <= 12 && getElevatorHeight() >= 138){
-
-  // elevatorClosedLoopController.setReference(getElevatorHeight(),
-  // ControlType.kMAXMotionPositionControl);
-  // elevatorClosedLoopController.setReference(getAngle(),
-  // ControlType.kMAXMotionPositionControl);
-  // } // Kill code, don't know if works
-  // }
-
-  // public double getElevatorHeight() {
-  // return elevatorMotorOne.getEncoder().getPosition() *
-  // ElevatorConstants.ENCODER_TO_METERS;
-  // }
-
-  // public boolean checkElevatorHeight(double targetHeight, double tolerance) {
-  // double currentHeight = getElevatorHeight();
-  // return Math.abs(currentHeight - targetHeight) < tolerance;
-  // }
-
-  // //public void resetEncoders() {
-  // // if(elevatorLimitSwitch.isPressed()) {
-  // // elevatorEncoder.setPosition(0);
-  // // }
-  // // }
 
   public double getAngle() {
     return pivotMotorOne.getEncoder().getPosition();
   }
-
-  // public boolean pivotIsAtAngle(double pivotTargetHeight, double
-  // pivotTolerance) {
-  // double pivotCurrentHeight = getAngle();
-  // return Math.abs(pivotCurrentHeight - pivotTargetHeight) < pivotTolerance;
-  // }
-
-  // public void setAngle(double targetAngle){
-  // pivotClosedLoopController.setReference(targetAngle,
-  // ControlType.kMAXMotionPositionControl);
-
-  // if(getAngle() >= 90){
-
-  // pivotClosedLoopController.setReference(getElevatorHeight(),
-  // ControlType.kMAXMotionPositionControl);
-  // pivotClosedLoopController.setReference(getAngle(),
-  // ControlType.kMAXMotionPositionControl);
-  // }// Kill code, don't know if works
-  // }
-
-  // public void kill(){
-
-  // if(getAngle() <= 12 && getElevatorHeight() >= 138){
-
-  // pivotClosedLoopController.setReference(getElevatorHeight(),
-  // ControlType.kMAXMotionPositionControl);
-  // pivotClosedLoopController.setReference(getAngle(),
-  // ControlType.kMAXMotionPositionControl);
-  // }
-  // //This is supposed to stop the elevator and angle. Idk if it works
-  // }
 
   public Command moveToSetpoint() {
     return this.run(() -> {
@@ -189,22 +142,43 @@ public class Elevator extends SubsystemBase {
     });
   }
 
+  // public Command moveToSetpoint() {
+  //   return this.run(() -> {
+  //     elevatorMotorOne.setVoltage(
+  //       elevatorController.calculate(elevatorEncoder.getPosition())
+  //           + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
+
+  //       pivotMotorOne.setVoltage(
+  //         pivotController.calculate(pivotEncoder.getPosition())
+  //           + pivotFeedforward.calculate(pivotController.getSetpoint().position, pivotController.getSetpoint().velocity));
+
+  //   });
+  // }
+
   public Command setPivot(Setpoint setpoint) {
     return this.runOnce(
         () -> {
           switch (setpoint) {
             case rest:
               pivotCurrentTarget = PivotConstants.L0_ANGLE;
+              pivotController.setGoal(PivotConstants.L0_ANGLE);
               break;
             case kLevel1:
               pivotCurrentTarget = PivotConstants.L1_ANGLE;
+              pivotController.setGoal(PivotConstants.L1_ANGLE);
               break;
             case kLevel2:
               pivotCurrentTarget = PivotConstants.L2_ANGLE;
+              pivotController.setGoal(PivotConstants.L2_ANGLE);
               break;
             case kLevel3:
               pivotCurrentTarget = PivotConstants.L3_ANGLE;
+              pivotController.setGoal(PivotConstants.L3_ANGLE);
               break;
+            case kHang:
+            pivotCurrentTarget = PivotConstants.LHANG_ANGLE;
+            pivotController.setGoal(PivotConstants.LHANG_ANGLE);
+            break;
           }
         });
   }
@@ -215,73 +189,27 @@ public class Elevator extends SubsystemBase {
           switch (setpoint) {
             case rest:
               elevatorCurrentTarget = ElevatorConstants.L0;
+              elevatorController.setGoal(ElevatorConstants.L0);
               break;
             case kLevel1:
               elevatorCurrentTarget = ElevatorConstants.L1;
+              elevatorController.setGoal(ElevatorConstants.L1);
               break;
             case kLevel2:
               elevatorCurrentTarget = ElevatorConstants.L2;
+              elevatorController.setGoal(ElevatorConstants.L2);
               break;
             case kLevel3:
               elevatorCurrentTarget = ElevatorConstants.L3;
+              elevatorController.setGoal(ElevatorConstants.L3);
               break;
           }
         });
   }
 
-  // public Command intake() {
-
-  // return run(
-  // () -> setElevatorHeight(0))
-  // .until(() -> checkElevatorHeight(0, 0.01))
-  // .andThen(() -> setAngle(0))
-  // .until(() -> pivotIsAtAngle(0, 0.01));
-  // }
-
-  // public Command extend() {
-
-  // if(getAngle() >= 12){
-
-  // return run(
-  // () -> setElevatorHeight(1.3462))
-  // .until(() -> checkElevatorHeight(1.3462, 0.01));
-  // }
-  // else{
-
-  // return run(
-  // () -> setElevatorHeight(1.27))
-  // .until(() -> checkElevatorHeight(1.27, 0.01));
-  // }
-  // }//useless
-
-  // public Command moveToPositionCommand() {
-  // // tolerance will be tuned or whatever later
-  // return run(
-  // () -> setAngle(pivotCurrentTarget))
-  // .until(()-> pivotIsAtAngle(pivotCurrentTarget, 0.0))
-  // .andThen(() -> setElevatorHeight(elevatorCurrentTarget))
-  // .until(() -> checkElevatorHeight(elevatorCurrentTarget, 0.01)); // tolerance
-  // will be tuned or whatever later
-
-  // }
-
-  // public Command moveToL2Command() {
-  // // tolerance will be tuned or whatever later
-  // return run(
-  // () -> setAngle(PivotConstants.L2_ANGLE))
-  // .until(()-> pivotIsAtAngle(PivotConstants.L2_ANGLE, 0.0))
-  // .andThen(() -> setElevatorHeight(elevatorCurrentTarget))
-  // .until(() -> checkElevatorHeight(elevatorCurrentTarget, 0.01)); // tolerance
-  // will be tuned or whatever later
-  // }
-
-  // public Command moveToL3Command() {
-  // // tolerance will be tuned or whatever later
-  // return run(
-  // () -> setAngle(PivotConstants.L3_ANGLE))
-  // .until(()-> pivotIsAtAngle(PivotConstants.L3_ANGLE, 0.0))
-  // .andThen(() -> setElevatorHeight(elevatorCurrentTarget))
-  // .until(() -> checkElevatorHeight(ElevatorConstants.L3, 0.01)); // tolerance
-  // will be tuned or whatever later
-  // }
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Pivot Angle", pivotEncoder.getPosition());
+  }
 }
