@@ -5,8 +5,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.config.PIDConstants;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -107,12 +106,6 @@ public final class Constants {
         public static final int WRIST_CURRENT_LIMIT = 20; //amps
         public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
        
-    }
-
-    public static class hangConstants{
-        public static final double CAGE_ANGLE = 0; //change
-        public static final int CANID = 16;
-        public static final int SECONDS = 12;
     }
 
 }

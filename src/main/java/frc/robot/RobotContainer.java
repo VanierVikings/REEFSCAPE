@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swerve.AbsoluteDriveAdv;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -44,28 +43,8 @@ public class RobotContainer {
   private final static EndEffector m_endEffector = new EndEffector();
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-      "swerve/neo"));
+      "swerve"));
    private final SendableChooser<Command> autoChooser;
-
-  // Applies deadbands and inverts controls because joysticks
-  // are back-right positive while robot
-  // controls are front-left positive
-  // left stick controls translation
-  // right stick controls the rotational velocity
-  // buttons are quick rotation positions to different ways to face
-  // WARNING: default buttons are on the same buttons as the ones defined in
-  // configureBindings
-  AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivetrain,
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
-          OperatorConstants.LEFT_Y_DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
-          OperatorConstants.DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
-          OperatorConstants.RIGHT_X_DEADBAND),
-      driverXbox.getHID()::getYButtonPressed,
-      driverXbox.getHID()::getAButtonPressed,
-      driverXbox.getHID()::getXButtonPressed,
-      driverXbox.getHID()::getBButtonPressed);
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled

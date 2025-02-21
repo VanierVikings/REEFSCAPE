@@ -28,6 +28,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,6 +39,8 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.swerve.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -72,6 +76,9 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * PhotonVision class to keep an accurate odometry.
    */
+  private Vision vision;
+
+  public Field2d m_field = new Field2d();
   private       Vision              vision;
 
   /**
@@ -79,6 +86,9 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @param directory Directory of swerve drive config files.
    */
+  public SwerveSubsystem(File directory) {
+    SmartDashboard.putData("Field", m_field);
+
   public SwerveSubsystem(File directory)
   {
     // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
@@ -158,6 +168,8 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    m_field.setRobotPose(getPose());
   }
 
   @Override
@@ -517,6 +529,48 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.drive(velocity);
   }
 
+  /**
+   * Rotate to face the nearest reef april tag.
+   * 
+   * 
+   */
+  public void alignNearestReefTag() {
+    // SWITCH APRILTAG LAYOUT TO K2025REEFSCAPE BTW
+    //Maybe move list generation out of method
+    Pose2d robotPose = getPose();
+    Optional<Alliance> ally = DriverStation.getAlliance(); 
+    int initTag;
+    int endTag;
+
+    if (ally.isPresent()) {
+      ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
+
+      if (ally.get() == Alliance.Red) {
+        initTag = 6;
+        endTag = 12;
+      } else {
+        initTag = 17;
+        endTag = 23;
+      }
+
+      //Get poses of reef april tags based on alliance, add it to the list of reef tag poses
+      for (int i = initTag; i < endTag; i++) {
+        if(aprilTagFieldLayout.getTagPose(i).isPresent()){
+          reefTagPoses.add(aprilTagFieldLayout.getTagPose(i).get().toPose2d()); 
+        }
+      }
+
+      //Find nearest reef tag
+      Pose2d nearestReefTag = robotPose.nearest(reefTagPoses);
+
+      //Make a new pose which keeps our translational data, but faces the nearest reef tag
+      //If bot faces wrong direction, remove .plus(...)
+      Pose2d facingPose = new Pose2d(robotPose.getTranslation(), nearestReefTag.getRotation().plus(Rotation2d.k180deg));
+      //Vroom Vroom!!
+      driveToPose(facingPose);
+    }
+  }
+
 
   /**
    * Get the swerve drive kinematics object.
@@ -744,4 +798,13 @@ public class SwerveSubsystem extends SubsystemBase
   {
     return swerveDrive;
   }
-}
+
+
+  /*
+   * COMMANDS
+   */
+  public Command align() {
+    SmartDashboard.putBoolean("Work?", true);
+    return this.runOnce(() -> alignNearestReefTag());
+  }
+} 
