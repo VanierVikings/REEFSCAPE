@@ -79,15 +79,12 @@ public class SwerveSubsystem extends SubsystemBase
   private Vision vision;
 
   public Field2d m_field = new Field2d();
-  private       Vision              vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
    */
-  public SwerveSubsystem(File directory) {
-    SmartDashboard.putData("Field", m_field);
 
   public SwerveSubsystem(File directory)
   {
