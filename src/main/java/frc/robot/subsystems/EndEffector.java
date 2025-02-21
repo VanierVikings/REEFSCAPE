@@ -91,11 +91,4 @@ public class EndEffector extends SubsystemBase {
             () -> setAngle(EndEffectorConstants.wristL3_ANGLE))
              .until(() -> checkAngle(EndEffectorConstants.wristL3_ANGLE, 0.01));
     }
-
-    // public Command moveToL4Command() {
-    //     return run(
-    //         () -> setAngle(EndEffectorConstants.wristL4_ANGLE))
-    //          .until(() -> checkAngle(EndEffectorConstants.wristL4_ANGLE, 0.01));
-    // }
-    // If L4 eve
 }

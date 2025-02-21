@@ -115,6 +115,4 @@ public final class Constants {
         public static final int SECONDS = 12;
     }
 
-
-
 }
