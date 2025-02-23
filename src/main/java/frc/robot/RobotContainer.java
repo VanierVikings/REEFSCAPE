@@ -4,22 +4,28 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swerve.AbsoluteDriveAdv;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.EndEffector;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -33,27 +39,12 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
-  // The robot's subsystems and commandsare defined here...
-  private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  // Applies deadbands and inverts controls because joysticks
-  // are back-right positive while robot
-  // controls are front-left positive
-  // left stick controls translation
-  // right stick controls the rotational velocity
-  // buttons are quick rotation positions to different ways to face
-  // WARNING: default buttons are on the same buttons as the ones defined in
-  // configureBindings
-  AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivetrain,
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
-          OperatorConstants.LEFT_Y_DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
-          OperatorConstants.DEADBAND),
-      () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
-          OperatorConstants.RIGHT_X_DEADBAND),
-      driverXbox.getHID()::getYButtonPressed,
-      driverXbox.getHID()::getAButtonPressed,
-      driverXbox.getHID()::getXButtonPressed,
-      driverXbox.getHID()::getBButtonPressed);
+  private final static Elevator m_elevator = new Elevator();
+  private final static EndEffector m_endEffector = new EndEffector();
+  // The robot's subsystems and commands are defined here...
+  private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+      "swerve"));
+   private final SendableChooser<Command> autoChooser;
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -122,6 +113,11 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
   }
 
   /**
@@ -145,11 +141,20 @@ public class RobotContainer {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
 
-    driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
+    m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
+   
+    // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
+    // .andThen(m_elevator.setPivot(Setpoint.rest)));
 
-    driverXbox.b().onTrue(drivetrain.align());
+    // driverXbox.a().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(m_elevator.setElevator(Setpoint.kLevel1)));
+
+    // // X Button -> Elevator/Arm to level 2 position
+    // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
+
+    // // Y Button -> Elevator/Arm to level 3 position
+    // driverXbox.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)));
   }
-  
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -166,5 +171,7 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);
-  }
+  }  
+ 
+ 
 }
