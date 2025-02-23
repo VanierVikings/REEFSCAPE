@@ -4,91 +4,83 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-//import com.revrobotics.RelativeEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import frc.robot.Constants.EndEffectorConstants;
 
 public class EndEffector extends SubsystemBase {
     private final SparkMax wristMotor;
     private final SparkMax shooterMotor;
-   // private final RelativeEncoder wristEncoder;
+    private final RelativeEncoder wristEncoder;
     private final SparkClosedLoopController wristClosedLoopController;
+    private double target;
 
-    
+    public enum SetpointEE {
+        kRest,
+        kSource,
+        kPlaceL1,
+        kPlaceGen
+    }
+
     public EndEffector() {
         shooterMotor = new SparkMax(EndEffectorConstants.shooterMotorID, MotorType.kBrushless);
         wristMotor = new SparkMax(EndEffectorConstants.wristMotorID, MotorType.kBrushless);
-       // wristEncoder = wristMotor.getEncoder();
+        wristEncoder = wristMotor.getEncoder();
+        target = EndEffectorConstants.L0_ANGLE;
 
-        SparkMaxConfig shooterMotorConfig= new SparkMaxConfig();
-        shooterMotorConfig.smartCurrentLimit(EndEffectorConstants.SHOOTER_CURRENT_LIMIT);
+        SparkMaxConfig shooterMotorConfig = new SparkMaxConfig();
+        shooterMotorConfig
+        .smartCurrentLimit(EndEffectorConstants.SHOOTER_CURRENT_LIMIT)
+        .idleMode(IdleMode.kCoast)
+        .voltageCompensation(12);
+
         SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
-        wristMotorConfig.smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT);
+        wristMotorConfig
+        .smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT)
+        .idleMode(IdleMode.kBrake)
+        .voltageCompensation(12);
 
         wristClosedLoopController = wristMotor.getClosedLoopController();
 
         wristMotorConfig.encoder
-            .positionConversionFactor(EndEffectorConstants.WRIST_ENCODER_TO_DEGREES);
+                .positionConversionFactor(EndEffectorConstants.WRIST_ENCODER_TO_DEGREES);
 
         wristMotorConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .p(EndEffectorConstants.WRIST_KP)
-            .i(EndEffectorConstants.WRIST_KI)
-            .d(EndEffectorConstants.WRIST_KD);
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(EndEffectorConstants.WRIST_KP)
+                .i(EndEffectorConstants.WRIST_KI)
+                .d(EndEffectorConstants.WRIST_KD);
 
+        this.setDefaultCommand(this.run(() -> wristClosedLoopController.setReference(wristEncoder.getPosition(), ControlType.kPosition)));
     }
 
-    public double getAngle() {
-        return wristMotor.getEncoder().getPosition(); 
+    public Command setPosition(SetpointEE setpoint) {
+        return this.runOnce(
+                () -> {
+                    switch (setpoint) {
+                        case kRest:
+                            target = EndEffectorConstants.L0_ANGLE;
+                            break;
+                        case kSource:
+                            target = EndEffectorConstants.SOURCE_ANGLE;
+                            break;
+                        case kPlaceL1:
+                            target = EndEffectorConstants.L1_ANGLE;
+                            break;
+                        case kPlaceGen:
+                            target = EndEffectorConstants.LGEN_ANGLE;
+                            break;
+                    }
+                });
     }
 
-    public boolean checkAngle(double targetAngle, double tolerance) {
-        double currentAngle = getAngle();
-        return Math.abs(currentAngle - targetAngle) < tolerance;
-    }
-
-    public void setAngle(double targetAngle){
-        wristClosedLoopController.setReference(targetAngle, ControlType.kPosition);
-    } //Set the angle of the wrist
-
-
-    public void runShooter(int direction){
-        shooterMotor.set(direction * EndEffectorConstants.shooterMaxVelocity);
-    }
-
-    public void stopShooter(){
-        shooterMotor.set(0);
-    }
-    
-    public void stopWrist(){
-        wristMotor.set(0);
-    }
-
-    public Command intake() {
-        return run(
-            () -> setAngle(0))
-            .until(() -> checkAngle(0, 0.01));
-    }
-
-    public Command moveToL1Command() {
-        return run(
-            () -> setAngle(EndEffectorConstants.wristL1_ANGLE))
-             .until(() -> checkAngle(EndEffectorConstants.wristL1_ANGLE, 0.01));
-    }
-
-    public Command moveToL2Command() {
-        return run(
-            () -> setAngle(EndEffectorConstants.wristL2_ANGLE))
-             .until(() -> checkAngle(EndEffectorConstants.wristL2_ANGLE, 0.01));
-    }
-
-    public Command moveToL3Command() {
-        return run(
-            () -> setAngle(EndEffectorConstants.wristL3_ANGLE))
-             .until(() -> checkAngle(EndEffectorConstants.wristL3_ANGLE, 0.01));
+    public Command spin(int direction) {
+        return this.run(() -> shooterMotor.set(direction));
     }
 }

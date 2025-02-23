@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,8 +23,8 @@ import swervelib.SwerveInputStream;
 
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.EndEffector.SetpointEE;
 import frc.robot.subsystems.EndEffector;
-
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -140,8 +139,6 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
-
-    m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
    
     // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
     // .andThen(m_elevator.setPivot(Setpoint.rest)));

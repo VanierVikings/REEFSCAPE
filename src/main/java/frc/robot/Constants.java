@@ -51,10 +51,7 @@ public final class Constants {
         public static final double L1 = 84.55; //cm
         public static final double L2 = 107.76; //cm
         public static final double L3 = 140.33;  //cm
-
-        public static final double goal_position = 0;
-        public static final double goal_velocity = 0;
-        public static final double time = 0;
+        public static final double SOURCE = 59.55;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 35; //amps
 
@@ -80,7 +77,8 @@ public final class Constants {
         public static final double L1_ANGLE = 32.74; //degrees
         public static final double L2_ANGLE = 48.70; //degrees
         public static final double L3_ANGLE = 59.55; //degrees
-        public static final double LHANG_ANGLE = 59.55; //degrees
+        public static final double HANG_ANGLE = 59.55;
+        public static final double SOURCE_ANGLE = 59.55; //degrees
 
         public static final int PIVOT_CURRENT_LIMIT = 35; //amps
     }
@@ -95,17 +93,14 @@ public final class Constants {
 
         public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
 
-        public static final double intakeANGLE = 0;
-        public static final double REEF_ANGLE = 0;
-        public static final double wristL1_ANGLE = 0; //must change due to the wrist
-        public static final double wristL2_ANGLE = 0; //must change
-        public static final double wristL3_ANGLE = 0; //must change
-   
-        public static final double shooterMaxVelocity = 5676; //rpm
+        public static final double L0_ANGLE = 0;
+        public static final double SOURCE_ANGLE = 0;
+        public static final double L1_ANGLE = 0;
+        public static final double LGEN_ANGLE = 0;
+
 
         public static final int WRIST_CURRENT_LIMIT = 20; //amps
         public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
-       
     }
 
 }
