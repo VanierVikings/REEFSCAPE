@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "North starting point to north reef"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "North East Reef to North Coral Station"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "North Station to South East Reef"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "North starting to North Coral",
+  "choreoAuto": false
+}

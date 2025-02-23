@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.402295918367347,
+        "y": 5.491230867346939
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.059183673469388,
+        "y": 6.617952806122449
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.298341836734694,
+        "y": 6.991039540816327
+      },
+      "prevControl": {
+        "x": 2.5444515306122453,
+        "y": 6.476179846938775
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "North Coral Station"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 126.40408856307904
+  },
+  "reversed": false,
+  "folder": "Reef to North Coral Station",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -120.033280435995
+  },
+  "useDefaultConstraints": true
+}

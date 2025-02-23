@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.65625,
+        "y": 2.5513073979591834
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.9922831632653064,
+        "y": 2.394610969387754
+      },
+      "isLocked": false,
+      "linkedName": "South West Reef"
+    },
+    {
+      "anchor": {
+        "x": 1.2162627551020408,
+        "y": 1.1410395408163254
+      },
+      "prevControl": {
+        "x": 2.716071428571429,
+        "y": 1.8648278061224473
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "South Coral Station"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -123.91743053697029
+  },
+  "reversed": false,
+  "folder": "Reef To South Coral Station",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 60.642246457208714
+  },
+  "useDefaultConstraints": true
+}

@@ -10,6 +10,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,8 +20,15 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
+
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.EndEffector.SetpointEE;
+import frc.robot.subsystems.EndEffector;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -33,9 +42,12 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  private final static Elevator m_elevator = new Elevator();
+  private final static EndEffector m_endEffector = new EndEffector();
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve"));
+   private final SendableChooser<Command> autoChooser;
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -76,6 +88,11 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
+
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
   }
 
   /**
@@ -108,8 +125,14 @@ public class RobotContainer {
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     }
+   
+    // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
+    // .andThen(m_elevator.setPivot(Setpoint.rest)));
 
-    driverXbox.a().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
+    // driverXbox.a().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(m_elevator.setElevator(Setpoint.kLevel1)));
+
+    // // X Button -> Elevator/Arm to level 2 position
+    // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
     driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
 
@@ -133,5 +156,7 @@ public class RobotContainer {
 
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);
-  }
+  }  
+ 
+ 
 }
