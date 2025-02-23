@@ -1,5 +1,6 @@
-package frc.robot.subsystems.swerve;
+//Vision v1.10 (REQUIRES LLOS 2024.9.1 OR LATER)
 
+package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Seconds;
@@ -53,7 +54,7 @@ public class Vision
    * April Tag Field Layout of the year.
    */
   public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2024Crescendo);
+      AprilTagFields.k2025Reefscape);
   /**
    * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
    */
@@ -394,7 +395,8 @@ public class Vision
     /**
      * Estimated robot pose.
      */
-    public        Optional<EstimatedRobotPose> estimatedRobotPose;
+    public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
+
     /**
      * Simulated camera instance which only exists during simulations.
      */

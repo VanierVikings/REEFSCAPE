@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -19,6 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
 
 import frc.robot.subsystems.Elevator;
@@ -52,7 +56,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(driverXbox::getRightX)
+      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
@@ -65,45 +69,17 @@ public class RobotContainer {
       driverXbox::getRightY)
       .headingWhile(true);
 
-  // Applies deadbands and inverts controls because joysticks
-  // are back-right positive while robot
-  // controls are front-left positive
-  // left stick controls translation
-  // right stick controls the desired angle NOT angular rotation
-  Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
+  /**
+   * Clone's the angular velocity input stream and converts it to a robotRelative
+   * input stream.
+   */
+  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+      .allianceRelativeControl(false);
 
-  // Applies deadbands and inverts controls because joysticks
-  // are back-right positive while robot
-  // controls are front-left positive
-  // left stick controls translation
-  // right stick controls the angular velocity of the robot
-  Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
-
-  Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
-
-  SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-      () -> -driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX())
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
-  // Derive the heading axis with math!
-  SwerveInputStream driveDirectAngleSim = driveAngularVelocitySim.copy()
-      .withControllerHeadingAxis(() -> Math.sin(
-          driverXbox.getRawAxis(
-              2) * Math.PI)
-          * (Math.PI * 2),
-          () -> Math.cos(
-              driverXbox.getRawAxis(
-                  2) * Math.PI)
-              *
-              (Math.PI * 2))
-      .headingWhile(true);
-
-  Command driveFieldOrientedDirectAngleSim = drivetrain.driveFieldOriented(driveDirectAngleSim);
-
-  Command driveSetpointGenSim = drivetrain.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
+  SwerveController controller = drivetrain.getSwerveController();
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftY(),
+      () -> -driverXbox.getLeftX(),
+      () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -133,8 +109,18 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-    drivetrain.setDefaultCommand(
-        !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle : driveFieldOrientedDirectAngleSim);
+    Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
+    // Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
+    // Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
+    // Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
+    //     driveDirectAngle);
+
+    if (RobotBase.isSimulation()) {
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    } else {
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    }
 
     if (Robot.isSimulation()) {
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
@@ -148,8 +134,14 @@ public class RobotContainer {
     // // X Button -> Elevator/Arm to level 2 position
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
-    // // Y Button -> Elevator/Arm to level 3 position
-    // driverXbox.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)));
+    driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
+
+    // SwerveController controller = drivetrain.getSwerveController();
+    // driverXbox.x()
+    //     .whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
+    //         drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond,
+    //         controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()))));
+
   }
 
   /**
@@ -160,10 +152,6 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return drivetrain.getAutonomousCommand("New Auto");
-  }
-
-  public void setDriveMode() {
-    configureBindings();
   }
 
   public void setMotorBrake(boolean brake) {

@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase {
       ElevatorConstants.kG, ElevatorConstants.kV);
 
   private final TrapezoidProfile.Constraints pivotConstraints = new TrapezoidProfile.Constraints(
-      ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
+      PivotConstants.MAX_VELOCITY, PivotConstants.MAX_ACCELERATION);
   private final ProfiledPIDController pivotController = new ProfiledPIDController(PivotConstants.kP, PivotConstants.kI,
       PivotConstants.kD, pivotConstraints, PivotConstants.kDt);
   private final ArmFeedforward pivotFeedforward = new ArmFeedforward(PivotConstants.kS, PivotConstants.kG,

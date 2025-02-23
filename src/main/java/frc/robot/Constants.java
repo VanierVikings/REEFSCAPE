@@ -23,14 +23,14 @@ public final class Constants {
         public static final double WHEEL_LOCK_TIME = 10; // seconds
     }
 
-    public static class OperatorConstants {
+    public static final class OperatorConstants {
         public static final double DEADBAND = 0.1;
         public static final double LEFT_Y_DEADBAND = 0.1;
         public static final double RIGHT_X_DEADBAND = 0.1;
         public static final double TURN_CONSTANT = 6;
     }
 
-    public static class ElevatorConstants {
+    public static final class ElevatorConstants {
         public static final int motorOneID = 9;
         public static final int motorTwoID = 10;
 
@@ -57,7 +57,7 @@ public final class Constants {
 
     }
 
-    public static class PivotConstants {
+    public static final class PivotConstants {
         public static final int motorOneID = 11;
         public static final int motorTwoID = 12;    
 
@@ -83,7 +83,7 @@ public final class Constants {
         public static final int PIVOT_CURRENT_LIMIT = 35; //amps
     }
 
-    public static class EndEffectorConstants {
+    public static final class EndEffectorConstants {
         public static final int shooterMotorID = 13;
         public static final int wristMotorID = 14;
 
