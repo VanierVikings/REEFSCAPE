@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.372,
-        "y": 2.504
+        "x": 5.432142857142858,
+        "y": 2.5811543367346927
       },
       "prevControl": {
-        "x": 5.08212455637655,
-        "y": 2.7387365058615893
+        "x": 5.1422674135194075,
+        "y": 2.815890842596282
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "South East Reef"
     }
   ],
   "rotationTargets": [
@@ -47,10 +47,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 128.4032617021058
+    "rotation": 121.47683934958393
   },
   "reversed": false,
-  "folder": "Reefscape starting paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -179.55585556688806

@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.44,
-        "y": 5.497
+        "x": 5.39483418367347,
+        "y": 5.528539540816325
       },
       "prevControl": {
-        "x": 5.090830808257006,
-        "y": 5.2195168914374355
+        "x": 5.045664991930475,
+        "y": 5.251056432253761
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "North East Reef"
     }
   ],
   "rotationTargets": [
@@ -59,10 +59,10 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -117.12130340415848
+    "rotation": -119.53878225955809
   },
   "reversed": false,
-  "folder": "Reefscape starting paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 177.7394980888588

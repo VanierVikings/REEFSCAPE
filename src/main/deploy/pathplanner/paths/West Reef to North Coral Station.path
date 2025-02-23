@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.521938775510204,
-        "y": 5.528539540816325
+        "x": 2.7832270408163264,
+        "y": 4.0585778061224485
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.746045918367347,
-        "y": 5.804623724489796
+        "x": 2.361020088808088,
+        "y": 5.867445998771028
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 6.991039540816327
       },
       "prevControl": {
-        "x": 2.7096719208068336,
-        "y": 6.184969556695925
+        "x": 2.0519770408163267,
+        "y": 6.170248724489795
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "Reef to North Coral Station",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -58.3924977537511
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.342602040817002,
-        "y": 2.5438456632579927
+        "x": 5.432142857142858,
+        "y": 2.5811543367346927
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.775637755102715,
-        "y": 0.6187181122375855
+        "x": 3.8651785714285714,
+        "y": 0.6560267857142856
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "South East Reef"
     },
     {
       "anchor": {
@@ -77,10 +77,10 @@
     "rotation": 126.40408856307904
   },
   "reversed": false,
-  "folder": "Reefscape reef to station",
+  "folder": "Reef to North Coral Station",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 122.68055474336334
+    "rotation": 121.47683934958393
   },
   "useDefaultConstraints": true
 }

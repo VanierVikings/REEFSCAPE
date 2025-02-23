@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 6.178316326530613,
-        "y": 4.0585778061224485
+        "y": 4.133195153061224
       },
       "prevControl": null,
       "nextControl": {
         "x": 7.021492346938776,
-        "y": 6.588105867346939
+        "y": 6.662723214285714
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "East Reef"
     },
     {
       "anchor": {
@@ -45,10 +45,10 @@
     "rotation": 126.40408856307904
   },
   "reversed": false,
-  "folder": "Reefscape reef to station",
+  "folder": "Reef to North Coral Station",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 178.9769698113322
+    "rotation": -179.59651526494125
   },
   "useDefaultConstraints": true
 }

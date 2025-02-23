@@ -3,11 +3,19 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Station back to reef",
-    "Reefscape reef to station",
-    "Reefscape starting paths"
+    "South Coral Station to Reef",
+    "North Coral Station to Reef",
+    "Reef To South Coral Station",
+    "Reef to North Coral Station"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Mid Starting to North Coral",
+    "Mid Starting to South Coral",
+    "South Starting to North Coral",
+    "South Starting to South coral",
+    "North Starting to South Coral",
+    "North starting to North Coral"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

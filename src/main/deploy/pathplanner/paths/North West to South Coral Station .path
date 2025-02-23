@@ -12,7 +12,7 @@
         "y": 5.7374681122448985
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "North West Reef"
     },
     {
       "anchor": {
@@ -45,7 +45,7 @@
     "rotation": -123.91743053697029
   },
   "reversed": false,
-  "folder": "Reefscape reef to station",
+  "folder": "Reef To South Coral Station",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -60.154

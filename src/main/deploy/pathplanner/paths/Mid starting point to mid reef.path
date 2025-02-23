@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 6.162,
-        "y": 3.908
+        "x": 6.178316326530613,
+        "y": 4.133195153061224
       },
       "prevControl": {
-        "x": 5.977583418368306,
-        "y": 4.076791363580252
+        "x": 5.993899744898919,
+        "y": 4.301986516641477
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "East Reef"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -178.9190758133394
+    "rotation": -179.59651526494125
   },
   "reversed": false,
-  "folder": "Reefscape starting paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
