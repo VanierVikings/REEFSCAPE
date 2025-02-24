@@ -10,7 +10,7 @@ import frc.robot.Constants.hangConstants;
 
 public class Hang extends SubsystemBase{
 
-private SparkMax grabber = new SparkMax(16, MotorType.kBrushless); 
+private SparkMax grabber = new SparkMax(16, MotorType.kBrushless);  //DO NOT CHANGE
  
 
 public Hang(){
