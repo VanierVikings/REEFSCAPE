@@ -99,7 +99,7 @@ public class Elevator extends SubsystemBase {
         .maxMotion
         .maxVelocity(PivotConstants.MAX_VELOCITY)
         .maxAcceleration(PivotConstants.MAX_ACCELERATION)
-        .allowedClosedLoopError(1.0);
+        .allowedClosedLoopError(0.01);
 
     pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase {
         .maxMotion
         .maxVelocity(ElevatorConstants.MAX_VELOCITY / ElevatorConstants.ENCODER_TO_METERS)
         .maxAcceleration(ElevatorConstants.MAX_ACCELERATION / ElevatorConstants.ENCODER_TO_METERS)
-        .allowedClosedLoopError(0.01 / ElevatorConstants.ENCODER_TO_METERS);
+        .allowedClosedLoopError(0.01);
 
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     this.setDefaultCommand(moveToSetpoint());
