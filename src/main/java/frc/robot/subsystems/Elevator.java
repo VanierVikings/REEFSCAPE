@@ -95,7 +95,7 @@ public class Elevator extends SubsystemBase {
         .p(PivotConstants.kP)
         .i(PivotConstants.kI)
         .d(PivotConstants.kD)
-        .outputRange(-1, 1)
+        .outputRange(-0.2, 2)
         .maxMotion
         .maxVelocity(PivotConstants.MAX_VELOCITY)
         .maxAcceleration(PivotConstants.MAX_ACCELERATION)

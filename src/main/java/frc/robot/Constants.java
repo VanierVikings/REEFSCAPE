@@ -34,11 +34,15 @@ public final class Constants {
         public static final int motorOneID = 9;
         public static final int motorTwoID = 10;
 
-        public static final double MAX_VELOCITY = 1.0;
+        public static final double MAX_VELOCITY = 0.1;
+        //public static final double MAX_VELOCITY = 0.75806630731;
         public static final double MAX_ACCELERATION = 0.5;
-        public static final double ENCODER_TO_METERS = 2*20*Math.PI*0.85; //distance per pulse
+        ///public static final double MAX_ACCELERATION = 0.8717762534;
+        public static final double SPOOL_DIAMETER = 0.0444754;
+        public static final double GEAR_RATIO = 16;
+        public static final double ENCODER_TO_METERS = GEAR_RATIO * SPOOL_DIAMETER * Math.PI; //distance per pulse
        
-        public static final double kP = 0.1;
+        public static final double kP = 0.01;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
@@ -48,12 +52,12 @@ public final class Constants {
         public static final double kG = 0.0;
 
         public static final double L0 = 0; //cm
-        public static final double L1 = 84.55; //cm
-        public static final double L2 = 107.76; //cm
-        public static final double L3 = 140.33;  //cm
-        public static final double SOURCE = 59.55;
+        public static final double L1 = 0.2455; //cm
+        public static final double L2 = 0.4776; //cm
+        public static final double L3 = 0.8033;  //cm   
+        public static final double SOURCE = 0;
 
-        public static final int ELEVATOR_CURRENT_LIMIT = 35; //amps
+        public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
 
     }
 
@@ -61,17 +65,17 @@ public final class Constants {
         public static final int motorOneID = 11;
         public static final int motorTwoID = 12;    
 
-        public static final double MAX_VELOCITY = 1.0;
+        public static final double MAX_VELOCITY = 0.1;
         public static final double MAX_ACCELERATION = 0.5;
 
-        public static final double kP = 0.1;
+        public static final double kP = 0.01;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kDt = 0.0;
+        public static final double kDt = 0.02;
 
         public static final double kS = 0.1;
-        public static final double kV = 0.0;
-        public static final double kG = 0.0;
+        public static final double kV = 4.89;
+        public static final double kG = 0.53;
 
         public static final double L0_ANGLE = 32.74; //degrees
         public static final double L1_ANGLE = 32.74; //degrees
@@ -80,7 +84,7 @@ public final class Constants {
         public static final double HANG_ANGLE = 59.55;
         public static final double SOURCE_ANGLE = 59.55; //degrees
 
-        public static final int PIVOT_CURRENT_LIMIT = 35; //amps
+        public static final int PIVOT_CURRENT_LIMIT = 40; //amps
     }
 
     public static final class EndEffectorConstants {
@@ -88,7 +92,7 @@ public final class Constants {
         public static final int wristMotorID = 14;
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0;
+        public static final double WRIST_KP = 0.01;
         public static final double WRIST_KD = 0;
 
         public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
@@ -99,8 +103,8 @@ public final class Constants {
         public static final double LGEN_ANGLE = 0;
 
 
-        public static final int WRIST_CURRENT_LIMIT = 20; //amps
-        public static final int SHOOTER_CURRENT_LIMIT = 20; //amps
+        public static final int WRIST_CURRENT_LIMIT = 40; //amps
+        public static final int SHOOTER_CURRENT_LIMIT = 40; //amps
     }
 
 }
