@@ -38,8 +38,8 @@ public final class Constants {
         //public static final double MAX_VELOCITY = 0.75806630731;
         public static final double MAX_ACCELERATION = 0.5;
         ///public static final double MAX_ACCELERATION = 0.8717762534;
-        public static final double SPOOL_DIAMETER = 0.0444754;
-        public static final double GEAR_RATIO = 16;
+        public static final double SPOOL_DIAMETER = 0.04343;
+        public static final double GEAR_RATIO = 1/16;
         public static final double ENCODER_TO_METERS = GEAR_RATIO * SPOOL_DIAMETER * Math.PI; //distance per pulse
        
         public static final double kP = 0.01;

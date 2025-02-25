@@ -47,7 +47,6 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "swerve"));
-   private final SendableChooser<Command> autoChooser;
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -88,10 +87,6 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
-
-    autoChooser = AutoBuilder.buildAutoChooser();
-
-    SmartDashboard.putData("Auto Chooser", autoChooser);
 
   }
 

@@ -107,7 +107,7 @@ public class Elevator extends SubsystemBase {
     SparkMaxConfig elevatorFollow = new SparkMaxConfig();
     elevatorFollow
     .follow(9, true)
-    .idleMode(IdleMode.kBrake)
+    .idleMode(IdleMode.kCoast)
     .smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT)
     .voltageCompensation(12);
     elevatorMotorTwo.configure(elevatorFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -119,7 +119,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotorConfig = new SparkMaxConfig();
     elevatorMotorConfig
     .smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT)
-    .idleMode(IdleMode.kBrake)
+    .idleMode(IdleMode.kCoast)
     .voltageCompensation(12);
 
     elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
