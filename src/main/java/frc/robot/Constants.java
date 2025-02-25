@@ -47,13 +47,13 @@ public final class Constants {
         public static final double kV = 0.0;
         public static final double kG = 0.0;
 
-        public static final double L0 = 0; //cm
+        public static final double L0 = 1; //cm
         public static final double L1 = 84.55; //cm
         public static final double L2 = 107.76; //cm
         public static final double L3 = 140.33;  //cm
 
-        public static final double goal_position = 0;
-        public static final double goal_velocity = 0;
+        public static final double goal_position = 1;
+        public static final double goal_velocity = 2;
         public static final double time = 0;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 35; //amps
@@ -70,7 +70,7 @@ public final class Constants {
         public static final double kP = 0.1;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kDt = 0.0;
+        public static final double kDt = 0.02;
 
         public static final double kS = 0.1;
         public static final double kV = 0.0;
