@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase {
     .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
     .voltageCompensation(12)
     .idleMode(IdleMode.kBrake);
-    pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    //pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     pivotClosedLoopController = pivotMotorOne.getClosedLoopController();
 
@@ -119,8 +119,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotorConfig = new SparkMaxConfig();
     elevatorMotorConfig
     .smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT)
-    .idleMode(IdleMode.kCoast)
-    .voltageCompensation(12);
+    .idleMode(IdleMode.kCoast);
 
     elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
 
@@ -136,10 +135,9 @@ public class Elevator extends SubsystemBase {
         .d(ElevatorConstants.kD)
         .outputRange(-1, 1)
         .maxMotion
-        .maxVelocity(ElevatorConstants.MAX_VELOCITY / ElevatorConstants.ENCODER_TO_METERS)
-        .maxAcceleration(ElevatorConstants.MAX_ACCELERATION / ElevatorConstants.ENCODER_TO_METERS)
+        .maxVelocity(ElevatorConstants.MAX_VELOCITY)
+        .maxAcceleration(ElevatorConstants.MAX_ACCELERATION)
         .allowedClosedLoopError(0.01);
-
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     this.setDefaultCommand(moveToSetpoint());
   }
@@ -234,7 +232,10 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     rezeroElevator();
+    elevatorMotorOne.set(1);
+    elevatorMotorTwo.set(1);
     SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("MAXMotion Output", elevatorMotorOne.getAppliedOutput());
     SmartDashboard.putNumber("Pivot Angle", pivotEncoder.getPosition());
   }
 }
