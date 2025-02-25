@@ -31,8 +31,8 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final int motorOneID = 9;
-        public static final int motorTwoID = 10;
+        public static final int motorOneID = 9; //used
+        public static final int motorTwoID = 10; //used
 
         public static final double MAX_VELOCITY = 0.1;
         //public static final double MAX_VELOCITY = 0.75806630731;
@@ -62,8 +62,8 @@ public final class Constants {
     }
 
     public static final class PivotConstants {
-        public static final int motorOneID = 11;
-        public static final int motorTwoID = 12;    
+        public static final int motorOneID = 11; //used
+        public static final int motorTwoID = 12; //used
 
         public static final double MAX_VELOCITY = 0.1;
         public static final double MAX_ACCELERATION = 0.5;
@@ -88,8 +88,8 @@ public final class Constants {
     }
 
     public static final class EndEffectorConstants {
-        public static final int shooterMotorID = 13;
-        public static final int wristMotorID = 14;
+        public static final int shooterMotorID = 13; //used
+        public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
         public static final double WRIST_KP = 0.01;
