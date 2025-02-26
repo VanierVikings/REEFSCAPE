@@ -136,6 +136,8 @@ public class Elevator extends SubsystemBase {
         .maxAcceleration(1000)
         .allowedClosedLoopError(0);
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    elevatorController.setTolerance(0.0001);
   }
 
   // public Command moveToSetpoint() {
@@ -228,7 +230,8 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     rezeroElevator();
-    SmartDashboard.putNumber("Neo Volt", elevatorMotorOne.getBusVoltage());
+    SmartDashboard.putNumber("Setpoint Velocity", elevatorController.getSetpoint().velocity);
+    SmartDashboard.putNumber("Velocity", elevatorEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
     SmartDashboard.putNumber("Target", elevatorCurrentTarget);
     SmartDashboard.putNumber("Pivot Angle", pivotEncoder.getPosition());
