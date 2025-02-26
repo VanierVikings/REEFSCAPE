@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import java.io.File;
@@ -129,7 +130,8 @@ public class RobotContainer {
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
     //driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
-    driverXbox.x().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
+    driverXbox.x().onTrue(m_elevator.setElevator(Setpoint.kRest));
+    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
     // SwerveController controller = drivetrain.getSwerveController();
     // driverXbox.x()

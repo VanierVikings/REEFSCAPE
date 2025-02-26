@@ -34,27 +34,27 @@ public final class Constants {
         public static final int motorOneID = 9; //used
         public static final int motorTwoID = 10; //used
 
-        public static final double MAX_VELOCITY = 0.1;
+        public static final double MAX_VELOCITY = 0.7;
         //public static final double MAX_VELOCITY = 0.75806630731;
-        public static final double MAX_ACCELERATION = 0.5;
+        public static final double MAX_ACCELERATION = 2.5;
         ///public static final double MAX_ACCELERATION = 0.8717762534;
         public static final double SPOOL_DIAMETER = 0.04318;
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 0.01;
+        public static final double kP = 10.0;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double kS = 0.1;
-        public static final double kV = 0.0;
-        public static final double kG = 0.0;
+        public static final double kS = 0.0;
+        public static final double kV = 14.32;
+        public static final double kG = 0.25;
 
         public static final double L0 = 0; //cm
-        public static final double L1 = 0.2455; //cm
-        public static final double L2 = 0.4776; //cm
-        public static final double L3 = 0.8033;  //cm   
+        public static final double L1 = 0.15; //cm
+        public static final double L2 = 0.0; //cm
+        public static final double L3 = 0.0;  //cm   
         public static final double SOURCE = 0;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
@@ -65,10 +65,10 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 0.1;
+        public static final double MAX_VELOCITY = 0.01;
         public static final double MAX_ACCELERATION = 0.5;
 
-        public static final double kP = 0.01;
+        public static final double kP = 0.001;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
