@@ -1,9 +1,9 @@
 {
   "location": {
     "front": -11.5,
-    "left": -11.5
+    "left": -12.5
   },
-  "absoluteEncoderOffset": 326.5,
+  "absoluteEncoderOffset": 0,
   "drive": {
     "type": "krakenx60",
     "id": 7,
