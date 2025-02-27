@@ -65,24 +65,24 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 0.01;
+        public static final double MAX_VELOCITY = 0.1;
         public static final double MAX_ACCELERATION = 0.5;
 
-        public static final double kP = 0.001;
+        public static final double kP = 0.00;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double kS = 0.1;
-        public static final double kV = 4.89;
-        public static final double kG = 0.53;
+        public static final double kS = 0;
+        public static final double kV = 0.0;
+        public static final double kG = 0.5;
 
-        public static final double L0_ANGLE = 32.74; //degrees
-        public static final double L1_ANGLE = 32.74; //degrees
-        public static final double L2_ANGLE = 48.70; //degrees
-        public static final double L3_ANGLE = 59.55; //degrees
-        public static final double HANG_ANGLE = 59.55;
-        public static final double SOURCE_ANGLE = 59.55; //degrees
+        public static final double L0_ANGLE = 39; //degrees
+        public static final double L1_ANGLE = 45; //degrees
+        public static final double L2_ANGLE = 0; //degrees
+        public static final double L3_ANGLE = 0; //degrees
+        public static final double HANG_ANGLE = 0;
+        public static final double SOURCE_ANGLE = 0; //degrees
 
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
     }

@@ -4,22 +4,18 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.LimitSwitchConfig.Type;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -31,9 +27,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMax elevatorMotorTwo;
   private final SparkMax pivotMotorOne;
   private final SparkMax pivotMotorTwo;
-  private final SparkClosedLoopController pivotClosedLoopController;
-  private final SparkAbsoluteEncoder pivotEncoder;
-  private final SparkClosedLoopController elevatorClosedLoopController;
+  private final DutyCycleEncoder pivotEncoder = new DutyCycleEncoder(0, 360, 0);
   private final TrapezoidProfile.Constraints elevatorConstraints = new TrapezoidProfile.Constraints(
       ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
   private final ProfiledPIDController elevatorController = new ProfiledPIDController(ElevatorConstants.kP,
@@ -73,31 +67,18 @@ public class Elevator extends SubsystemBase {
 
     SparkMaxConfig pivotFollow = new SparkMaxConfig();
     pivotFollow
-    .follow(11, true)
+    .follow(11)
     .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
     .voltageCompensation(12)
-    .idleMode(IdleMode.kBrake);
+    .idleMode(IdleMode.kCoast);
     pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    pivotClosedLoopController = pivotMotorOne.getClosedLoopController();
-
-    pivotEncoder = pivotMotorOne.getAbsoluteEncoder();
     SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
     pivotMotorConfig
     .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
-    .idleMode(IdleMode.kBrake)
+    .idleMode(IdleMode.kCoast)
+    .inverted(true)
     .voltageCompensation(12);
-
-    pivotMotorConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-        .p(PivotConstants.kP)
-        .i(PivotConstants.kI)
-        .d(PivotConstants.kD)
-        .outputRange(-0.2, 2)
-        .maxMotion
-        .maxVelocity(PivotConstants.MAX_VELOCITY)
-        .maxAcceleration(PivotConstants.MAX_ACCELERATION)
-        .allowedClosedLoopError(0.01);
 
     pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -108,8 +89,6 @@ public class Elevator extends SubsystemBase {
     .idleMode(IdleMode.kBrake)
     .smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT);
     elevatorMotorTwo.configure(elevatorFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    elevatorClosedLoopController = elevatorMotorOne.getClosedLoopController();
 
     elevatorEncoder = elevatorMotorOne.getEncoder();
 
@@ -125,27 +104,13 @@ public class Elevator extends SubsystemBase {
     elevatorMotorConfig.encoder
         .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); // inches
 
-    elevatorMotorConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(ElevatorConstants.kP)
-        .i(ElevatorConstants.kI)
-        .d(ElevatorConstants.kD)
-        .outputRange(-1, 1)
-        .maxMotion
-        .maxVelocity(500)
-        .maxAcceleration(1000)
-        .allowedClosedLoopError(0);
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevatorController.setTolerance(0.0001);
-  }
 
-  // public Command moveToSetpoint() {
-  //   return this.run(() -> {
-  //     pivotClosedLoopController.setReference(pivotCurrentTarget, ControlType.kMAXMotionPositionControl);
-  //     elevatorClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
-  //   });
-  // }
+    elevatorController.setGoal(ElevatorConstants.L0);
+    pivotController.setGoal(PivotConstants.L0_ANGLE);
+  }
 
   public Command moveToSetpoint() {
   return this.run(() -> {
@@ -153,10 +118,10 @@ public class Elevator extends SubsystemBase {
   elevatorController.calculate(elevatorEncoder.getPosition())
   + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
 
-  // pivotMotorOne.setVoltage(
-  // pivotController.calculate(pivotEncoder.getPosition())
-  // + pivotFeedforward.calculate(pivotController.getSetpoint().position,
-  // pivotController.getSetpoint().velocity));
+  pivotMotorOne.setVoltage(
+  pivotController.calculate(pivotEncoder.get())
+  + pivotFeedforward.calculate(pivotController.getSetpoint().position,
+  pivotController.getSetpoint().velocity));
 
   });
   }
@@ -166,27 +131,21 @@ public class Elevator extends SubsystemBase {
         () -> {
           switch (setpoint) {
             case kRest:
-              pivotCurrentTarget = PivotConstants.L0_ANGLE;
               pivotController.setGoal(PivotConstants.L0_ANGLE);
               break;
             case kLevel1:
-              pivotCurrentTarget = PivotConstants.L1_ANGLE;
               pivotController.setGoal(PivotConstants.L1_ANGLE);
               break;
             case kLevel2:
-              pivotCurrentTarget = PivotConstants.L2_ANGLE;
               pivotController.setGoal(PivotConstants.L2_ANGLE);
               break;
             case kLevel3:
-              pivotCurrentTarget = PivotConstants.L3_ANGLE;
               pivotController.setGoal(PivotConstants.L3_ANGLE);
               break;
             case kHang:
-              pivotCurrentTarget = PivotConstants.HANG_ANGLE;
               pivotController.setGoal(PivotConstants.HANG_ANGLE);
               break;
             case kSource:
-              elevatorCurrentTarget = PivotConstants.SOURCE_ANGLE;
               elevatorController.setGoal(PivotConstants.SOURCE_ANGLE);
               break;
           }
@@ -198,23 +157,18 @@ public class Elevator extends SubsystemBase {
       () -> {
         switch (setpoint) {
           case kRest:
-            elevatorCurrentTarget = ElevatorConstants.L0;
             elevatorController.setGoal(ElevatorConstants.L0);
             break;
           case kLevel1:
-            elevatorCurrentTarget = ElevatorConstants.L1;
             elevatorController.setGoal(ElevatorConstants.L1);
             break;
           case kLevel2:
-            elevatorCurrentTarget = ElevatorConstants.L2;
             elevatorController.setGoal(ElevatorConstants.L2);
             break;
           case kLevel3:
-            elevatorCurrentTarget = ElevatorConstants.L3;
             elevatorController.setGoal(ElevatorConstants.L3);
             break;
           case kSource:
-            elevatorCurrentTarget = ElevatorConstants.SOURCE;
             elevatorController.setGoal(ElevatorConstants.SOURCE);
             break;
         }
@@ -230,10 +184,14 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     rezeroElevator();
-    SmartDashboard.putNumber("Setpoint Velocity", elevatorController.getSetpoint().velocity);
-    SmartDashboard.putNumber("Velocity", elevatorEncoder.getVelocity());
-    SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
-    SmartDashboard.putNumber("Target", elevatorCurrentTarget);
-    SmartDashboard.putNumber("Pivot Angle", pivotEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator Setpoint Velocity", elevatorController.getSetpoint().velocity);
+    SmartDashboard.putNumber("Elevator Velocity", elevatorEncoder.getVelocity());
+    SmartDashboard.putNumber("Elevator Position", elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator Setpoint Position", elevatorController.getGoal().position);
+
+    // SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getSetpoint().velocity);
+    // SmartDashboard.putNumber("Pivot Velocity", pivotEncoder.get());
+    SmartDashboard.putData("Pivot Position", pivotEncoder);
+    SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
   }
 }

@@ -116,7 +116,7 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
     } else {
-      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      //drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
     m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
@@ -130,8 +130,12 @@ public class RobotContainer {
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
     //driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
-    driverXbox.x().onTrue(m_elevator.setElevator(Setpoint.kRest));
+    driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
     driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
+
+    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+
 
     // SwerveController controller = drivetrain.getSwerveController();
     // driverXbox.x()
