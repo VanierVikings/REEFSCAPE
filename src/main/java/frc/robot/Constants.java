@@ -55,10 +55,8 @@ public final class Constants {
         public static final double kDt = 0.02;
 
         public static final double kS = 0.0;
-        // public static final double kV = 12;
-        // public static final double kG = 0.54;
-        public static final double kV = 0;
-        public static final double kG = 0;
+        public static final double kV = 0.01;
+        public static final double kG = 0.54;
 
         public static final double L0 = 0.001; //cm
         public static final double L1 = 0.15; //cm
@@ -74,20 +72,20 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 80;
+        public static final double MAX_VELOCITY = 180;
         public static final double MAX_ACCELERATION = 400;
 
-        public static final double kP = 0.001;
+        public static final double kP = 0.00;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
         public static final double kS = 0;
-        public static final double kV = 0.0;
+        public static final double kV = 12;
         public static final double kG = 0.65;
 
-        public static final double L0_ANGLE = 39; //degrees
-        public static final double L1_ANGLE = 45; //degrees
+        public static final double L0_ANGLE = 47.37; //degrees
+        public static final double L1_ANGLE = 70; //degrees
         public static final double L2_ANGLE = 0; //degrees
         public static final double L3_ANGLE = 0; //degrees
         public static final double HANG_ANGLE = 0;
