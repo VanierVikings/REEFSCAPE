@@ -53,13 +53,13 @@ public class RobotContainer {
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-      () -> driverXbox.getLeftY() * -1,
-      () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-      .deadband(OperatorConstants.DEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
+    () -> driverXbox.getLeftY() * 1,
+    () -> driverXbox.getLeftX() * 1) // Axis which give the desired translational angle and speed.
+  .withControllerRotationAxis(driverXbox::getRightX) // Axis which give the desired angular velocity.
+  .deadband(0.01)                  // Controller deadband
+  .scaleTranslation(0.8)           // Scaled controller translation axis
+  .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative
@@ -105,6 +105,7 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
+    Command driveAngleVel = drivetrain.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
     Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
@@ -130,12 +131,12 @@ public class RobotContainer {
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
     //driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
-    // driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
-    // driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
+    driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
+    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
-    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
-
+    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    driverXbox.start().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
 
     // SwerveController controller = drivetrain.getSwerveController();
     // driverXbox.x()

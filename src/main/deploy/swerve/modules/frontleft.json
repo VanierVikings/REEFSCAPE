@@ -20,8 +20,8 @@
   },
   "encoder": {
     "type": "analog",
-    "id": 1,
+    "id": 3,
     "canbus": null
   },
-  "absoluteEncoderInverted": true
+  "absoluteEncoderInverted": false
 }
