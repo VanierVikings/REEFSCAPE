@@ -3,6 +3,8 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -14,6 +16,23 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.LimitSwitchConfig.Type;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
@@ -34,6 +53,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.PivotConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.swerve.LimelightHelpers;
 import java.io.File;
 import java.io.IOException;
@@ -97,6 +118,26 @@ public class SwerveSubsystem extends SubsystemBase
       // angleConversionFactor, driveConversionFactor);
     } catch (Exception e) {
       throw new RuntimeException(e);
+    }
+    
+    SparkMaxConfig steerConfig = new SparkMaxConfig();
+    steerConfig
+    .smartCurrentLimit(SwerveConstants.SteerCurrentLimit)
+    .idleMode(IdleMode.kBrake)
+    .voltageCompensation(12);
+    
+    
+    for (swervelib.SwerveModule m : swerveDrive.getModules()){
+      SparkMax steeringMotor = (SparkMax)m.getAngleMotor().getMotor();
+      TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
+      var limitConfigs = new CurrentLimitsConfigs();
+      var talonFXConfigurator  = driveMotor.getConfigurator();
+      limitConfigs.StatorCurrentLimit = SwerveConstants.StatorCurrentLimitDrive;
+      limitConfigs.StatorCurrentLimitEnable = true;
+      limitConfigs.SupplyCurrentLimit = SwerveConstants.SupplyCurrentLimitDrive;
+      limitConfigs.SupplyCurrentLimitEnable = true;
+      talonFXConfigurator.apply(limitConfigs);
+      steeringMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.

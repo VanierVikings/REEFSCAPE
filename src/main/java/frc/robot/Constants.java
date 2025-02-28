@@ -21,6 +21,12 @@ public final class Constants {
         public static final PIDConstants autoDrivePID = new PIDConstants(5.0, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(5.0, 0.0, 0.0);
         public static final double WHEEL_LOCK_TIME = 10; // seconds
+        public static final double StatorCurrentLimitDrive = 100;
+        public static final double SupplyCurrentLimitDrive = 60;
+        public static final int SteerCurrentLimit = 40;
+
+
+
     }
 
     public static final class OperatorConstants {
@@ -71,17 +77,17 @@ public final class Constants {
         public static final double MAX_VELOCITY = 10;
         public static final double MAX_ACCELERATION = 20;
 
-        public static final double kP = 0.00;
+        public static final double kP = 0.001;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
         public static final double kS = 0;
-        public static final double kV = 0.09;
-        public static final double kG = 0.65;
+        public static final double kV = 0.0;
+        public static final double kG = 0.5;
 
-        public static final double L0_ANGLE = 70; //degrees
-        public static final double L1_ANGLE = 70; //degrees
+        public static final double L0_ANGLE = 39; //degrees
+        public static final double L1_ANGLE = 45; //degrees
         public static final double L2_ANGLE = 0; //degrees
         public static final double L3_ANGLE = 0; //degrees
         public static final double HANG_ANGLE = 0;
