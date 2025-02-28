@@ -67,16 +67,16 @@ public class Elevator extends SubsystemBase {
 
     SparkMaxConfig pivotFollow = new SparkMaxConfig();
     pivotFollow
-    .follow(11)
+    .follow(11, false)
     .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
     .voltageCompensation(12)
-    .idleMode(IdleMode.kCoast);
+    .idleMode(IdleMode.kBrake);
     pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
     pivotMotorConfig
     .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
-    .idleMode(IdleMode.kCoast)
+    .idleMode(IdleMode.kBrake)
     .inverted(true)
     .voltageCompensation(12);
 
@@ -189,9 +189,10 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Position", elevatorEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Setpoint Position", elevatorController.getGoal().position);
 
-    // SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getSetpoint().velocity);
-    // SmartDashboard.putNumber("Pivot Velocity", pivotEncoder.get());
-    SmartDashboard.putData("Pivot Position", pivotEncoder);
+    SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getGoal().velocity);
+    SmartDashboard.putNumber("Pivot Velocity", pivotController.getSetpoint().velocity);
+    SmartDashboard.putNumber("Pivot Position", pivotEncoder.get());
     SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
+    SmartDashboard.putNumber("Pivot Voltage", pivotMotorOne.getBusVoltage());
   }
 }
