@@ -42,14 +42,17 @@ public final class Constants {
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 80.0;
+        //public static final double kP = 80;
+        public static final double kP = 0.0;
         public static final double kI = 0.0;
         public static final double kD = 0.1;
         public static final double kDt = 0.02;
 
         public static final double kS = 0.0;
-        public static final double kV = 12;
-        public static final double kG = 0.54;
+        // public static final double kV = 12;
+        // public static final double kG = 0.54;
+        public static final double kV = 0;
+        public static final double kG = 0;
 
         public static final double L0 = 0.001; //cm
         public static final double L1 = 0.15; //cm
@@ -75,10 +78,10 @@ public final class Constants {
 
         public static final double kS = 0;
         public static final double kV = 0.09;
-        public static final double kG = 0.55;
+        public static final double kG = 0.65;
 
-        public static final double L0_ANGLE = 39; //degrees
-        public static final double L1_ANGLE = 60; //degrees
+        public static final double L0_ANGLE = 70; //degrees
+        public static final double L1_ANGLE = 70; //degrees
         public static final double L2_ANGLE = 0; //degrees
         public static final double L3_ANGLE = 0; //degrees
         public static final double HANG_ANGLE = 0;

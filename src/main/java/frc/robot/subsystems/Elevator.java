@@ -46,9 +46,6 @@ public class Elevator extends SubsystemBase {
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
 
-  public double elevatorCurrentTarget = ElevatorConstants.L0;
-  private double pivotCurrentTarget = PivotConstants.L0_ANGLE;
-
   public enum Setpoint {
     kRest,
     kLevel1,
@@ -59,6 +56,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
+    elevatorController.setGoal(ElevatorConstants.L1);
+    pivotController.setGoal(PivotConstants.L0_ANGLE);
+
     elevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
     elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);
 
@@ -107,9 +107,8 @@ public class Elevator extends SubsystemBase {
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevatorController.setTolerance(0.0001);
-
-    elevatorController.setGoal(ElevatorConstants.L0);
-    pivotController.setGoal(PivotConstants.L0_ANGLE);
+    pivotController.enableContinuousInput(0, 360);
+    
   }
 
   public Command moveToSetpoint() {
@@ -120,9 +119,8 @@ public class Elevator extends SubsystemBase {
 
   pivotMotorOne.setVoltage(
   pivotController.calculate(pivotEncoder.get())
-  + pivotFeedforward.calculate(pivotController.getSetpoint().position,
-  pivotController.getSetpoint().velocity));
-
+  + pivotFeedforward.calculate(Math.toRadians(pivotEncoder.get()),
+  Math.toRadians(pivotController.getSetpoint().velocity)));
   });
   }
 
@@ -188,11 +186,13 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Velocity", elevatorEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Position", elevatorEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Setpoint Position", elevatorController.getGoal().position);
+    SmartDashboard.putNumber("Elevator Error", elevatorController.getPositionError());
 
     SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getGoal().velocity);
     SmartDashboard.putNumber("Pivot Velocity", pivotController.getSetpoint().velocity);
     SmartDashboard.putNumber("Pivot Position", pivotEncoder.get());
     SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
-    SmartDashboard.putNumber("Pivot Voltage", pivotMotorOne.getBusVoltage());
+    SmartDashboard.putNumber("Pivot Voltage", pivotMotorOne.getAppliedOutput());
+    SmartDashboard.putNumber("Positional Error", pivotController.getPositionError());
   }
 }
