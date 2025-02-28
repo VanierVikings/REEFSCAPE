@@ -74,8 +74,8 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 10;
-        public static final double MAX_ACCELERATION = 20;
+        public static final double MAX_VELOCITY = 80;
+        public static final double MAX_ACCELERATION = 400;
 
         public static final double kP = 0.001;
         public static final double kI = 0.0;
@@ -84,7 +84,7 @@ public final class Constants {
 
         public static final double kS = 0;
         public static final double kV = 0.0;
-        public static final double kG = 0.5;
+        public static final double kG = 0.65;
 
         public static final double L0_ANGLE = 39; //degrees
         public static final double L1_ANGLE = 45; //degrees

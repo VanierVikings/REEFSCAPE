@@ -46,40 +46,40 @@ public class RobotContainer {
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
   // The robot's subsystems and commands are defined here...
-  //private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-  //    "swerve"));
+  private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+     "swerve"));
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled
    * by angular velocity.
    */
-  // SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-  //     () -> driverXbox.getLeftY() * -1,
-  //     () -> driverXbox.getLeftX() * -1)
-  //     .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
-  //     .deadband(OperatorConstants.DEADBAND)
-  //     .scaleTranslation(0.8)
-  //     .allianceRelativeControl(true);
+  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRawAxis(2))
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(0.8)
+      .allianceRelativeControl(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative
    * input stream.
    */
-  // SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
-  //     driverXbox::getRightY)
-  //     .headingWhile(true);
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
+      driverXbox::getRightY)
+      .headingWhile(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative
    * input stream.
    */
-  // SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-  //     .allianceRelativeControl(false);
+  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+      .allianceRelativeControl(false);
 
-  // SwerveController controller = drivetrain.getSwerveController();
-  // SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftY(),
-  //     () -> -driverXbox.getLeftX(),
-  //     () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()));
+  SwerveController controller = drivetrain.getSwerveController();
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftY(),
+      () -> -driverXbox.getLeftX(),
+      () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -105,19 +105,19 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-    // Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
-    // Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
-    // Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
-    // Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
-    // Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
-    //     driveDirectAngle);
+    Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
+    Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
+    Command driveRobotOrientedAngularVelocity = drivetrain.driveFieldOriented(driveRobotOriented);
+    Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
+        driveDirectAngle);
 
-    // if (RobotBase.isSimulation()) {
-    //   drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    //   driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-    // } else {
-    //   //drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    // }
+    if (RobotBase.isSimulation()) {
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+    } else {
+      drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    }
 
     m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
    
@@ -130,11 +130,11 @@ public class RobotContainer {
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
     //driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
-    driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
-    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
+    // driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
+    // driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
-    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
 
 
     // SwerveController controller = drivetrain.getSwerveController();
@@ -155,9 +155,9 @@ public class RobotContainer {
   //   return drivetrain.getAutonomousCommand("New Auto");
   // }
 
-  // public void setMotorBrake(boolean brake) {
-  //   drivetrain.setMotorBrake(brake);
-  // }  
+  public void setMotorBrake(boolean brake) {
+    drivetrain.setMotorBrake(brake);
+  }  
  
  
 }

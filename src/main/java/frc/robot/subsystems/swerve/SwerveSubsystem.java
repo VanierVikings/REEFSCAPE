@@ -120,25 +120,23 @@ public class SwerveSubsystem extends SubsystemBase
       throw new RuntimeException(e);
     }
     
-    SparkMaxConfig steerConfig = new SparkMaxConfig();
-    steerConfig
-    .smartCurrentLimit(SwerveConstants.SteerCurrentLimit)
-    .idleMode(IdleMode.kBrake)
-    .voltageCompensation(12);
+    // SparkMaxConfig steerConfig = new SparkMaxConfig();
+    // steerConfig
+    // .smartCurrentLimit(SwerveConstants.SteerCurrentLimit)
+    // .idleMode(IdleMode.kBrake);    
     
-    
-    for (swervelib.SwerveModule m : swerveDrive.getModules()){
-      SparkMax steeringMotor = (SparkMax)m.getAngleMotor().getMotor();
-      TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
-      var limitConfigs = new CurrentLimitsConfigs();
-      var talonFXConfigurator  = driveMotor.getConfigurator();
-      limitConfigs.StatorCurrentLimit = SwerveConstants.StatorCurrentLimitDrive;
-      limitConfigs.StatorCurrentLimitEnable = true;
-      limitConfigs.SupplyCurrentLimit = SwerveConstants.SupplyCurrentLimitDrive;
-      limitConfigs.SupplyCurrentLimitEnable = true;
-      talonFXConfigurator.apply(limitConfigs);
-      steeringMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
+    // for (swervelib.SwerveModule m : swerveDrive.getModules()){
+    //   SparkMax steeringMotor = (SparkMax)m.getAngleMotor().getMotor();
+    //   TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
+    //   var limitConfigs = new CurrentLimitsConfigs();
+    //   var talonFXConfigurator  = driveMotor.getConfigurator();
+    //   limitConfigs.StatorCurrentLimit = SwerveConstants.StatorCurrentLimitDrive;
+    //   limitConfigs.StatorCurrentLimitEnable = true;
+    //   limitConfigs.SupplyCurrentLimit = SwerveConstants.SupplyCurrentLimitDrive;
+    //   limitConfigs.SupplyCurrentLimitEnable = true;
+    //   talonFXConfigurator.apply(limitConfigs);
+    //   steeringMotor.configure(steerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // }
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
