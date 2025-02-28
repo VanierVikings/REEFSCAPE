@@ -94,6 +94,7 @@ public final class Constants {
         public static final double SOURCE_ANGLE = 0; //degrees
 
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
+        public static final double PIVOT_RATIO = 251.012345679; //4*3*(34/18)*(52/18)*(46/12)
     }
 
     public static final class EndEffectorConstants {

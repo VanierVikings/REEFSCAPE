@@ -43,6 +43,7 @@ public class Elevator extends SubsystemBase {
       PivotConstants.kV);
 
   private final RelativeEncoder elevatorEncoder;
+  private final RelativeEncoder neoPivotEncoder;
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
 
@@ -91,6 +92,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotorTwo.configure(elevatorFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevatorEncoder = elevatorMotorOne.getEncoder();
+    neoPivotEncoder = pivotMotorOne.getEncoder();
 
     elevatorMotorConfig = new SparkMaxConfig();
     elevatorMotorConfig
@@ -100,7 +102,7 @@ public class Elevator extends SubsystemBase {
     elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
 
     elevatorMotorConfig.limitSwitch.forwardLimitSwitchType(Type.kNormallyOpen);
-
+  
     elevatorMotorConfig.encoder
         .positionConversionFactor(ElevatorConstants.ENCODER_TO_METERS); // inches
 
@@ -108,7 +110,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorController.setTolerance(0.0001);
     pivotController.enableContinuousInput(0, 360);
-    
+    resetPivotAngle();
   }
 
   public Command moveToSetpoint() {
@@ -118,9 +120,8 @@ public class Elevator extends SubsystemBase {
   + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
 
   pivotMotorOne.setVoltage(
-  pivotController.calculate(pivotEncoder.get())
-  + pivotFeedforward.calculate(Math.toRadians(pivotEncoder.get()),
-  Math.toRadians(pivotController.getSetpoint().velocity)));
+  pivotController.calculate(getPivotAngle())
+  + pivotFeedforward.calculate(Math.toRadians(getPivotAngle()),(pivotController.getSetpoint().velocity)));
   });
   }
 
@@ -173,10 +174,24 @@ public class Elevator extends SubsystemBase {
       });
   }
 
+
+  public void resetPivotAngle(){
+    neoPivotEncoder.setPosition(pivotEncoder.get()*PivotConstants.PIVOT_RATIO);
+  }
+  public double getPivotAngle(){
+    return neoPivotEncoder.getPosition()/PivotConstants.PIVOT_RATIO;
+    
+  }
+
   private void rezeroElevator() {
     if (elevatorLimitSwitch.isPressed()) {
       elevatorEncoder.setPosition(0);
     }
+  }
+
+  public void getArmAngle(){
+    pivotController.setGoal(SmartDashboard.getNumber("Desired Pivot Angle",pivotController.getSetpoint().position));
+
   }
 
   @Override
@@ -190,9 +205,10 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getGoal().velocity);
     SmartDashboard.putNumber("Pivot Velocity", pivotController.getSetpoint().velocity);
-    SmartDashboard.putNumber("Pivot Position", pivotEncoder.get());
+    SmartDashboard.putNumber("Pivot Position", getPivotAngle());
     SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
     SmartDashboard.putNumber("Pivot Voltage", pivotMotorOne.getAppliedOutput());
     SmartDashboard.putNumber("Positional Error", pivotController.getPositionError());
+    getArmAngle();
   }
 }
