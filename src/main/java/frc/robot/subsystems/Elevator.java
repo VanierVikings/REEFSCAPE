@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
   private final SparkLimitSwitch elevatorLimitSwitch;
 
   private final IdleMode elevatorIdleMode = IdleMode.kBrake;
-  private final IdleMode pivotIdleMode = IdleMode.kCoast;
+  private final IdleMode pivotIdleMode = IdleMode.kBrake;
 
   public enum Setpoint {
     kRest,
