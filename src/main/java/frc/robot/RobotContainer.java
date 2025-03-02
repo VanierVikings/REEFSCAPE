@@ -14,12 +14,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.subsystems.swerve.SwerveSubsystem.branchSide;
+
 import java.io.File;
+import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -54,11 +58,11 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> driverXbox.getLeftY() * 1,
-    () -> driverXbox.getLeftX() * 1) // Axis which give the desired translational angle and speed.
+    () -> driverXbox.getLeftX(),
+    () -> -driverXbox.getLeftY()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(driverXbox::getRightX) // Axis which give the desired angular velocity.
   .deadband(0.01)                  // Controller deadband
-  .scaleTranslation(0.8)           // Scaled controller translation axis
+  .scaleTranslation(1)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
@@ -76,10 +80,9 @@ public class RobotContainer {
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveController controller = drivetrain.getSwerveController();
-  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftY(),
-      () -> -driverXbox.getLeftX(),
-      () -> controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRotation().getRadians()));
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driverXbox.getLeftX(),
+      () -> -driverXbox.getLeftY(),
+      () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -115,7 +118,7 @@ public class RobotContainer {
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+      drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
@@ -130,7 +133,6 @@ public class RobotContainer {
     // // X Button -> Elevator/Arm to level 2 position
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
-    //driverXbox.x().whileTrue(driveFieldOrientedAnglularVelocityRP);
     driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
     driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
@@ -138,11 +140,13 @@ public class RobotContainer {
     driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
     driverXbox.start().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
 
-    // SwerveController controller = drivetrain.getSwerveController();
-    // driverXbox.x()
-    //     .whileTrue(drivetrain.driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
-    //         drivetrain.getFieldVelocity().vxMetersPerSecond, drivetrain.getFieldVelocity().vyMetersPerSecond,
-    //         controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getReefTag().getRadians()))));
+    //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
+    driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
+
+    driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
+
+    driverXbox.b().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driverXbox.y().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 

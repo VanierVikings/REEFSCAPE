@@ -45,7 +45,7 @@
     "rotation": -66.37062226934316
   },
   "reversed": false,
-  "folder": "Station back to reef",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 135.4213686389561
