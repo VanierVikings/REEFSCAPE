@@ -3,12 +3,9 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
@@ -23,6 +20,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -37,8 +35,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.SwerveConstants;
+
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -55,7 +56,6 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import edu.wpi.first.units.*;
 
 public class SwerveSubsystem extends SubsystemBase {
 
@@ -77,6 +77,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public SwerveController controller;
 
+  public enum branchSide{
+    leftBranch,
+    rightBranch
+  }
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -88,10 +93,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.SwerveConstants.MAX_SPEED,
-          new Pose2d(new Translation2d(Meter.of(17),
-              Meter.of(4)),
-              Rotation2d.fromDegrees(0)));
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED);
       // Alternative method if you don't want to supply the conversion factor via JSON
       // files.
       // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
@@ -99,25 +101,6 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
-    // SparkMaxConfig steerConfig = new SparkMaxConfig();
-    // steerConfig
-    // .smartCurrentLimit(SwerveConstants.SteerCurrentLimit)
-    // .idleMode(IdleMode.kBrake);
-
-    // for (swervelib.SwerveModule m : swerveDrive.getModules()){
-    // SparkMax steeringMotor = (SparkMax)m.getAngleMotor().getMotor();
-    // TalonFX driveMotor = (TalonFX)m.getDriveMotor().getMotor();
-    // var limitConfigs = new CurrentLimitsConfigs();
-    // var talonFXConfigurator = driveMotor.getConfigurator();
-    // limitConfigs.StatorCurrentLimit = SwerveConstants.StatorCurrentLimitDrive;
-    // limitConfigs.StatorCurrentLimitEnable = true;
-    // limitConfigs.SupplyCurrentLimit = SwerveConstants.SupplyCurrentLimitDrive;
-    // limitConfigs.SupplyCurrentLimitEnable = true;
-    // talonFXConfigurator.apply(limitConfigs);
-    // steeringMotor.configure(steerConfig, ResetMode.kResetSafeParameters,
-    // PersistMode.kPersistParameters);
-    // }
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
@@ -133,7 +116,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
     if (visionEnabled) {
-      LimelightHelpers.SetIMUMode("limelight", 1);
+      LimelightHelpers.SetIMUMode("limelight", 0);
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       swerveDrive.stopOdometryThread();
@@ -226,9 +209,9 @@ public class SwerveSubsystem extends SubsystemBase {
           new PPHolonomicDriveController(
               // PPHolonomicController is the built in path following controller for holonomic
               // drive trains
-              new PIDConstants(5.0, 0.0, 0.0),
+              SwerveConstants.autoDrivePID,
               // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
+              SwerveConstants.autoRotationPID
           // Rotation PID constants
           ),
           config,
@@ -737,21 +720,19 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
-  public Pose2d getReefTag() {
-    Optional<Alliance> ally = DriverStation.getAlliance();
+  public Pose2d getNearestReefPose() {
     int initTag;
     int endTag;
 
-    if (ally.isPresent()) {
-      ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
+    ArrayList<Pose2d> reefTagPoses = new ArrayList<Pose2d>(6);
 
-      if (ally.get() == Alliance.Red) {
-        initTag = 6;
-        endTag = 12;
-      } else {
-        initTag = 17;
-        endTag = 23;
-      }
+    if (isRedAlliance()) {
+      initTag = 6;
+      endTag = 12;
+    } else {
+      initTag = 17;
+      endTag = 23;
+    }
 
       // Get poses of reef april tags based on alliance, add it to the list of reef
       // tag poses
@@ -762,14 +743,37 @@ public class SwerveSubsystem extends SubsystemBase {
       }
 
       // Find nearest reef tag
-      Pose2d nearestPose = getPose().nearest(reefTagPoses);
-      SmartDashboard.putString("Alliance", ally.get().toString());
+      Pose2d nearestPose = new Pose2d(getPose().nearest(reefTagPoses).getTranslation(), getPose().nearest(reefTagPoses).getRotation().rotateBy(Rotation2d.k180deg));
+
       SmartDashboard.putNumber("AprilTag ID",
-          reefTagPoses.indexOf(nearestPose) + (ally.get() == Alliance.Red ? 6 : 17));
-      SmartDashboard.putNumber("Alignment Angle", nearestPose.getRotation().getDegrees());
+          reefTagPoses.indexOf(nearestPose) + (isRedAlliance() ? 6 : 17));
+      SmartDashboard.putString("Nearest Reef Pose", nearestPose.toString());
 
       return nearestPose;
+  }
+
+  public Pose2d getBranchPose(branchSide bs) {
+    Pose2d pose = getNearestReefPose();
+    double rotation = pose.getRotation().getRadians();
+    double branchOffset = 0.3556;
+
+    switch (bs) {
+      case leftBranch:
+        branchOffset = 0.1651;
+        break;
+      case rightBranch:
+        branchOffset = -0.1651;
+        break;
     }
-    return new Pose2d();
+
+    Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
+    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
+    return branchPose;
+  }
+
+  public Command reefPointSetpointGen() {
+    return driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
+        getFieldVelocity().vxMetersPerSecond, getFieldVelocity().vyMetersPerSecond,
+        controller.headingCalculate(getHeading().getRadians(), getNearestReefPose().getRotation().getRadians())));
   }
 }

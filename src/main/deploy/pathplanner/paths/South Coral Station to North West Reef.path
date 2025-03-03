@@ -45,7 +45,7 @@
     "rotation": -60.154
   },
   "reversed": false,
-  "folder": "South Coral Station to Reef",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -123.91743053697029

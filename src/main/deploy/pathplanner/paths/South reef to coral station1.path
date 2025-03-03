@@ -8,7 +8,7 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4375,
+        "x": 2.4374999999999996,
         "y": 0.15424999999999933
       },
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 123.17851165939268
   },
   "reversed": false,
-  "folder": "Reefscape reef to station",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 123.38603718441183

@@ -20,8 +20,8 @@
         "y": 2.5811543367346927
       },
       "prevControl": {
-        "x": 3.7905612244897964,
-        "y": 1.2455038265306106
+        "x": 3.790561224489796,
+        "y": 1.2455038265306104
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 121.47683934958393
   },
   "reversed": false,
-  "folder": "South Coral Station to Reef",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -123.91743053697029

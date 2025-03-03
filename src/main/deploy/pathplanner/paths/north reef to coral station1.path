@@ -50,7 +50,7 @@
     "rotation": 130.9717363335148
   },
   "reversed": false,
-  "folder": "Reefscape reef to station",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": -119.81233458473645
