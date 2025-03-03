@@ -70,7 +70,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionEnabled = false;
+  private final boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -116,7 +116,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
     if (visionEnabled) {
-      LimelightHelpers.SetIMUMode("limelight", 1);
+      LimelightHelpers.SetIMUMode("limelight", 0);
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       swerveDrive.stopOdometryThread();
