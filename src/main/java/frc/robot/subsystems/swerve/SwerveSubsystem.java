@@ -149,7 +149,7 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.updateOdometry();
     mt1Estimator.update(getHeading(), swerveDrive.getModulePositions());
     updatemt1();
-    if (this.getFieldVelocity().vxMetersPerSecond  < 0.1 && this.getRobotVelocity().vyMetersPerSecond < 0.1){
+    if (this.getFieldVelocity().vxMetersPerSecond  < 0.1 && this.getFieldVelocity().vyMetersPerSecond < 0.1){
       LimelightHelpers.SetIMUMode("limelight", 1);
     } else{
       LimelightHelpers.SetIMUMode("limelight", 2);
@@ -174,8 +174,6 @@ public class SwerveSubsystem extends SubsystemBase {
           mt2.pose,
           mt2.timestampSeconds);
     }
-
-
   }
 
   public void updatemt1(){
