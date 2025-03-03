@@ -50,7 +50,7 @@ public class RobotContainer {
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
      "swerve"));
 
   /**

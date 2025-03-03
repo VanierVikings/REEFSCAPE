@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
@@ -123,6 +124,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
   }
 
   /**
@@ -140,7 +142,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void updateVision(boolean visionEnabled) {
-    Boolean doRejectUpdate = true;
+    Boolean doRejectUpdate = false;
     if (visionEnabled) {
       swerveDrive.updateOdometry();
       LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getPose().getRotation().getDegrees(), 0, 0, 0, 0,
