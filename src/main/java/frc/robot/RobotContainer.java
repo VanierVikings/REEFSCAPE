@@ -58,11 +58,11 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> driverXbox.getLeftX(),
-    () -> -driverXbox.getLeftY()) // Axis which give the desired translational angle and speed.
-  .withControllerRotationAxis(driverXbox::getRightX) // Axis which give the desired angular velocity.
-  .deadband(0.01)                  // Controller deadband
-  .scaleTranslation(1)           // Scaled controller translation axis
+    () -> driverXbox.getLeftY(),
+    () -> driverXbox.getLeftX()) // Axis which give the desired translational angle and speed.
+  .withControllerRotationAxis(() -> -driverXbox.getRightX()) // Axis which give the desired angular velocity.
+  .deadband(0.05)                  // Controller deadband
+  .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
@@ -133,20 +133,20 @@ public class RobotContainer {
     // // X Button -> Elevator/Arm to level 2 position
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
+
     driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
     driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
     driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
     driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
-    driverXbox.start().onTrue((Commands.runOnce(drivetrain::zeroGyro)));
 
     //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
     driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
-    driverXbox.b().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driverXbox.y().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
+    // driverXbox.b().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
+    // driverXbox.y().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 
