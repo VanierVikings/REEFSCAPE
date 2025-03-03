@@ -25,9 +25,12 @@ public final class Constants {
         public static final double StatorCurrentLimitDrive = 100;
         public static final double SupplyCurrentLimitDrive = 60;
         public static final int SteerCurrentLimit = 40;
+    }
 
-
-
+    public static final class VisionConstants {
+        public static final double STDdevX = 0.5;
+        public static final double STDdevY = 0.5;
+        public static final double STDTheta = 100;
     }
 
     public static final class OperatorConstants {

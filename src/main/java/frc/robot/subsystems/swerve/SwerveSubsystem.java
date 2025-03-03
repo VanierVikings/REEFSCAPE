@@ -18,6 +18,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -37,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.swerve.LimelightHelpers.PoseEstimate;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
+
   /**
    * AprilTag field layout.
    */
@@ -77,7 +80,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
 
   public SwerveController controller;
-
+  public SwerveDrivePoseEstimator mt1Estimator;
   public enum branchSide{
     leftBranch,
     rightBranch
@@ -117,7 +120,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
     if (visionEnabled) {
-      LimelightHelpers.SetIMUMode("limelight", 0);
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       swerveDrive.stopOdometryThread();
@@ -125,6 +127,8 @@ public class SwerveSubsystem extends SubsystemBase {
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
+
   }
 
   /**
@@ -141,36 +145,75 @@ public class SwerveSubsystem extends SubsystemBase {
             Rotation2d.fromDegrees(0)));
   }
 
-  public void updateVision(boolean visionEnabled) {
+  public void updateVision() {
+    swerveDrive.updateOdometry();
+    mt1Estimator.update(getHeading(), swerveDrive.getModulePositions());
+    updatemt1();
+    if (this.getFieldVelocity().vxMetersPerSecond  < 0.1 && this.getRobotVelocity().vyMetersPerSecond < 0.1){
+      LimelightHelpers.SetIMUMode("limelight", 1);
+    } else{
+      LimelightHelpers.SetIMUMode("limelight", 2);
+    }
     Boolean doRejectUpdate = false;
-    if (visionEnabled) {
-      swerveDrive.updateOdometry();
-      LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getPose().getRotation().getDegrees(), 0, 0, 0, 0,
-          0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 720) // if our angular velocity
-                                                                                              // is greater than 720
-                                                                                              // degrees per second,
-                                                                                              // ignore vision updates
+    LimelightHelpers.SetRobotOrientation("limelight",mt1Estimator.getEstimatedPosition().getRotation().getDegrees() , 0, 0, 0, 0,
+        0);
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+    if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 720) // if our angular velocity
+                                                                                            // is greater than 720
+                                                                                            // degrees per second,
+                                                                                            // ignore vision updates
+    {
+      doRejectUpdate = true;
+    }
+    if (mt2.tagCount == 0) {
+      doRejectUpdate = true;
+    }
+    if (!doRejectUpdate) {
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(Constants.VisionConstants.STDdevX, Constants.VisionConstants.STDdevY, Double.MAX_VALUE));
+      swerveDrive.addVisionMeasurement(
+          mt2.pose,
+          mt2.timestampSeconds);
+    }
+
+
+  }
+
+  public void updatemt1(){
+    boolean doRejectUpdate2 = false;
+    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
       {
-        doRejectUpdate = true;
+        if(mt1.rawFiducials[0].ambiguity > .7)
+        {
+          doRejectUpdate2 = true;
+        }
+        if(mt1.rawFiducials[0].distToCamera > 3)
+        {
+          doRejectUpdate2 = true;
+        }
       }
-      if (mt2.tagCount == 0) {
-        doRejectUpdate = true;
-      }
-      if (!doRejectUpdate) {
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
-        swerveDrive.addVisionMeasurement(
-            mt2.pose,
-            mt2.timestampSeconds);
+      if(mt1.tagCount == 0)
+      {
+        doRejectUpdate2 = true;
       }
 
-    }
+      if(!doRejectUpdate2)
+      {
+            mt1Estimator.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE,Constants.VisionConstants.STDTheta));
+        swerveDrive.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+      } 
   }
 
   @Override
   public void periodic() {
-    updateVision(visionEnabled);
+    if (visionEnabled){
+      updateVision();
+    }
   }
 
   @Override
