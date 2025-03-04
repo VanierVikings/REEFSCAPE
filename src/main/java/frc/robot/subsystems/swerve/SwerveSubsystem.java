@@ -41,16 +41,23 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.swerve.LimelightHelpers.PoseEstimate;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashMap;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.json.simple.parser.ParseException;
+
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -75,7 +82,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionEnabled = true;
+  private final boolean visionEnabled = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -87,6 +94,12 @@ public class SwerveSubsystem extends SubsystemBase {
     rightBranch
   }
 
+  private int aprilID = 0;
+
+  private HashMap<Integer, Integer> additionalOffsets = new HashMap<Integer, Integer>();
+
+
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -95,6 +108,19 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
+
+    additionalOffsets.put(6, 0);
+    additionalOffsets.put(7, 0);
+    additionalOffsets.put(8, 0);
+    additionalOffsets.put(9, 0);
+    additionalOffsets.put(10, 0);
+    additionalOffsets.put(11, 0);
+    additionalOffsets.put(17, 0);
+    additionalOffsets.put(18, 0);
+    additionalOffsets.put(19, 0);
+    additionalOffsets.put(20, 0);
+    additionalOffsets.put(21, 0);
+    additionalOffsets.put(22, 0);    
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
@@ -789,10 +815,10 @@ public class SwerveSubsystem extends SubsystemBase {
       // Find nearest reef tag
       Pose2d nearestPose = new Pose2d(getPose().nearest(reefTagPoses).getTranslation(), getPose().nearest(reefTagPoses).getRotation().rotateBy(Rotation2d.k180deg));
 
-      SmartDashboard.putNumber("AprilTag ID",
-          reefTagPoses.indexOf(nearestPose) + (isRedAlliance() ? 6 : 17));
+      aprilID = reefTagPoses.indexOf(nearestPose) + (isRedAlliance() ? 6 : 17);
+
+      SmartDashboard.putNumber("AprilTag ID", aprilID);
       SmartDashboard.putString("Nearest Reef Pose", nearestPose.toString());
-      SmartDashboard.putNumber("Nearest Reef Anglw", nearestPose.getRotation().getDegrees());
 
       return nearestPose;
   }
@@ -800,7 +826,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public Pose2d getBranchPose(branchSide bs) {
     Pose2d pose = getNearestReefPose();
     double rotation = pose.getRotation().getRadians();
-    double branchOffset = 0.1651;
+    double branchOffset = 0.3556;
     double chassisOffset = 0.7112;
 
     switch (bs) {
@@ -812,10 +838,17 @@ public class SwerveSubsystem extends SubsystemBase {
         break;
     }
 
+    if (Set.of(6,7,8,17,18,19).contains(aprilID)) {
+      branchOffset += additionalOffsets.get(aprilID);
+    }
+
     Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
-    SmartDashboard.putString("Nearest Branch Pose no chassis offset", branchPose.toString());
-    branchPose = new Pose2d(new Translation2d(branchPose.getX() + chassisOffset, branchPose.getY()), branchPose.getRotation());
     SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
+
+    SmartDashboard.putString("Nearest Branch Pose no chassis offset", branchPose.toString());
+    branchPose = new Pose2d(new Translation2d(branchPose.getX() + chassisOffset * Math.cos(rotation), branchPose.getY() + chassisOffset * Math.sin(rotation)), branchPose.getRotation());
+    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
+
     return branchPose;
   }
 
