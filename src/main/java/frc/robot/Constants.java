@@ -28,8 +28,8 @@ public final class Constants {
     }
 
     public static final class VisionConstants {
-        public static final double STDdevX = 0.5;
-        public static final double STDdevY = 0.5;
+        public static final double STDdevX = 0.7;
+        public static final double STDdevY = 0.7;
         public static final double STDTheta = 100;
     }
 

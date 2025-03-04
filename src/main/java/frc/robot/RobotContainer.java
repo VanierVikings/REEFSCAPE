@@ -58,10 +58,10 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> driverXbox.getLeftY(),
-    () -> driverXbox.getLeftX()) // Axis which give the desired translational angle and speed.
+    () -> -driverXbox.getLeftY(),
+    () -> -driverXbox.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driverXbox.getRightX()) // Axis which give the desired angular velocity.
-  .deadband(0.01)                  // Controller deadband
+  .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
@@ -83,7 +83,7 @@ public class RobotContainer {
   SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driverXbox.getLeftY(),
       () -> -driverXbox.getLeftX(),
       () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()))
-      .deadband(0.01)
+      .deadband(0.05)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
 
