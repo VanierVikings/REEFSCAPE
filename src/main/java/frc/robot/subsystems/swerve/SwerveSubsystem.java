@@ -791,6 +791,7 @@ public class SwerveSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("AprilTag ID",
           reefTagPoses.indexOf(nearestPose) + (isRedAlliance() ? 6 : 17));
       SmartDashboard.putString("Nearest Reef Pose", nearestPose.toString());
+      SmartDashboard.putNumber("Nearest Reef Anglw", nearestPose.getRotation().getDegrees());
 
       return nearestPose;
   }
