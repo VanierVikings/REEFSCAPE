@@ -18,7 +18,7 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
 
     public static final class SwerveConstants {
-        public static final double PPTolerance = 5; //meters
+        public static final double PPTolerance = 0.25; //meters
         public static final double translationkP = 1;
         public static final double translationkI = 0.0;
         public static final double translationkD = 0.0;

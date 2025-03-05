@@ -83,14 +83,13 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled;
+  public boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
 
   public PIDController translationSwervePidController;
-  public PIDController headingSwervePidController;
-  
+
   public SwerveController controller;
   public SwerveDrivePoseEstimator mt1Estimator;
   public enum branchSide{
@@ -150,14 +149,13 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
-    visionEnabled = true;
-    if (visionEnabled) {
-      // Stop the odometry thread if we are using vision that way we can synchronize
-      // updates better.
-      swerveDrive.stopOdometryThread();
-    }
+    // visionEnabled = true;
+    // if (visionEnabled) {
+    //   // Stop the odometry thread if we are using vision that way we can synchronize
+    //   // updates better.
+    //   swerveDrive.stopOdometryThread();
+    // }
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
-    headingSwervePidController = new PIDController(SwerveConstants.rotationalkP, SwerveConstants.rotationalkI, SwerveConstants.rotationalkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
@@ -332,7 +330,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public ChassisSpeeds setPointChassisSpeeds(Pose2d pose){
-    var speeds = new ChassisSpeeds(translationSwervePidController.calculate(this.getPose().getX(), pose.getX()), translationSwervePidController.calculate(this.getPose().getY(), pose.getY()), headingSwervePidController.calculate(this.getHeading().getDegrees(),this.getHeading().getDegrees()));
+    var speeds = new ChassisSpeeds(translationSwervePidController.calculate(this.getPose().getX(), pose.getX()), translationSwervePidController.calculate(this.getPose().getY(), pose.getY()), controller.headingCalculate(this.getHeading().getRadians(),this.getHeading().getRadians()));
     return speeds;
   }
 
@@ -857,6 +855,36 @@ public class SwerveSubsystem extends SubsystemBase {
       return nearestPose;
   }
 
+  public Pose2d getBranchPoseTest(branchSide bs) {
+    Pose2d pose = getNearestReefPose();
+    double rotation = pose.getRotation().getRadians();
+    double branchOffset = 0.3556;
+    double chassisOffset = 0.5;
+
+    switch (bs) {
+      case leftBranch:
+        branchOffset = 0.166;
+        break;
+      case rightBranch:
+        branchOffset = -0.166;
+        break;
+    }
+
+
+    if (Set.of(6,7,8,17,18,19).contains(aprilID)) {
+      branchOffset += additionalOffsets.get(aprilID);
+    }
+
+    Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
+    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
+
+    // branchPose = new Pose2d(branchPose.getX() - (chassisOffset * Math.cos(rotation)), branchPose.getY() - (chassisOffset * Math.sin(rotation)), pose.getRotation());
+    // SmartDashboard.putString("Nearest Branch Pose chassis offset", branchPose.toString());
+
+    resetOdometry(branchPose);
+    return branchPose;
+  }
+
   public Pose2d getBranchPose(branchSide bs) {
     Pose2d pose = getNearestReefPose();
     double rotation = pose.getRotation().getRadians();
@@ -865,10 +893,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     switch (bs) {
       case leftBranch:
-        branchOffset = 0.168;
-        break;
+        branchOffset = 0.166;
+        break;  
       case rightBranch:
-        branchOffset = -0.168;
+        branchOffset = -0.166; 
         break;
     }
 
@@ -882,6 +910,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     branchPose = new Pose2d(branchPose.getX() - (chassisOffset * Math.cos(rotation)), branchPose.getY() - (chassisOffset * Math.sin(rotation)), pose.getRotation());
     SmartDashboard.putString("Nearest Branch Pose chassis offset", branchPose.toString());
+
+    resetOdometry(branchPose);
     return branchPose;
   }
 

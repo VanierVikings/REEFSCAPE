@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -151,6 +150,10 @@ public class RobotContainer {
     driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
+
+    driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.leftBranch)));
+    driverXbox.y().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPoseTest(branchSide.leftBranch)));
+
 
     driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
