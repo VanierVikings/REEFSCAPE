@@ -17,6 +17,7 @@ import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -82,11 +83,13 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionEnabled = true;
+  public boolean visionEnabled;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
 
+public PIDController swervePidController;
+  
   public SwerveController controller;
   public SwerveDrivePoseEstimator mt1Estimator;
   public enum branchSide{
@@ -146,11 +149,13 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
+    visionEnabled = true;
     if (visionEnabled) {
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       swerveDrive.stopOdometryThread();
     }
+    swervePidController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
@@ -324,12 +329,39 @@ public class SwerveSubsystem extends SubsystemBase {
     return new PathPlannerAuto(pathName);
   }
 
+  public ChassisSpeeds setPointChassisSpeeds(Pose2d pose){
+    var speeds = new ChassisSpeeds(swervePidController.calculate(this.getPose().getX(), pose.getX()), swervePidController.calculate(this.getPose().getY(), pose.getY()), swervePidController.calculate(this.getHeading().getDegrees(),this.getHeading().getDegrees()));
+    return speeds;
+  }
+
+  public Command autoAlign(Pose2d pose){
+    if (pose.getTranslation().getDistance(this.getPose().getTranslation()) < SwerveConstants.PPTolerance){
+      try
+      {
+        return driveWithSetpointGenerator(() -> {
+          return ChassisSpeeds.fromFieldRelativeSpeeds(setPointChassisSpeeds(pose), getHeading());
+  
+        });
+      } catch (Exception e)
+      {
+        DriverStation.reportError(e.toString(), true);
+      }
+      return Commands.none();
+
+    }
+    else{
+    return driveToPose(pose);
+   }
+  }
+
   /**
    * Use PathPlanner Path finding to go to a point on the field.
    *
    * @param pose Target {@link Pose2d} to go to.
    * @return PathFinding command
    */
+
+
   public Command driveToPose(Pose2d pose) {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(

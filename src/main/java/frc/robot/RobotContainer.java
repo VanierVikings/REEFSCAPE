@@ -125,6 +125,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
+      drivetrain.visionEnabled = false;
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
@@ -143,16 +144,16 @@ public class RobotContainer {
     driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
     driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
 
-    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
 
     //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
     driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
-    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 
