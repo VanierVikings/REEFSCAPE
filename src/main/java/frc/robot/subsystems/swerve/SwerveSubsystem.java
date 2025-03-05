@@ -88,7 +88,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * PhotonVision class to keep an accurate odometry.
    */
 
-public PIDController swervePidController;
+  public PIDController translationSwervePidController;
+  public PIDController headingSwervePidController;
   
   public SwerveController controller;
   public SwerveDrivePoseEstimator mt1Estimator;
@@ -155,7 +156,8 @@ public PIDController swervePidController;
       // updates better.
       swerveDrive.stopOdometryThread();
     }
-    swervePidController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
+    headingSwervePidController = new PIDController(SwerveConstants.rotationalkP, SwerveConstants.rotationalkI, SwerveConstants.rotationalkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
@@ -330,7 +332,7 @@ public PIDController swervePidController;
   }
 
   public ChassisSpeeds setPointChassisSpeeds(Pose2d pose){
-    var speeds = new ChassisSpeeds(swervePidController.calculate(this.getPose().getX(), pose.getX()), swervePidController.calculate(this.getPose().getY(), pose.getY()), swervePidController.calculate(this.getHeading().getDegrees(),this.getHeading().getDegrees()));
+    var speeds = new ChassisSpeeds(translationSwervePidController.calculate(this.getPose().getX(), pose.getX()), translationSwervePidController.calculate(this.getPose().getY(), pose.getY()), headingSwervePidController.calculate(this.getHeading().getDegrees(),this.getHeading().getDegrees()));
     return speeds;
   }
 
