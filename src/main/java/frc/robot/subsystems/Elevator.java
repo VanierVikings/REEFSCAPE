@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
@@ -26,15 +29,17 @@ import frc.robot.Constants.PivotConstants;
 public class Elevator extends SubsystemBase {
   private final SparkMax elevatorMotorOne;
   private final SparkMax elevatorMotorTwo;
-  private final SparkMax pivotMotorOne;
-  private final SparkMax pivotMotorTwo;
+  private final TalonFX pivotMotorOne;
+  private final TalonFX pivotMotorTwo;
+  private final TalonFXConfiguration pivotConfig;
+  final MotionMagicVelocityVoltage pivotRequest = new MotionMagicVelocityVoltage(0);
   private final TrapezoidProfile.Constraints elevatorConstraints = new TrapezoidProfile.Constraints(
       ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
   private final ProfiledPIDController elevatorController = new ProfiledPIDController(ElevatorConstants.kP,
       ElevatorConstants.kI, ElevatorConstants.kD, elevatorConstraints, ElevatorConstants.kDt);
   private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS,
       ElevatorConstants.kG, ElevatorConstants.kV);
-
+      
   private final TrapezoidProfile.Constraints pivotConstraints = new TrapezoidProfile.Constraints(
       PivotConstants.MAX_VELOCITY, PivotConstants.MAX_ACCELERATION);
   private final ProfiledPIDController pivotController = new ProfiledPIDController(PivotConstants.kP, PivotConstants.kI,
@@ -65,29 +70,77 @@ public class Elevator extends SubsystemBase {
     pivotController.setGoal(PivotConstants.L0_ANGLE);
 
     elevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
-    elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);
+    elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);    
+    
+    pivotMotorOne = new TalonFX(PivotConstants.motorOneID);
+    pivotMotorTwo = new TalonFX(PivotConstants.motorTwoID);
+    // pivotMotorOne.setInverted(true); not needed because its here (below)
+    pivotMotorTwo.setControl(new Follower(PivotConstants.motorOneID, true));
 
-    pivotMotorOne = new SparkMax(PivotConstants.motorTwoID, MotorType.kBrushless);
-    pivotMotorTwo = new SparkMax(PivotConstants.motorOneID, MotorType.kBrushless);
+    pivotConfig = new TalonFXConfiguration();
+    var slot0Configs = pivotConfig.Slot0;
 
-    pivotEncoder = pivotMotorOne.getEncoder();
 
-    SparkMaxConfig pivotFollow = new SparkMaxConfig();
-    pivotFollow
-    .follow(11, false)
-    .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
-    .idleMode(pivotIdleMode);
-    pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
-    pivotMotorConfig
-    .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
-    .idleMode(pivotIdleMode)
-    .inverted(false);
+    slot0Configs.kS = PivotConstants.kS;
+    slot0Configs.kV = PivotConstants.kV;
+    slot0Configs.kA = PivotConstants.kA; // if no need, remove
+    slot0Configs.kG = PivotConstants.kG;
+    slot0Configs.kP = PivotConstants.kP;
+    slot0Configs.kI = PivotConstants.kI;
+    slot0Configs.kD = PivotConstants.kD;
+    
+    var motionMagicConfigs = pivotConfig.MotionMagic;
 
-    pivotMotorConfig.encoder.positionConversionFactor(PivotConstants.positionConversionFactor);
+    TalonFXConfiguration pivotFollow = new TalonFXConfiguration();
 
-    pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motionMagicConfigs.MotionMagicCruiseVelocity = PivotConstants.MAX_VELOCITY; // Target cruise velocity of 80 rps
+    motionMagicConfigs.MotionMagicAcceleration = PivotConstants.MAX_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
+    motionMagicConfigs.MotionMagicJerk = 1600; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate? 
+
+    pivotMotorOne.getConfigurator().apply(pivotConfig);
+    pivotMotorTwo.getConfigurator().apply(pivotConfig);// no clue what this does
+    // pivotFollow
+    // .follow(11, false)
+    // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
+    // .idleMode(pivotIdleMode);
+    // pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    // SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
+    // pivotMotorConfig
+    // .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
+    // .idleMode(pivotIdleMode)
+    // .inverted(false);
+
+    // pivotMotorConfig.encoder.positionConversionFactor(PivotConstants.positionConversionFactor);
+    // pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
+// might be useful
+
+//     Timer.delay(1);
+// this.krakenConfiguration = new TalonFXConfiguration();
+
+// krakenConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+// krakenConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+// krakenConfiguration.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
+// krakenConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
+// krakenConfiguration.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
+// krakenConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
+// krakenConfiguration.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
+
+// Slot0Configs krakenSlot0Configs = krakenConfiguration.Slot0;
+// krakenSlot0Configs.kS = swerveModuleConstants.getDriveKS();
+// krakenSlot0Configs.kV = swerveModuleConstants.getDriveKV();
+// krakenSlot0Configs.kP = swerveModuleConstants.getDriveKP();
+// krakenSlot0Configs.kI = swerveModuleConstants.getDriveKI();
+// krakenSlot0Configs.kD = swerveModuleConstants.getDriveKD();
+
+// driveMotor.getConfigurator().apply(krakenConfiguration);
+
+// driveMotor.getVelocity().setUpdateFrequency(100);
+// driveMotor.getPosition().setUpdateFrequency(100);
 
     // Elevator motor configuration
     SparkMaxConfig elevatorFollow = new SparkMaxConfig();
@@ -116,7 +169,6 @@ public class Elevator extends SubsystemBase {
     elevatorController.setTolerance(0.0001);
     pivotController.enableContinuousInput(0, 360);
 
-    pivotEncoder.setPosition(pivotOffsetEncoder.get());
     
   }
 
