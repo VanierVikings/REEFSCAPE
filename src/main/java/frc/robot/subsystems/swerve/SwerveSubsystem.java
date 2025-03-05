@@ -82,7 +82,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean visionEnabled = false;
+  private final boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -827,16 +827,17 @@ public class SwerveSubsystem extends SubsystemBase {
     Pose2d pose = getNearestReefPose();
     double rotation = pose.getRotation().getRadians();
     double branchOffset = 0.3556;
-    double chassisOffset = 0.7112;
+    double chassisOffset = 0.5;
 
     switch (bs) {
       case leftBranch:
-        branchOffset = 0.1651;
+        branchOffset = 0.168;
         break;
       case rightBranch:
-        branchOffset = -0.1651;
+        branchOffset = -0.168;
         break;
     }
+
 
     if (Set.of(6,7,8,17,18,19).contains(aprilID)) {
       branchOffset += additionalOffsets.get(aprilID);
@@ -845,10 +846,8 @@ public class SwerveSubsystem extends SubsystemBase {
     Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
     SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
 
-    SmartDashboard.putString("Nearest Branch Pose no chassis offset", branchPose.toString());
-    branchPose = new Pose2d(new Translation2d(branchPose.getX() + chassisOffset * Math.cos(rotation), branchPose.getY() + chassisOffset * Math.sin(rotation)), branchPose.getRotation());
-    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
-
+    branchPose = new Pose2d(branchPose.getX() - (chassisOffset * Math.cos(rotation)), branchPose.getY() - (chassisOffset * Math.sin(rotation)), pose.getRotation());
+    SmartDashboard.putString("Nearest Branch Pose chassis offset", branchPose.toString());
     return branchPose;
   }
 

@@ -33,6 +33,7 @@ import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.EndEffector.SetpointEE;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.EndEffector;
 
 /**
@@ -49,6 +50,7 @@ public class RobotContainer {
   final CommandXboxController driverXbox = new CommandXboxController(0);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
+  private final LED led = new LED();
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
      "swerve"));
@@ -149,8 +151,8 @@ public class RobotContainer {
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
-    driverXbox.b().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
-    //driverXbox.y().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 
