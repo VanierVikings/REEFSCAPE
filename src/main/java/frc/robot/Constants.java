@@ -92,6 +92,7 @@ public final class Constants {
 
         public static final double positionConversionFactor = 1.43426295;
 
+        public static final double kA = 0;
         public static final double kS = 0;
         public static final double kV = 0.09;
         public static final double kG = 0.65;
