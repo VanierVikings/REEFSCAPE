@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -27,10 +27,12 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PivotConstants;
 
 public class Elevator extends SubsystemBase {
+  private final DutyCycleEncoder pivotEncoder;
   private final SparkMax elevatorMotorOne;
   private final SparkMax elevatorMotorTwo;
   private final TalonFX pivotMotorOne;
   private final TalonFX pivotMotorTwo;
+  private final MotionMagicExpoVoltage m_request;
   private final TalonFXConfiguration pivotConfig;
   final MotionMagicVelocityVoltage pivotRequest = new MotionMagicVelocityVoltage(0);
   private final TrapezoidProfile.Constraints elevatorConstraints = new TrapezoidProfile.Constraints(
@@ -39,21 +41,13 @@ public class Elevator extends SubsystemBase {
       ElevatorConstants.kI, ElevatorConstants.kD, elevatorConstraints, ElevatorConstants.kDt);
   private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS,
       ElevatorConstants.kG, ElevatorConstants.kV);
-      
-  private final TrapezoidProfile.Constraints pivotConstraints = new TrapezoidProfile.Constraints(
-      PivotConstants.MAX_VELOCITY, PivotConstants.MAX_ACCELERATION);
-  private final ProfiledPIDController pivotController = new ProfiledPIDController(PivotConstants.kP, PivotConstants.kI,
-      PivotConstants.kD, pivotConstraints, PivotConstants.kDt);
-  private final ArmFeedforward pivotFeedforward = new ArmFeedforward(PivotConstants.kS, PivotConstants.kG,
-      PivotConstants.kV);
+
 
   private final RelativeEncoder elevatorEncoder;
-  private final DutyCycleEncoder pivotOffsetEncoder = new DutyCycleEncoder(0, 360, 0);
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
 
   private final IdleMode elevatorIdleMode = IdleMode.kBrake;
-  private final IdleMode pivotIdleMode = IdleMode.kBrake;
 
   public enum Setpoint {
     kRest,
@@ -65,8 +59,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
+    pivotEncoder = new DutyCycleEncoder(0,360,0);
     elevatorController.setGoal(ElevatorConstants.L0);
-    pivotController.setGoal(PivotConstants.L0_ANGLE);
+
 
     elevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
     elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);    
@@ -77,8 +72,8 @@ public class Elevator extends SubsystemBase {
     pivotMotorTwo.setControl(new Follower(PivotConstants.motorOneID, true));
 
     pivotConfig = new TalonFXConfiguration();
+    pivotConfig.Feedback.SensorToMechanismRatio = PivotConstants.positionConversionFactor;
     var slot0Configs = pivotConfig.Slot0;
-
 
 
     slot0Configs.kS = PivotConstants.kS;
@@ -91,18 +86,19 @@ public class Elevator extends SubsystemBase {
     
     var motionMagicConfigs = pivotConfig.MotionMagic;
 
-    TalonFXConfiguration pivotFollow = new TalonFXConfiguration();
-
     motionMagicConfigs.MotionMagicCruiseVelocity = PivotConstants.MAX_VELOCITY; // Target cruise velocity of 80 rps
     motionMagicConfigs.MotionMagicAcceleration = PivotConstants.MAX_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 1600; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate? 
-
+    motionMagicConfigs.MotionMagicJerk = 1600; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate?
+    
     pivotMotorOne.getConfigurator().apply(pivotConfig);
-    pivotMotorTwo.getConfigurator().apply(pivotConfig);// no clue what this does
+    
+    m_request = new MotionMagicExpoVoltage(0);
+
+    pivotMotorOne.setPosition(pivotEncoder.get());
     // pivotFollow
     // .follow(11, false)
     // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
-    // .idleMode(pivotIdleMode);
+    // .idleMode(pivotIdleMode); 
     // pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
@@ -166,7 +162,6 @@ public class Elevator extends SubsystemBase {
     elevatorMotorOne.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevatorController.setTolerance(0.0001);
-    pivotController.enableContinuousInput(0, 360);
 
     
   }
@@ -176,10 +171,7 @@ public class Elevator extends SubsystemBase {
   elevatorMotorOne.setVoltage(
   elevatorController.calculate(elevatorEncoder.getPosition())
   + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
-
   });
-
-
 
   }
 
@@ -189,22 +181,22 @@ public class Elevator extends SubsystemBase {
         () -> {
           switch (setpoint) {
             case kRest:
-              pivotController.setGoal(PivotConstants.L0_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
               break;
             case kLevel1:
-              pivotController.setGoal(PivotConstants.L1_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
               break;
             case kLevel2:
-              pivotController.setGoal(PivotConstants.L2_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
               break;
             case kLevel3:
-              pivotController.setGoal(PivotConstants.L3_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
               break;
             case kHang:
-              pivotController.setGoal(PivotConstants.HANG_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
               break;
             case kSource:
-              elevatorController.setGoal(PivotConstants.SOURCE_ANGLE);
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
               break;
           }
         });
@@ -248,7 +240,9 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Setpoint Position", elevatorController.getGoal().position);
     SmartDashboard.putNumber("Elevator Error", elevatorController.getPositionError());
 
-    SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getSetpoint().velocity);
-    SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
+    SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotMotorOne.getClosedLoopReferenceSlope().getValueAsDouble());
+    SmartDashboard.putNumber("Pivot Position", pivotMotorOne.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Pivot Velocity", pivotMotorOne.getVelocity().getValueAsDouble());
+    SmartDashboard.putNumber("Pivot Setpoint Position", pivotMotorOne.getClosedLoopReference().getValueAsDouble()); 
   }
 }
