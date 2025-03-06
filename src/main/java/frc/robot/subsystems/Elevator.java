@@ -167,13 +167,10 @@ public class Elevator extends SubsystemBase {
     
   }
 
-  public Command moveToSetpoint() {
-  return this.run(() -> {
+  public void moveToSetpoint() {
   elevatorMotorOne.setVoltage(
   elevatorController.calculate(elevatorEncoder.getPosition())
   + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
-  });
-
   }
 
 
@@ -238,6 +235,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     rezeroElevator();
+    moveToSetpoint();
     SmartDashboard.putNumber("Elevator Setpoint Velocity", elevatorController.getSetpoint().velocity);
     SmartDashboard.putNumber("Elevator Velocity", elevatorEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Position", elevatorEncoder.getPosition());

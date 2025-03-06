@@ -28,7 +28,8 @@ public class EndEffector extends SubsystemBase {
         kRest,
         kSource,
         kPlaceL1,
-        kPlaceGen
+        kPlaceGen,
+        kPlaceL2
     }
 
     public EndEffector() {
@@ -64,8 +65,6 @@ public class EndEffector extends SubsystemBase {
                 .d(EndEffectorConstants.WRIST_KD);
 
         wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        this.setDefaultCommand(this.run(() -> wristClosedLoopController.setReference(target, ControlType.kPosition)));
     }
 
     public boolean atSetpoint(){
@@ -76,6 +75,8 @@ public class EndEffector extends SubsystemBase {
         return this.runOnce(
                 () -> {
                     switch (setpoint) {
+                        case kPlaceL2:
+                            target= EndEffectorConstants.L2_ANGLE;
                         case kRest:
                             target = EndEffectorConstants.L0_ANGLE;
                             break;
@@ -99,5 +100,6 @@ public class EndEffector extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Wrist Encoder", wristEncoder.getPosition());
         SmartDashboard.putNumber("Wrist Setpoint", target);
+        wristClosedLoopController.setReference(target, ControlType.kPosition);
     }
 }

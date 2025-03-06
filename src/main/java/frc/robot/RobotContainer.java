@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -129,8 +130,6 @@ public class RobotContainer {
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
-
-    m_elevator.setDefaultCommand(m_elevator.moveToSetpoint());
    
     // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
     // .andThen(m_elevator.setPivot(Setpoint.rest)));
@@ -141,19 +140,21 @@ public class RobotContainer {
     // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
 
 
-    driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
-    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel3));
+    // driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
+    // driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel3));
 
-    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    driverXbox.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
 
     //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
     driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
-    driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceGen)));
-    driverXbox.y().onTrue(m_endEffector.setPosition(SetpointEE.kRest).alongWith(Commands.waitSeconds(3)).andThen(m_elevator.setElevator(Setpoint.kRest)));
+    driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceGen)));
+    //driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.3)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
+    driverXbox.y().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
 
     driverXbox.povUp().whileTrue(m_endEffector.spin(0.7));
     driverXbox.povDown().whileTrue(m_endEffector.spin(-0.7));

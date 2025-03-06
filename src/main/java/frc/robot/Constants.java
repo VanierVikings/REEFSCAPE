@@ -72,7 +72,7 @@ public final class Constants {
 
         public static final double L0 = 0.02; //cm
         public static final double L1 = 0.15; //cm
-        public static final double L2 = 0.0; //cm
+        public static final double L2 = 0.202; //cm
         public static final double L3 = 0.34;  //cm   
         public static final double SOURCE = 0;
 
@@ -99,9 +99,9 @@ public final class Constants {
 
         public static final double L0_ANGLE = 10; //degrees
         public static final double L1_ANGLE = 90; //degrees
-        public static final double L2_ANGLE = 0; //degrees
+        public static final double L2_ANGLE = 68; //degrees
         public static final double L3_ANGLE = 78.5; //degrees
-        public static final double HANG_ANGLE = 0;
+        public static final double HANG_ANGLE = 90;
         public static final double SOURCE_ANGLE = 0; //degrees
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
@@ -121,6 +121,7 @@ public final class Constants {
         public static final double SOURCE_ANGLE = 0;
         public static final double L1_ANGLE = 90;
         public static final double LGEN_ANGLE = 90;
+        public static final double L2_ANGLE = 79.2;
 
 
         public static final int WRIST_CURRENT_LIMIT = 40; //amps
