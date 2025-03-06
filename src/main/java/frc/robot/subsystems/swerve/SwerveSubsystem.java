@@ -852,64 +852,23 @@ public class SwerveSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("AprilTag ID", aprilID);
       SmartDashboard.putString("Nearest Reef Pose", nearestPose.toString());
 
-      return nearestPose;
-  }
+      double angle = nearestPose.getRotation().getRadians();
 
-  public Pose2d getBranchPoseTest(branchSide bs) {
-    Pose2d pose = getNearestReefPose();
-    double rotation = pose.getRotation().getRadians();
-    double branchOffset = 0.3556;
-    double chassisOffset = 0.5;
-
-    switch (bs) {
-      case leftBranch:
-        branchOffset = 0.166;
-        break;
-      case rightBranch:
-        branchOffset = -0.166;
-        break;
-    }
-
-
-    if (Set.of(6,7,8,17,18,19).contains(aprilID)) {
-      branchOffset += additionalOffsets.get(aprilID);
-    }
-
-    Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
-    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
-
-    // branchPose = new Pose2d(branchPose.getX() - (chassisOffset * Math.cos(rotation)), branchPose.getY() - (chassisOffset * Math.sin(rotation)), pose.getRotation());
-    // SmartDashboard.putString("Nearest Branch Pose chassis offset", branchPose.toString());
-
-    resetOdometry(branchPose);
-    return branchPose;
+      return new Pose2d(nearestPose.getX() -SwerveConstants.chassisOffset * Math.cos(angle), nearestPose.getY() + -SwerveConstants.chassisOffset * Math.sin(angle), nearestPose.getRotation());
   }
 
   public Pose2d getBranchPose(branchSide bs) {
     Pose2d pose = getNearestReefPose();
     double rotation = pose.getRotation().getRadians();
-    double branchOffset = 0.3556;
+    double branchOffset = 0;
     double chassisOffset = 0.5;
 
-    switch (bs) {
-      case leftBranch:
-        branchOffset = 0.166;
-        break;  
-      case rightBranch:
-        branchOffset = -0.166; 
-        break;
-    }
+    branchOffset = bs == branchSide.leftBranch ? SwerveConstants.branchOffset : -SwerveConstants.branchOffset;
 
-
-    if (Set.of(6,7,8,17,18,19).contains(aprilID)) {
-      branchOffset += additionalOffsets.get(aprilID);
-    }
-
-    Pose2d branchPose = pose.plus(new Transform2d(branchOffset * Math.sin(rotation), branchOffset * Math.cos(rotation), new Rotation2d(0)));
+    Pose2d branchPose = new Pose2d(pose.getX() + (branchOffset * Math.sin(rotation)), 
+    pose.getY() + (branchOffset * Math.cos(rotation)), pose.getRotation());
+    
     SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
-
-    branchPose = new Pose2d(branchPose.getX() - (chassisOffset * Math.cos(rotation)), branchPose.getY() - (chassisOffset * Math.sin(rotation)), pose.getRotation());
-    SmartDashboard.putString("Nearest Branch Pose chassis offset", branchPose.toString());
 
     resetOdometry(branchPose);
     return branchPose;
