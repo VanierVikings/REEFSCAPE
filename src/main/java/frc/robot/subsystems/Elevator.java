@@ -75,7 +75,6 @@ public class Elevator extends SubsystemBase {
     pivotConfig.Feedback.SensorToMechanismRatio = PivotConstants.positionConversionFactor;
     var slot0Configs = pivotConfig.Slot0;
 
-
     slot0Configs.kS = PivotConstants.kS;
     slot0Configs.kV = PivotConstants.kV;
     slot0Configs.kA = PivotConstants.kA; // if no need, remove
