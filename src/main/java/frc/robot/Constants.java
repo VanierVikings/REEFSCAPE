@@ -32,6 +32,8 @@ public final class Constants {
         public static final double StatorCurrentLimitDrive = 100;
         public static final double SupplyCurrentLimitDrive = 60;
         public static final int SteerCurrentLimit = 40;
+        public static final double branchOffset = 0.16;
+        public static final double chassisOffset = 0.5;
     }
 
     public static final class VisionConstants {

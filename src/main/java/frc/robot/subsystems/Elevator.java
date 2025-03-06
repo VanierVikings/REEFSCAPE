@@ -48,7 +48,6 @@ public class Elevator extends SubsystemBase {
       PivotConstants.kV);
 
   private final RelativeEncoder elevatorEncoder;
-  private final RelativeEncoder pivotEncoder;
   private final DutyCycleEncoder pivotOffsetEncoder = new DutyCycleEncoder(0, 360, 0);
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
@@ -178,9 +177,6 @@ public class Elevator extends SubsystemBase {
   elevatorController.calculate(elevatorEncoder.getPosition())
   + elevatorFeedforward.calculate(elevatorController.getSetpoint().velocity));
 
-  double pOut = pivotController.calculate(pivotEncoder.getPosition()) + pivotFeedforward.calculate(Math.toRadians(pivotEncoder.getPosition()), Math.toRadians(pivotController.getSetpoint().velocity));
-  //pivotMotorOne.setVoltage(pOut);
-  SmartDashboard.putNumber("pivot output", pOut);
   });
 
 
@@ -253,8 +249,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Error", elevatorController.getPositionError());
 
     SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotController.getSetpoint().velocity);
-    SmartDashboard.putNumber("Pivot Position", pivotEncoder.getPosition());
-    SmartDashboard.putNumber("Pivot Velocity", pivotEncoder.getVelocity());
     SmartDashboard.putNumber("Pivot Setpoint Position", pivotController.getGoal().position);
   }
 }
