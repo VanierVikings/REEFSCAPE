@@ -87,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = false;
+  public boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -111,7 +111,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private int aprilID = 0;
 
-  private HashMap<Integer, Integer> additionalOffsets = new HashMap<Integer, Integer>();
+  private HashMap<Integer, int[]> additionalOffsets = new HashMap<Integer, int[]>();
 
 
 
@@ -124,18 +124,18 @@ public class SwerveSubsystem extends SubsystemBase {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created.
 
-    additionalOffsets.put(6, 0);
-    additionalOffsets.put(7, 0);
-    additionalOffsets.put(8, 0);
-    additionalOffsets.put(9, 0);
-    additionalOffsets.put(10, 0);
-    additionalOffsets.put(11, 0);
-    additionalOffsets.put(17, 0);
-    additionalOffsets.put(18, 0);
-    additionalOffsets.put(19, 0);
-    additionalOffsets.put(20, 0);
-    additionalOffsets.put(21, 0);
-    additionalOffsets.put(22, 0);    
+    additionalOffsets.put(6, new int[] {0, 0});
+    additionalOffsets.put(7, new int[] {0, 0});
+    additionalOffsets.put(8, new int[] {0, 0});
+    additionalOffsets.put(9, new int[] {0, 0});
+    additionalOffsets.put(10, new int[] {0, 0});
+    additionalOffsets.put(11, new int[] {0, 0});
+    additionalOffsets.put(17, new int[] {0, 0});
+    additionalOffsets.put(18, new int[] {0, 0});
+    additionalOffsets.put(19, new int[] {0, 0});
+    additionalOffsets.put(20, new int[] {0, 0});
+    additionalOffsets.put(21, new int[] {0, 0});
+    additionalOffsets.put(22, new int[] {0, 0});    
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
@@ -877,6 +877,10 @@ public class SwerveSubsystem extends SubsystemBase {
     else{
       finalPose = getPose().nearest(Arrays.asList(isRedAlliance() ? rightBranchPosesRed : rightBranchPosesBlue));
     }
+
+    getNearestReefPose();
+    finalPose = finalPose.plus(new Transform2d(additionalOffsets.get(aprilID)[0], additionalOffsets.get(aprilID)[1], new Rotation2d(0)));
+
     return finalPose;
   }
 

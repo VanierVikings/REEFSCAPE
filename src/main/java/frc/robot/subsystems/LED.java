@@ -55,7 +55,8 @@ public class LED extends SubsystemBase {
     /** Periodically updates the LED strip with the latest buffer data. */
     @Override
     public void periodic() {
-        m_led.setData(m_ledBuffer);
+       // m_led.setData(m_ledBuffer);
+       flamePatternCreator();
     }
 
     /**
