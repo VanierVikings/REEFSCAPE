@@ -141,10 +141,10 @@ public class RobotContainer {
 
 
     driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
-    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1));
+    driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel3));
 
-    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
+    driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
 
     //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
     driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);

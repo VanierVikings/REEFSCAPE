@@ -1,13 +1,16 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -37,13 +40,12 @@ public class EndEffector extends SubsystemBase {
         SparkMaxConfig shooterMotorConfig = new SparkMaxConfig();
         shooterMotorConfig
         .smartCurrentLimit(EndEffectorConstants.SHOOTER_CURRENT_LIMIT)
-        .idleMode(IdleMode.kCoast)
-        .voltageCompensation(12);
+        .idleMode(IdleMode.kBrake);
 
         SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
         wristMotorConfig
         .smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT)
-        .idleMode(IdleMode.kBrake)
+        .idleMode(IdleMode.kCoast)
         .voltageCompensation(12);
 
         wristClosedLoopController = wristMotor.getClosedLoopController();
@@ -56,6 +58,8 @@ public class EndEffector extends SubsystemBase {
                 .p(EndEffectorConstants.WRIST_KP)
                 .i(EndEffectorConstants.WRIST_KI)
                 .d(EndEffectorConstants.WRIST_KD);
+
+        wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         this.setDefaultCommand(this.run(() -> wristClosedLoopController.setReference(wristEncoder.getPosition(), ControlType.kPosition)));
     }
@@ -82,5 +86,9 @@ public class EndEffector extends SubsystemBase {
 
     public Command spin(int direction) {
         return this.run(() -> shooterMotor.set(direction));
+    }
+
+    public void periodic() {
+        SmartDashboard.putNumber("Wrist Encoder", wristEncoder.getPosition());
     }
 }

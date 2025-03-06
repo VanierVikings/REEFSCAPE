@@ -9,11 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorOutputStatusValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkMax;
@@ -62,19 +65,17 @@ public class Elevator extends SubsystemBase {
     pivotEncoder = new DutyCycleEncoder(1,360,0);
     elevatorController.setGoal(ElevatorConstants.L0);
 
-
     elevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
     elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);    
     
     pivotMotorOne = new TalonFX(PivotConstants.motorOneID);
     pivotMotorTwo = new TalonFX(PivotConstants.motorTwoID);
-    // pivotMotorOne.setInverted(true); not needed because its here (below)
     pivotMotorTwo.setControl(new Follower(PivotConstants.motorOneID, true));
 
     pivotConfig = new TalonFXConfiguration();
-    pivotConfig.Feedback.SensorToMechanismRatio = PivotConstants.positionConversionFactor;
+    pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    pivotConfig.Feedback.SensorToMechanismRatio = (4*3*34/18*52/18*46/12);
     var slot0Configs = pivotConfig.Slot0;
-
 
     slot0Configs.kS = PivotConstants.kS;
     slot0Configs.kV = PivotConstants.kV;
@@ -88,14 +89,13 @@ public class Elevator extends SubsystemBase {
 
     motionMagicConfigs.MotionMagicCruiseVelocity = PivotConstants.MAX_VELOCITY; // Target cruise velocity of 80 rps
     motionMagicConfigs.MotionMagicAcceleration = PivotConstants.MAX_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
-    motionMagicConfigs.MotionMagicJerk = 1600; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate?
+    motionMagicConfigs.MotionMagicJerk = 30; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate?
     
     pivotMotorOne.getConfigurator().apply(pivotConfig);
     
     m_request = new MotionMagicExpoVoltage(0);
 
-    pivotMotorOne.setPosition(pivotEncoder.get());
-    SmartDashboard.putData("Abs Encoder", pivotEncoder);
+    pivotMotorOne.setPosition(pivotEncoder.get()/360);
     // pivotFollow
     // .follow(11, false)
     // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
@@ -181,24 +181,24 @@ public class Elevator extends SubsystemBase {
     return this.runOnce(
         () -> {
           switch (setpoint) {
-            // case kRest:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
-            //   break;
-            // case kLevel1:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
-            //   break;
-            // case kLevel2:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
-            //   break;
-            // case kLevel3:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
-            //   break;
-            // case kHang:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
-            //   break;
-            // case kSource:
-            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
-            //   break;
+            case kRest:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
+              break;
+            case kLevel1:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
+              break;
+            case kLevel2:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
+              break;
+            case kLevel3:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
+              break;
+            case kHang:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
+              break;
+            case kSource:
+              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
+              break;
           }
         });
   }
@@ -240,9 +240,10 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Position", elevatorEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Setpoint Position", elevatorController.getGoal().position);
     SmartDashboard.putNumber("Elevator Error", elevatorController.getPositionError());
-
+    SmartDashboard.putNumber("Abs Encoder", pivotEncoder.get());
     SmartDashboard.putNumber("Pivot Setpoint Velocity", pivotMotorOne.getClosedLoopReferenceSlope().getValueAsDouble());
-    SmartDashboard.putNumber("Pivot Position", pivotMotorOne.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Pivot Position turn", pivotMotorOne.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("Pivot Position degrees", pivotMotorOne.getPosition().getValueAsDouble()*360);
     SmartDashboard.putNumber("Pivot Velocity", pivotMotorOne.getVelocity().getValueAsDouble());
     SmartDashboard.putNumber("Pivot Setpoint Position", pivotMotorOne.getClosedLoopReference().getValueAsDouble()); 
   }

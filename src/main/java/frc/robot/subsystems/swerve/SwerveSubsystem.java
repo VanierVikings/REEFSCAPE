@@ -85,7 +85,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = true;
+  public boolean visionEnabled = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */

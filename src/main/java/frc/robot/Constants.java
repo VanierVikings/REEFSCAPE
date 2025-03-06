@@ -70,10 +70,10 @@ public final class Constants {
         public static final double kV = 14.3;
         public static final double kG = 0.54;
 
-        public static final double L0 = 0.001; //cm
+        public static final double L0 = 0.025; //cm
         public static final double L1 = 0.15; //cm
         public static final double L2 = 0.0; //cm
-        public static final double L3 = 0.0;  //cm   
+        public static final double L3 = 0.345;  //cm   
         public static final double SOURCE = 0;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
@@ -84,23 +84,21 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 10;
-        public static final double MAX_ACCELERATION = 400;
+        public static final double MAX_VELOCITY = 0.4;
+        public static final double MAX_ACCELERATION = 4;
 
-        public static final double kP = 0.00;
+        public static final double kP = 200;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double positionConversionFactor = 1.43426295;
-
         public static final double kA = 0;
         public static final double kS = 0;
-        public static final double kV = 0.09;
-        public static final double kG = 0.65;
+        public static final double kV = 31;
+        public static final double kG = 0;
 
-        public static final double L0_ANGLE = 39; //degrees
-        public static final double L1_ANGLE = 70; //degrees
+        public static final double L0_ANGLE = 0.02777777777777777777777777777778; //degrees
+        public static final double L1_ANGLE = 0.25; //degrees
         public static final double L2_ANGLE = 0; //degrees
         public static final double L3_ANGLE = 0; //degrees
         public static final double HANG_ANGLE = 0;
@@ -114,10 +112,10 @@ public final class Constants {
         public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0.01;
+        public static final double WRIST_KP = 0.0000;
         public static final double WRIST_KD = 0;
 
-        public static final double WRIST_ENCODER_TO_DEGREES = 45; //degrees
+        public static final double WRIST_ENCODER_TO_DEGREES = 5.72727272; //degrees
 
         public static final double L0_ANGLE = 0;
         public static final double SOURCE_ANGLE = 0;
