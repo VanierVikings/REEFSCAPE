@@ -47,10 +47,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -98,6 +100,14 @@ public class SwerveSubsystem extends SubsystemBase {
     leftBranch,
     rightBranch
   }
+
+  
+  public Pose2d[] leftBranchPosesBlue = new Pose2d[6];
+  public Pose2d[] rightBranchPosesBlue = new Pose2d[6];
+
+  public Pose2d[] leftBranchPosesRed = new Pose2d[6];
+  public Pose2d[] rightBranchPosesRed = new Pose2d[6];
+
 
   private int aprilID = 0;
 
@@ -162,7 +172,7 @@ public class SwerveSubsystem extends SubsystemBase {
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
-
+    generatePoseArray();
   }
 
   /**
@@ -860,18 +870,38 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Pose2d getBranchPose(branchSide bs) {
-    Translation2d center = new Translation2d(4.48, 4.06);
-    Pose2d pose = new Pose2d(3.749, 3.086, new Rotation2d(0));
+    Pose2d finalPose = new Pose2d();
+    if(bs == branchSide.leftBranch) {
+      finalPose = getPose().nearest(Arrays.asList(isRedAlliance() ? leftBranchPosesRed : leftBranchPosesBlue));
+    }
+    else{
+      finalPose = getPose().nearest(Arrays.asList(isRedAlliance() ? rightBranchPosesRed : rightBranchPosesBlue));
+    }
+    return finalPose;
+  }
+
+  public void generatePoseArray() {
+    Pose2d lOrgBlue = new Pose2d(3.16, 4.18, new Rotation2d(0));
+    Pose2d rOrgBlue = new Pose2d(3.16, 3.86, new Rotation2d(0));
+    Translation2d centerBlue = new Translation2d(4.47, 4.060);
+
+    Pose2d lOrgRed = new Pose2d();
+    Pose2d rOrgRed = new Pose2d();
+    Translation2d centerRed = new Translation2d();
+
     if (isRedAlliance()) {
-      pose = FlippingUtil.flipFieldPose(pose);
-      center = FlippingUtil.flipFieldPosition(center);
-        }
-    Rotation2d rotation = getNearestReefPose().getRotation();
-    Pose2d leftPose = new Pose2d(pose.getX(), pose.getY() - SwerveConstants.branchOffset, pose.getRotation());
-    Pose2d rightPose = new Pose2d(pose.getX(), pose.getY() + SwerveConstants.branchOffset, pose.getRotation());
-    Pose2d branchPose = bs == branchSide.leftBranch ? leftPose.rotateAround(center, getNearestReefPose().getRotation()) : rightPose.rotateAround(center, rotation);
-    resetOdometry(branchPose);
-    return branchPose;
+      lOrgRed = FlippingUtil.flipFieldPose(lOrgBlue);
+      rOrgRed = FlippingUtil.flipFieldPose(rOrgBlue);
+      centerRed = FlippingUtil.flipFieldPosition(centerBlue);
+    }
+
+    for (int i = 0; i < 6; i += 1) {
+      var rotAngle = Rotation2d.fromDegrees(60 * i);
+      leftBranchPosesBlue[i] = lOrgBlue.rotateAround(centerBlue, rotAngle);
+      rightBranchPosesBlue[i] = rOrgBlue.rotateAround(centerBlue, rotAngle);
+      leftBranchPosesRed[i] = lOrgRed.rotateAround(centerRed, rotAngle);
+      rightBranchPosesRed[i] = rOrgRed.rotateAround(centerRed, rotAngle);
+    }
   }
 
   public Command reefPointSetpointGen() {

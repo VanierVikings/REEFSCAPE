@@ -159,14 +159,8 @@ public class RobotContainer {
     driverXbox.povUp().whileTrue(m_endEffector.spin(0.7));
     driverXbox.povDown().whileTrue(m_endEffector.spin(-0.7));
 
-
-
-    // driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.leftBranch)));
-    // driverXbox.y().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.rightBranch)));
-
-
-    // driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    // driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 

@@ -18,13 +18,10 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
 
     public static final class SwerveConstants {
-        public static final double PPTolerance = 0.25; //meters
-        public static final double translationkP = 1;
+        public static final double PPTolerance = 0.35; //meters
+        public static final double translationkP = 10;
         public static final double translationkI = 0.0;
         public static final double translationkD = 0.0;
-        public static final double rotationalkP = 1;
-        public static final double rotationalkI = 0.0;
-        public static final double rotationalkD = 0.0;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);
         public static final PIDConstants autoDrivePID = new PIDConstants(4.8, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(5.0, 0.0, 0.0);
@@ -32,7 +29,7 @@ public final class Constants {
         public static final double StatorCurrentLimitDrive = 100;
         public static final double SupplyCurrentLimitDrive = 60;
         public static final int SteerCurrentLimit = 40;
-        public static final double branchOffset = 0.16;
+        public static final double branchOffset = 0.1651;
         public static final double chassisOffset = 0.5;
     }
 
