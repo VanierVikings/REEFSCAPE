@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +27,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.PivotConstants;
 
 public class Elevator extends SubsystemBase {
+  private final DutyCycleEncoder pivotEncoder;
   private final SparkMax elevatorMotorOne;
   private final SparkMax elevatorMotorTwo;
   private final TalonFX pivotMotorOne;
@@ -56,7 +59,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
+    pivotEncoder = new DutyCycleEncoder(0,360,0);
     elevatorController.setGoal(ElevatorConstants.L0);
+
 
     elevatorMotorOne = new SparkMax(ElevatorConstants.motorOneID, MotorType.kBrushless);
     elevatorMotorTwo = new SparkMax(ElevatorConstants.motorTwoID, MotorType.kBrushless);    
@@ -81,17 +86,15 @@ public class Elevator extends SubsystemBase {
     
     var motionMagicConfigs = pivotConfig.MotionMagic;
 
-
     motionMagicConfigs.MotionMagicCruiseVelocity = PivotConstants.MAX_VELOCITY; // Target cruise velocity of 80 rps
     motionMagicConfigs.MotionMagicAcceleration = PivotConstants.MAX_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 1600; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate?
     
-
     pivotMotorOne.getConfigurator().apply(pivotConfig);
     
     m_request = new MotionMagicExpoVoltage(0);
 
-
+    pivotMotorOne.setPosition(pivotEncoder.get());
     // pivotFollow
     // .follow(11, false)
     // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
