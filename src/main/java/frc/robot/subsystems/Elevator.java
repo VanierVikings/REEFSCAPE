@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
-    pivotEncoder = new DutyCycleEncoder(0,360,0);
+    pivotEncoder = new DutyCycleEncoder(1,360,0);
     elevatorController.setGoal(ElevatorConstants.L0);
 
 
@@ -95,6 +95,7 @@ public class Elevator extends SubsystemBase {
     m_request = new MotionMagicExpoVoltage(0);
 
     pivotMotorOne.setPosition(pivotEncoder.get());
+    SmartDashboard.putData("Abs Encoder", pivotEncoder);
     // pivotFollow
     // .follow(11, false)
     // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
@@ -180,24 +181,24 @@ public class Elevator extends SubsystemBase {
     return this.runOnce(
         () -> {
           switch (setpoint) {
-            case kRest:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
-              break;
-            case kLevel1:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
-              break;
-            case kLevel2:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
-              break;
-            case kLevel3:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
-              break;
-            case kHang:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
-              break;
-            case kSource:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
-              break;
+            // case kRest:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
+            //   break;
+            // case kLevel1:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
+            //   break;
+            // case kLevel2:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
+            //   break;
+            // case kLevel3:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
+            //   break;
+            // case kHang:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
+            //   break;
+            // case kSource:
+            //   pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
+            //   break;
           }
         });
   }

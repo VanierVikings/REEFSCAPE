@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Rotation;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -11,6 +12,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 
@@ -79,7 +81,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * AprilTag field layout.
    */
-  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+  private final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   /**
    * Enable vision odometry updates while driving.
    */
@@ -858,18 +860,16 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Pose2d getBranchPose(branchSide bs) {
-    Pose2d pose = getNearestReefPose();
-    double rotation = pose.getRotation().getRadians();
-    double branchOffset = 0;
-    double chassisOffset = 0.5;
-
-    branchOffset = bs == branchSide.leftBranch ? SwerveConstants.branchOffset : -SwerveConstants.branchOffset;
-
-    Pose2d branchPose = new Pose2d(pose.getX() + (branchOffset * Math.sin(rotation)), 
-    pose.getY() + (branchOffset * Math.cos(rotation)), pose.getRotation());
-    
-    SmartDashboard.putString("Nearest Branch Pose", branchPose.toString());
-
+    Translation2d center = new Translation2d(4.48, 4.06);
+    Pose2d pose = new Pose2d(3.749, 3.086, new Rotation2d(0));
+    if (isRedAlliance()) {
+      pose = FlippingUtil.flipFieldPose(pose);
+      center = FlippingUtil.flipFieldPosition(center);
+        }
+    Rotation2d rotation = getNearestReefPose().getRotation();
+    Pose2d leftPose = new Pose2d(pose.getX(), pose.getY() - SwerveConstants.branchOffset, pose.getRotation());
+    Pose2d rightPose = new Pose2d(pose.getX(), pose.getY() + SwerveConstants.branchOffset, pose.getRotation());
+    Pose2d branchPose = bs == branchSide.leftBranch ? leftPose.rotateAround(center, getNearestReefPose().getRotation()) : rightPose.rotateAround(center, rotation);
     resetOdometry(branchPose);
     return branchPose;
   }
