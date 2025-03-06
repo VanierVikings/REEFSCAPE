@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
 
-  private final IdleMode elevatorIdleMode = IdleMode.kBrake;
+  private final IdleMode elevatorIdleMode = IdleMode.kCoast;
 
   public enum Setpoint {
     kRest,
@@ -180,26 +180,29 @@ public class Elevator extends SubsystemBase {
   public Command setPivot(Setpoint setpoint) {
     return this.runOnce(
         () -> {
+          double angle = PivotConstants.L0_ANGLE/360;
           switch (setpoint) {
             case kRest:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L0_ANGLE)); //degrees
+              angle = PivotConstants.L0_ANGLE/360;
               break;
             case kLevel1:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L1_ANGLE)); 
+              angle = PivotConstants.L1_ANGLE/360;
               break;
             case kLevel2:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L2_ANGLE));
+              angle = PivotConstants.L2_ANGLE/360;
               break;
             case kLevel3:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.L3_ANGLE));
+              angle = PivotConstants.L3_ANGLE/360;
               break;
             case kHang:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.HANG_ANGLE));
+              angle = PivotConstants.HANG_ANGLE/360;
               break;
             case kSource:
-              pivotMotorOne.setControl(m_request.withPosition(PivotConstants.SOURCE_ANGLE));
+              angle = PivotConstants.SOURCE_ANGLE/360;
               break;
           }
+
+          pivotMotorOne.setControl(m_request.withPosition(angle));
         });
   }
 

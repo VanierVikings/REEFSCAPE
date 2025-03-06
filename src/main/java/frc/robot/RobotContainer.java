@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
@@ -151,12 +152,20 @@ public class RobotContainer {
 
     driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
-    driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.leftBranch)));
-    driverXbox.y().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.rightBranch)));
+    driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceGen)));
+    driverXbox.y().onTrue(m_endEffector.setPosition(SetpointEE.kRest).alongWith(Commands.waitSeconds(3)).andThen(m_elevator.setElevator(Setpoint.kRest)));
+
+    driverXbox.povUp().whileTrue(m_endEffector.spin(0.7));
+    driverXbox.povDown().whileTrue(m_endEffector.spin(-0.7));
 
 
-    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+
+    // driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.leftBranch)));
+    // driverXbox.y().onTrue(drivetrain.runOnce(() -> drivetrain.getBranchPose(branchSide.rightBranch)));
+
+
+    // driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    // driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 

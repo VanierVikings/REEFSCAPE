@@ -42,16 +42,20 @@ public class EndEffector extends SubsystemBase {
         .smartCurrentLimit(EndEffectorConstants.SHOOTER_CURRENT_LIMIT)
         .idleMode(IdleMode.kBrake);
 
+        shooterMotor.configure(shooterMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
         SparkMaxConfig wristMotorConfig = new SparkMaxConfig();
         wristMotorConfig
         .smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT)
-        .idleMode(IdleMode.kCoast)
-        .voltageCompensation(12);
+        .inverted(true)
+        .idleMode(IdleMode.kCoast);
 
         wristClosedLoopController = wristMotor.getClosedLoopController();
 
         wristMotorConfig.encoder
                 .positionConversionFactor(EndEffectorConstants.WRIST_ENCODER_TO_DEGREES);
+
+        wristEncoder.setPosition(0);
 
         wristMotorConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -61,7 +65,11 @@ public class EndEffector extends SubsystemBase {
 
         wristMotor.configure(wristMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        this.setDefaultCommand(this.run(() -> wristClosedLoopController.setReference(wristEncoder.getPosition(), ControlType.kPosition)));
+        this.setDefaultCommand(this.run(() -> wristClosedLoopController.setReference(target, ControlType.kPosition)));
+    }
+
+    public boolean atSetpoint(){
+        return Math.abs(wristEncoder.getPosition() - target) < 1;
     }
 
     public Command setPosition(SetpointEE setpoint) {
@@ -84,11 +92,12 @@ public class EndEffector extends SubsystemBase {
                 });
     }
 
-    public Command spin(int direction) {
-        return this.run(() -> shooterMotor.set(direction));
+    public Command spin(double direction) {
+        return this.runEnd(() -> shooterMotor.set(direction), () -> shooterMotor.set(0));
     }
 
     public void periodic() {
         SmartDashboard.putNumber("Wrist Encoder", wristEncoder.getPosition());
+        SmartDashboard.putNumber("Wrist Setpoint", target);
     }
 }

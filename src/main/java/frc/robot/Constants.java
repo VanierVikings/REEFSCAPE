@@ -70,10 +70,10 @@ public final class Constants {
         public static final double kV = 14.3;
         public static final double kG = 0.54;
 
-        public static final double L0 = 0.025; //cm
+        public static final double L0 = 0.02; //cm
         public static final double L1 = 0.15; //cm
         public static final double L2 = 0.0; //cm
-        public static final double L3 = 0.345;  //cm   
+        public static final double L3 = 0.34;  //cm   
         public static final double SOURCE = 0;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
@@ -97,10 +97,10 @@ public final class Constants {
         public static final double kV = 31;
         public static final double kG = 0;
 
-        public static final double L0_ANGLE = 0.02777777777777777777777777777778; //degrees
-        public static final double L1_ANGLE = 0.25; //degrees
+        public static final double L0_ANGLE = 10; //degrees
+        public static final double L1_ANGLE = 90; //degrees
         public static final double L2_ANGLE = 0; //degrees
-        public static final double L3_ANGLE = 0; //degrees
+        public static final double L3_ANGLE = 78.5; //degrees
         public static final double HANG_ANGLE = 0;
         public static final double SOURCE_ANGLE = 0; //degrees
         
@@ -112,15 +112,15 @@ public final class Constants {
         public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0.0000;
+        public static final double WRIST_KP = 0.04;
         public static final double WRIST_KD = 0;
 
         public static final double WRIST_ENCODER_TO_DEGREES = 5.72727272; //degrees
 
-        public static final double L0_ANGLE = 0;
+        public static final double L0_ANGLE = 10;
         public static final double SOURCE_ANGLE = 0;
-        public static final double L1_ANGLE = 0;
-        public static final double LGEN_ANGLE = 0;
+        public static final double L1_ANGLE = 90;
+        public static final double LGEN_ANGLE = 90;
 
 
         public static final int WRIST_CURRENT_LIMIT = 40; //amps
