@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
@@ -53,9 +54,12 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController operator = new CommandXboxController(1);
   final CommandPS5Controller driver = new CommandPS5Controller(0);
-  private final static Elevator m_elevator = new Elevator();
-  private final static EndEffector m_endEffector = new EndEffector();
-  private final static Hang m_hang = new Hang();
+  private final Elevator m_elevator;
+  private final EndEffector m_endEffector;
+  private final Hang m_hang;
+  private final SendableChooser<Command> autoChooser;
+
+
   private final LED led = new LED();
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -100,9 +104,27 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the trigger bindings
-    configureBindings();
+    m_elevator = new Elevator();
+    m_endEffector = new EndEffector();
+    m_hang = new Hang();
+    
+
     DriverStation.silenceJoystickConnectionWarning(true);
 
+    autoChooser = AutoBuilder.buildAutoChooser();  
+    
+
+
+
+
+    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.7).withTimeout(1))); 
+    NamedCommands.registerCommand("scoreL2", m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
+    NamedCommands.registerCommand("scoreL3", m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
+    NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(1)));  
+    NamedCommands.registerCommand("rest", m_elevator.setPivot(Setpoint.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest)));
+
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -152,6 +174,7 @@ public class RobotContainer {
     operator.x().onTrue(m_hang.setpoint(HangConstants.hanging));
     operator.y().onTrue(m_hang.setpoint(HangConstants.rest));
 
+
     driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
@@ -162,10 +185,10 @@ public class RobotContainer {
    *
    * @return the command to run in autus
    */
-  // public Command getAutonomousCommand() {
-  //   // An example command will be run in autonomous
-  //   return drivetrain.getAutonomousCommand("New Auto");
-  // }
+  public Command getAutonomousCommand() {
+    // An example command will be run in autonomous
+    return autoChooser.getSelected();
+    }
 
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);
