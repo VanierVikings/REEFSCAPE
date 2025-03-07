@@ -87,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = false;
+  public boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -170,7 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
     generatePoseArray();
   }
@@ -363,7 +363,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     else{
     return driveToPose(pose);
-   }
+    }
   }
 
   /**
@@ -877,9 +877,6 @@ public class SwerveSubsystem extends SubsystemBase {
     else{
       finalPose = getPose().nearest(Arrays.asList(isRedAlliance() ? rightBranchPosesRed : rightBranchPosesBlue));
     }
-
-    getNearestReefPose();
-    finalPose = finalPose.plus(new Transform2d(additionalOffsets.get(aprilID)[0], additionalOffsets.get(aprilID)[1], new Rotation2d(0)));
 
     return finalPose;
   }

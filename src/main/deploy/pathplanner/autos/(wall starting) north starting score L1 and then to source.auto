@@ -11,15 +11,33 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "North East Reef to South Coral Station "
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "South Coral Station to South West Reef"
+            "pathName": "North East Reef to North Coral Station"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreSource"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
           }
         }
       ]

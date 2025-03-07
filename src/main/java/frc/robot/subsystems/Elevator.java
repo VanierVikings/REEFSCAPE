@@ -58,7 +58,11 @@ public class Elevator extends SubsystemBase {
     kLevel2,
     kLevel3,
     kHang,
-    kSource
+    kSource,
+    KAlgaeLowStart,
+    KAlgaeLowEnd,
+    KAlgaeHighStart,
+    KAlgaeHighEnd
   }
 
   public Elevator() {
@@ -156,8 +160,20 @@ public class Elevator extends SubsystemBase {
             case kSource:
               angle = PivotConstants.SOURCE_ANGLE/360;
               break;
+            case KAlgaeLowStart:
+              angle = PivotConstants.ALGAE_ANGLE_LOW_START/360;
+              break;
+            case KAlgaeLowEnd:
+              angle = PivotConstants.ALGAE_ANGLE_LOW_END/360;              
+            break;
+            case KAlgaeHighStart:
+              angle = PivotConstants.ALGAE_ANGLE_HIGH_START/360;   
+              break;
+            case KAlgaeHighEnd:
+              angle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
+              break;
           }
-
+          
           pivotMotorOne.setControl(m_request.withPosition(angle));
         });
   }
@@ -180,6 +196,18 @@ public class Elevator extends SubsystemBase {
             break;
           case kSource:
             elevatorController.setGoal(ElevatorConstants.SOURCE);
+            break;
+          case KAlgaeLowStart:
+            elevatorController.setGoal(ElevatorConstants.ALGAE_HEIGHT_LOW_START);
+            break;
+          case KAlgaeLowEnd:
+            elevatorController.setGoal(ElevatorConstants.ALGAE_HEIGHT_LOW_END);
+            break;
+            case KAlgaeHighStart:
+            elevatorController.setGoal(ElevatorConstants.ALGAE_HEIGHT_HIGH_START);
+            break;
+          case KAlgaeHighEnd:
+            elevatorController.setGoal(ElevatorConstants.ALGAE_HEIGHT_HIGH_END);
             break;
         }
       });

@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import swervelib.SwerveController;
 import swervelib.SwerveInputStream;
@@ -68,8 +69,8 @@ public class RobotContainer {
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
     () -> -driver.getLeftY(),
-    () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
-  .withControllerRotationAxis(() -> driver.getRightX()) // Axis which give the desired angular velocity.
+    () -> -driver.getLeftX()) // Axis which give the desired translational angle and speed.
+  .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
   .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
@@ -90,7 +91,7 @@ public class RobotContainer {
       .allianceRelativeControl(false);
 
   SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driver.getLeftY(),
-      () -> driver.getLeftX(),
+      () -> -driver.getLeftX(),
       () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()))
       .deadband(0.05)
       .scaleTranslation(0.8)
@@ -101,9 +102,27 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the trigger bindings
-    configureBindings();
+    m_elevator = new Elevator();
+    m_endEffector = new EndEffector();
+    m_hang = new Hang();
+    
+
     DriverStation.silenceJoystickConnectionWarning(true);
 
+    autoChooser = AutoBuilder.buildAutoChooser();  
+    
+
+
+
+
+    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.7).withTimeout(1))); 
+    NamedCommands.registerCommand("scoreL2", m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
+    NamedCommands.registerCommand("scoreL3", m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
+    NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(1)));  
+    NamedCommands.registerCommand("rest", m_elevator.setPivot(Setpoint.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest)));
+
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   /**
@@ -133,7 +152,7 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
       drivetrain.visionEnabled = false;
-    } else {
+    } else {        
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
@@ -146,6 +165,9 @@ public class RobotContainer {
     operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
     operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
+    operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowStart).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowEnd)))));
+    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighStart).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighEnd)))));
+
 
     operator.povUp().whileTrue(m_endEffector.spin(0.7));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
@@ -163,10 +185,10 @@ public class RobotContainer {
    *
    * @return the command to run in autus
    */
-  // public Command getAutonomousCommand() {
-  //   // An example command will be run in autonomous
-  //   return drivetrain.getAutonomousCommand("New Auto");
-  // }
+  public Command getAutonomousCommand() {
+    // An example command will be run in autonomous
+    return autoChooser.getSelected();
+    }
 
   public void setMotorBrake(boolean brake) {
     drivetrain.setMotorBrake(brake);

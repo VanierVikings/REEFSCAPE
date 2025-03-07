@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.39483418367347,
-        "y": 5.528539540816325
+        "x": 5.334118150684932,
+        "y": 5.144413527397259
       },
       "prevControl": {
-        "x": 5.693303571428572,
-        "y": 5.6703125
+        "x": 5.632587538440035,
+        "y": 5.286186486580934
       },
       "nextControl": null,
       "isLocked": false,
@@ -38,7 +38,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "Rotate1",
+      "name": "",
       "waypointRelativePos": 0.0,
       "endWaypointRelativePos": null,
       "command": {
