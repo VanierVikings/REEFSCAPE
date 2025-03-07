@@ -36,9 +36,10 @@ import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.EndEffector.SetpointEE;
-import frc.robot.subsystems.Hang;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.EndEffector;
+// import frc.robot.subsystems.Hang;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -55,7 +56,7 @@ public class RobotContainer {
   final CommandPS5Controller driver = new CommandPS5Controller(0);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
-  private final static Hang m_hang = new Hang();
+  // private final static Hang m_hang = new Hang();
   private final LED led = new LED();
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -149,8 +150,8 @@ public class RobotContainer {
     operator.povUp().whileTrue(m_endEffector.spin(0.7));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
 
-    operator.x().onTrue(m_hang.setpoint(HangConstants.hanging));
-    operator.y().onTrue(m_hang.setpoint(HangConstants.rest));
+    // operator.x().onTrue(m_hang.setpoint(HangConstants.hanging));
+    // operator.y().onTrue(m_hang.setpoint(HangConstants.rest));
 
     driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
