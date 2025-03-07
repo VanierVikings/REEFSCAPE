@@ -176,7 +176,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    return drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch)));
+    //return autoChooser.getSelected();
     }
 
 
