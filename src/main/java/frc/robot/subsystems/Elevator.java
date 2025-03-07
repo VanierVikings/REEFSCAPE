@@ -96,47 +96,6 @@ public class Elevator extends SubsystemBase {
     m_request = new MotionMagicExpoVoltage(0);
 
     pivotMotorOne.setPosition(pivotEncoder.get()/360);
-    // pivotFollow
-    // .follow(11, false)
-    // .smartCurrentLimit(PivotCons.MAX_ACCELERATIONtants.PIVOT_CURRENT_LIMIT)
-    // .idleMode(pivotIdleMode); 
-    // pivotMotorTwo.configure(pivotFollow, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // SparkMaxConfig pivotMotorConfig = new SparkMaxConfig();
-    // pivotMotorConfig
-    // .smartCurrentLimit(PivotConstants.PIVOT_CURRENT_LIMIT)
-    // .idleMode(pivotIdleMode)
-    // .inverted(false);
-
-    // pivotMotorConfig.encoder.positionConversionFactor(PivotConstants.positionConversionFactor);
-    // pivotMotorOne.configure(pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
-// might be useful
-
-//     Timer.delay(1);
-// this.krakenConfiguration = new TalonFXConfiguration();
-
-// krakenConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-// krakenConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
-// krakenConfiguration.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
-// krakenConfiguration.CurrentLimits.StatorCurrentLimitEnable = true;
-// krakenConfiguration.CurrentLimits.StatorCurrentLimit = DRIVE_STATOR_CURRENT_LIMIT;
-// krakenConfiguration.CurrentLimits.SupplyCurrentLimitEnable = true;
-// krakenConfiguration.CurrentLimits.SupplyCurrentLimit = DRIVE_SUPPLY_CURRENT_LIMIT;
-
-// Slot0Configs krakenSlot0Configs = krakenConfiguration.Slot0;
-// krakenSlot0Configs.kS = swerveModuleConstants.getDriveKS();
-// krakenSlot0Configs.kV = swerveModuleConstants.getDriveKV();
-// krakenSlot0Configs.kP = swerveModuleConstants.getDriveKP();
-// krakenSlot0Configs.kI = swerveModuleConstants.getDriveKI();
-// krakenSlot0Configs.kD = swerveModuleConstants.getDriveKD();
-
-// driveMotor.getConfigurator().apply(krakenConfiguration);
-
-// driveMotor.getVelocity().setUpdateFrequency(100);
-// driveMotor.getPosition().setUpdateFrequency(100);
 
     // Elevator motor configuration
     SparkMaxConfig elevatorFollow = new SparkMaxConfig();

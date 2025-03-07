@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.HangConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem.branchSide;
@@ -34,6 +36,7 @@ import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.EndEffector.SetpointEE;
+import frc.robot.subsystems.Hang;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.EndEffector;
 
@@ -48,9 +51,11 @@ import frc.robot.subsystems.EndEffector;
 public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController operator = new CommandXboxController(1);
+  final CommandPS5Controller driver = new CommandPS5Controller(0);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
+  private final static Hang m_hang = new Hang();
   private final LED led = new LED();
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -61,9 +66,9 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> -driverXbox.getLeftY(),
-    () -> driverXbox.getLeftX()) // Axis which give the desired translational angle and speed.
-  .withControllerRotationAxis(() -> -driverXbox.getRawAxis(2)) // Axis which give the desired angular velocity.
+    () -> -driver.getLeftY(),
+    () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
+  .withControllerRotationAxis(() -> driver.getRightX()) // Axis which give the desired angular velocity.
   .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
@@ -72,8 +77,8 @@ public class RobotContainer {
    * Clone's the angular velocity input stream and converts it to a fieldRelative
    * input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driverXbox::getRightX,
-      driverXbox::getRightY)
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driver::getRightX,
+      driver::getRightY)
       .headingWhile(true);
 
   /**
@@ -83,8 +88,8 @@ public class RobotContainer {
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driverXbox.getLeftY(),
-      () -> driverXbox.getLeftX(),
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driver.getLeftY(),
+      () -> driver.getLeftX(),
       () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()))
       .deadband(0.05)
       .scaleTranslation(0.8)
@@ -130,44 +135,32 @@ public class RobotContainer {
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
-   
-    // driverXbox.b().onTrue(m_elevator.setElevator(Setpoint.rest)
-    // .andThen(m_elevator.setPivot(Setpoint.rest)));
 
-    // driverXbox.a().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(m_elevator.setElevator(Setpoint.kLevel1)));
+    driver.circle().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
-    // // X Button -> Elevator/Arm to level 2 position
-    // driverXbox.x().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(m_elevator.setElevator(Setpoint.kLevel2))); 
+    driver.cross().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
+    operator.leftTrigger().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
+    operator.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
+    operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
+    operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
+    operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
 
-    // driverXbox.rightBumper().onTrue(m_elevator.setElevator(Setpoint.kRest));
-    // driverXbox.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel3));
+    operator.povUp().whileTrue(m_endEffector.spin(0.7));
+    operator.povDown().whileTrue(m_endEffector.spin(-1));
 
-    driverXbox.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    // driverXbox.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kRest));
-    // driverXbox.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel1));
+    operator.x().onTrue(m_hang.setpoint(HangConstants.hanging));
+    operator.y().onTrue(m_hang.setpoint(HangConstants.rest));
 
-    //driverXbox.x().whileTrue(drivetrain.reefPointSetpointGen());
-    driverXbox.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
-
-    driverXbox.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
-
-    driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceGen)));
-    //driverXbox.b().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.3)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
-    driverXbox.y().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
-
-    driverXbox.povUp().whileTrue(m_endEffector.spin(0.7));
-    driverXbox.povDown().whileTrue(m_endEffector.spin(-0.7));
-
-    driverXbox.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driverXbox.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
-   * @return the command to run in autonomous
+   * @return the command to run in autus
    */
   // public Command getAutonomousCommand() {
   //   // An example command will be run in autonomous

@@ -28,7 +28,7 @@ public class EndEffector extends SubsystemBase {
         kRest,
         kSource,
         kPlaceL1,
-        kPlaceGen,
+        kPlaceL3,
         kPlaceL2
     }
 
@@ -75,8 +75,6 @@ public class EndEffector extends SubsystemBase {
         return this.runOnce(
                 () -> {
                     switch (setpoint) {
-                        case kPlaceL2:
-                            target= EndEffectorConstants.L2_ANGLE;
                         case kRest:
                             target = EndEffectorConstants.L0_ANGLE;
                             break;
@@ -86,8 +84,11 @@ public class EndEffector extends SubsystemBase {
                         case kPlaceL1:
                             target = EndEffectorConstants.L1_ANGLE;
                             break;
-                        case kPlaceGen:
-                            target = EndEffectorConstants.LGEN_ANGLE;
+                        case kPlaceL2:
+                            target = EndEffectorConstants.L2_ANGLE;
+                            break;
+                        case kPlaceL3:
+                            target = EndEffectorConstants.L3_ANGLE;
                             break;
                     }
                 });
@@ -97,6 +98,7 @@ public class EndEffector extends SubsystemBase {
         return this.runEnd(() -> shooterMotor.set(direction), () -> shooterMotor.set(0));
     }
 
+    @Override
     public void periodic() {
         SmartDashboard.putNumber("Wrist Encoder", wristEncoder.getPosition());
         SmartDashboard.putNumber("Wrist Setpoint", target);

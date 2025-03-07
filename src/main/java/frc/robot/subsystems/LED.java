@@ -40,7 +40,7 @@ public class LED extends SubsystemBase {
 
     /** Creates a flame gradient pattern. */
     public void flamePatternCreator() {
-        LEDPattern m_FlamePatternAttempt = LEDPattern.gradient(GradientType.kContinuous, Color.kRed, Color.kYellow);
+        LEDPattern m_FlamePatternAttempt = LEDPattern.gradient(GradientType.kContinuous, Color.kWhite, Color.kOrange);
         m_FlamePatternAttempt.applyTo(m_ledBuffer);
         m_led.setData(m_ledBuffer);
     }
