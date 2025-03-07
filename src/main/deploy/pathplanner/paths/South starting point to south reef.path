@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.961500000000001,
-        "y": 0.6027499999999998
+        "x": 8.789923469387755,
+        "y": 5.043526785714285
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.211433868005963,
-        "y": 0.5970000762110602
+        "x": 9.039857337393716,
+        "y": 5.037776861925345
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "South Starting"
     },
     {
       "anchor": {

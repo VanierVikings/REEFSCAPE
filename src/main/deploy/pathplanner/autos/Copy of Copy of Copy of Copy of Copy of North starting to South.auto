@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "North Starting to South Coral",
+  "folder": null,
   "choreoAuto": false
 }
