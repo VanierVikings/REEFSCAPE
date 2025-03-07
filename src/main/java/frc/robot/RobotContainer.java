@@ -67,8 +67,8 @@ public class RobotContainer {
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
     () -> -driver.getLeftY(),
-    () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
-  .withControllerRotationAxis(() -> driver.getRightX()) // Axis which give the desired angular velocity.
+    () -> -driver.getLeftX()) // Axis which give the desired translational angle and speed.
+  .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
   .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
@@ -89,7 +89,7 @@ public class RobotContainer {
       .allianceRelativeControl(false);
 
   SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driver.getLeftY(),
-      () -> driver.getLeftX(),
+      () -> -driver.getLeftX(),
       () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()))
       .deadband(0.05)
       .scaleTranslation(0.8)
@@ -132,7 +132,7 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
       drivetrain.visionEnabled = false;
-    } else {
+    } else {        
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
@@ -145,12 +145,16 @@ public class RobotContainer {
     operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
     operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
+    operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowStart).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowEnd)))));
+    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighStart).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighEnd)))));
+
 
     operator.povUp().whileTrue(m_endEffector.spin(0.7));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
 
-    operator.x().onTrue(m_hang.setpoint(HangConstants.hanging));
-    operator.y().onTrue(m_hang.setpoint(HangConstants.rest));
+    operator.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    operator.povLeft().onTrue(m_hang.setpoint());
+    operator.povRight().onTrue(m_elevator.setPivot(Setpoint.kRest));
 
     driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));

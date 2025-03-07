@@ -50,15 +50,15 @@ public Hang(){
 
 }
 
-public Command setpoint(double angle) {
-    return this.runOnce(() -> target = angle);
+public Command setpoint() {
+    return this.run(() -> target = 1);
 }
 
 @Override
 public void periodic() {
     SmartDashboard.putNumber("Hang Encoder", grabberEncoder.getPosition());
     SmartDashboard.putNumber("Hang Setpoint", target);
-    grabberClosedLoopController.setReference(target, ControlType.kPosition);
+    grabber.set(target);
 }
 
 }   

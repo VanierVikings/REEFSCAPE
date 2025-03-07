@@ -29,7 +29,11 @@ public class EndEffector extends SubsystemBase {
         kSource,
         kPlaceL1,
         kPlaceL3,
-        kPlaceL2
+        kPlaceL2,
+        KAlgaeLowStart,
+        KAlgaeLowEnd,
+        KAlgaeHighStart,
+        KAlgaeHighEnd
     }
 
     public EndEffector() {
@@ -89,6 +93,12 @@ public class EndEffector extends SubsystemBase {
                             break;
                         case kPlaceL3:
                             target = EndEffectorConstants.L3_ANGLE;
+                            break;
+                        case KAlgaeLowStart:
+                            target = EndEffectorConstants.ALGAE_ANGLE_LOW_START;
+                            break;
+                        case KAlgaeHighEnd:
+                            target = EndEffectorConstants.ALGAE_ANGLE_HIGH_END;
                             break;
                     }
                 });
