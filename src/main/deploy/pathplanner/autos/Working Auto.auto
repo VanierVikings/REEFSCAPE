@@ -11,15 +11,33 @@
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "North East Reef to North Coral Station"
+            "waitTime": 2.48
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "North Station to North East Reef"
+            "pathName": "North East Reef to North Coral Station"
           }
         }
       ]

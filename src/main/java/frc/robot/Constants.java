@@ -70,7 +70,7 @@ public final class Constants {
         public static final double L0 = 0.02; //cm
         public static final double L1 = 0.096; //cm
         public static final double L2 = 0.174; //cm
-        public static final double L3 = 0.34;  //cm   
+        public static final double L3 = 0.31;  //cm   
         public static final double SOURCE = 0.193;
         public static final double ALGAE_HEIGHT_LOW_START = 0.15;
         public static final double ALGAE_HEIGHT_LOW_END = 0.14;
@@ -106,7 +106,7 @@ public final class Constants {
         public static final double SOURCE_ANGLE = 62.139; //degrees
         public static final double ALGAE_ANGLE_LOW_START = 50.54;
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
-        public static final double ALGAE_ANGLE_HIGH_START = 67.76;
+        public static final double ALGAE_ANGLE_HIGH_START = 50;
         public static final double ALGAE_ANGLE_HIGH_END = 93.60;
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps

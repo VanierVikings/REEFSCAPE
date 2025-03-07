@@ -17,7 +17,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 
-public class Hang extends SubsystemBase{
+public class Climb extends SubsystemBase{
 
 private SparkMax grabber;  //DO NOT CHANGE
 private SparkClosedLoopController grabberClosedLoopController;
@@ -25,7 +25,7 @@ private RelativeEncoder grabberEncoder;
 public double target = 0;
  
 
-public Hang(){
+public Climb(){
     grabber = new SparkMax(HangConstants.grabberID, MotorType.kBrushless);
     SparkMaxConfig grabberConfig = new SparkMaxConfig();
     grabberConfig
