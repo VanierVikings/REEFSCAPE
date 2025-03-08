@@ -53,7 +53,7 @@ public class EndEffector extends SubsystemBase {
         wristMotorConfig
         .smartCurrentLimit(EndEffectorConstants.WRIST_CURRENT_LIMIT)
         .inverted(true)
-        .idleMode(IdleMode.kCoast);
+        .idleMode(IdleMode.kBrake);
 
         wristClosedLoopController = wristMotor.getClosedLoopController();
 

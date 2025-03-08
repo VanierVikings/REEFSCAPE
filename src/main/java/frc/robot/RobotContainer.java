@@ -59,7 +59,6 @@ public class RobotContainer {
   private final static EndEffector m_endEffector = new EndEffector();
   private final static Climb m_hang = new Climb();
   private final SendableChooser<Command> autoChooser;
-
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
      "swerve"));
@@ -73,7 +72,7 @@ public class RobotContainer {
     () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
   .deadband(0.05)                  // Controller deadband
-  .scaleTranslation(0.8)           // Scaled controller translation axis
+  .scaleTranslation(0.95)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
@@ -104,7 +103,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     autoChooser = AutoBuilder.buildAutoChooser();  
-    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.5)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.7).withTimeout(1))); 
+    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.5)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.4).withTimeout(1))); 
     NamedCommands.registerCommand("scoreL2", m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
     NamedCommands.registerCommand("scoreL3", m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
     NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(1)));  
@@ -138,6 +137,7 @@ public class RobotContainer {
     Command driveSetpointGen = drivetrain.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngle);
 
+
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
       drivetrain.resetOdometry(new Pose2d(3, 3, new Rotation2d()));
@@ -157,12 +157,13 @@ public class RobotContainer {
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
     operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeLowEnd)))));
     operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.KAlgaeHighEnd)))));
-    operator.povUp().whileTrue(m_endEffector.spin(0.7));
+    operator.povUp().whileTrue(m_endEffector.spin(0.65));
+    operator.povLeft().whileTrue(m_endEffector.spin(0.3));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
 
     driver.L2().onTrue(m_elevator.setPivot(Setpoint.kHang));
     driver.L1().onTrue(m_hang.setpoint());
-    driver.R2().onTrue(m_elevator.setElevator(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
+    driver.R2().onTrue(m_elevator.setElevator(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
 
     driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
@@ -176,8 +177,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch)));
-    //return autoChooser.getSelected();
+  //   return drivetrain.driveFieldOriented(SwerveInputStream.of(drivetrain.getSwerveDrive(),
+  //   () -> 1,
+  //   () -> 0) // Axis which give the desired translational angle and speed.
+  // .withControllerRotationAxis(() -> 0) // Axis which give the desired angular velocity.
+  // .deadband(0.05)                  // Controller deadband
+  // .scaleTranslation(0.8)           // Scaled controller translation axis
+  // .allianceRelativeControl(true));
+  return autoChooser.getSelected();
     }
 
 

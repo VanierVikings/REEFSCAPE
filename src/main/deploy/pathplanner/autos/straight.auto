@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "South starting point to south reef"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": null
+            "pathName": "straight"
           }
         }
       ]

@@ -58,24 +58,24 @@ public final class Constants {
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 80;
+        public static final double kP = 100;
         public static final double kI = 0.0;
-        public static final double kD = 0.15;
+        public static final double kD = 0.22;
         public static final double kDt = 0.02;
 
         public static final double kS = 0.0;
         public static final double kV = 14.3;
         public static final double kG = 0.54;
 
-        public static final double L0 = 0.02; //cm
+        public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.174; //cm
-        public static final double L3 = 0.31;  //cm   
+        public static final double L2 = 0.18; //cm
+        public static final double L3 = 0.325;  //cm   
         public static final double SOURCE = 0.193;
-        public static final double ALGAE_HEIGHT_LOW_START = 0.15;
-        public static final double ALGAE_HEIGHT_LOW_END = 0.14;
-        public static final double ALGAE_HEIGHT_HIGH_START = 0.21;
-        public static final double ALGAE_HEIGHT_HIGH_END = 0.23;
+        public static final double ALGAE_HEIGHT_LOW_START = 0.17;
+        public static final double ALGAE_HEIGHT_LOW_END = 0.19;
+        public static final double ALGAE_HEIGHT_HIGH_START = 0.31;
+        public static final double ALGAE_HEIGHT_HIGH_END = 0.31;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
 
@@ -104,9 +104,9 @@ public final class Constants {
         public static final double L3_ANGLE = 78.5; //degrees
         public static final double HANG_ANGLE = 90;
         public static final double SOURCE_ANGLE = 62.139; //degrees
-        public static final double ALGAE_ANGLE_LOW_START = 50.54;
+        public static final double ALGAE_ANGLE_LOW_START = 40;
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
-        public static final double ALGAE_ANGLE_HIGH_START = 50;
+        public static final double ALGAE_ANGLE_HIGH_START = 45;
         public static final double ALGAE_ANGLE_HIGH_END = 93.60;
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
@@ -117,12 +117,12 @@ public final class Constants {
         public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0.04;
+        public static final double WRIST_KP = 0.05;
         public static final double WRIST_KD = 0;
 
         public static final double WRIST_ENCODER_TO_DEGREES = 5.72727272; //degrees
 
-        public static final double L0_ANGLE = 10;
+        public static final double L0_ANGLE = 7;
         public static final double SOURCE_ANGLE = 31;
         public static final double L1_ANGLE = 14.727;
         public static final double L3_ANGLE = 86;

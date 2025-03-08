@@ -87,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = true;
+  public boolean visionEnabled = false;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -149,7 +149,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
-    swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
+    swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
         true,
@@ -170,7 +170,7 @@ public class SwerveSubsystem extends SubsystemBase {
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
     generatePoseArray();
   }
