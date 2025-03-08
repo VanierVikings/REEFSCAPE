@@ -99,8 +99,6 @@ public class Elevator extends SubsystemBase {
     
     m_request = new MotionMagicExpoVoltage(0);
 
-    pivotMotorOne.setPosition(pivotEncoder.get()/360);
-
     // Elevator motor configuration
     SparkMaxConfig elevatorFollow = new SparkMaxConfig();
     elevatorFollow

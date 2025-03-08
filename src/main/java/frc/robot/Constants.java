@@ -23,7 +23,7 @@ public final class Constants {
         public static final double translationkI = 0.0;
         public static final double translationkD = 0.0;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-        public static final PIDConstants autoDrivePID = new PIDConstants(4.8, 0.0, 0.0);
+        public static final PIDConstants autoDrivePID = new PIDConstants(5, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(5.0, 0.0, 0.0);
         public static final double WHEEL_LOCK_TIME = 10; // seconds
         public static final double StatorCurrentLimitDrive = 100;
@@ -65,13 +65,13 @@ public final class Constants {
 
         public static final double kS = 0.0;
         public static final double kV = 14.3;
-        public static final double kG = 0.54;
+        public static final double kG = 0.7;
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
         public static final double L2 = 0.18; //cm
         public static final double L3 = 0.325;  //cm   
-        public static final double SOURCE = 0.193;
+        public static final double SOURCE = 0.17;
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
         public static final double ALGAE_HEIGHT_HIGH_START = 0.32;

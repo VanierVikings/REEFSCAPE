@@ -87,7 +87,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = false;
+  public boolean visionEnabled = true;
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -147,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
@@ -162,15 +162,15 @@ public class SwerveSubsystem extends SubsystemBase {
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
     // visionEnabled = true;
-    // if (visionEnabled) {
-    //   // Stop the odometry thread if we are using vision that way we can synchronize
-    //   // updates better.
-    //   swerveDrive.stopOdometryThread();
-    // }
+    if (visionEnabled) {
+      // Stop the odometry thread if we are using vision that way we can synchronize
+      // updates better.
+      swerveDrive.stopOdometryThread();
+    }
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
     generatePoseArray();
   }
@@ -199,7 +199,8 @@ public class SwerveSubsystem extends SubsystemBase {
       LimelightHelpers.SetIMUMode("limelight", 2);
     }
     Boolean doRejectUpdate = false;
-    LimelightHelpers.SetRobotOrientation("limelight",mt1Estimator.getEstimatedPosition().getRotation().getDegrees() , 0, 0, 0, 0,
+    Pose2d mt1Pose = mt1Estimator.getEstimatedPosition();
+    LimelightHelpers.SetRobotOrientation("limelight", getHeading().getDegrees() , 0, 0, 0, 0,
         0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 720) // if our angular velocity
@@ -241,13 +242,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
       if(!doRejectUpdate2)
       {
+            mt1Estimator.setVisionMeasurementStdDevs(VecBuilder.fill( Double.MAX_VALUE, Double.MAX_VALUE, Constants.VisionConstants.STDTheta));
             mt1Estimator.addVisionMeasurement(
             mt1.pose,
             mt1.timestampSeconds);
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE,Constants.VisionConstants.STDTheta));
-        swerveDrive.addVisionMeasurement(
-            mt1.pose,
-            mt1.timestampSeconds);
+
       } 
   }
 
@@ -328,6 +327,8 @@ public class SwerveSubsystem extends SubsystemBase {
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
   }
+
+  
 
   /**
    * Get the path follower with events.
@@ -722,7 +723,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return The yaw angle
    */
   public Rotation2d getHeading() {
-    return getPose().getRotation();
+    return this.swerveDrive.getYaw();
   }
 
   /**
