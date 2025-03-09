@@ -23,7 +23,7 @@ public final class Constants {
         public static final double translationkI = 0.0;
         public static final double translationkD = 0.0;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-        public static final PIDConstants autoDrivePID = new PIDConstants(5, 0.0, 0.0);
+        public static final PIDConstants autoDrivePID = new PIDConstants(4.8, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(5.0, 0.0, 0.0);
         public static final double WHEEL_LOCK_TIME = 10; // seconds
         public static final double StatorCurrentLimitDrive = 100;
@@ -52,26 +52,26 @@ public final class Constants {
 
         public static final double MAX_VELOCITY = 0.7;
         //public static final double MAX_VELOCITY = 0.75806630731;
-        public static final double MAX_ACCELERATION = 4.5;
+        public static final double MAX_ACCELERATION = 11;
         ///public static final double MAX_ACCELERATION = 0.8717762534;
         public static final double SPOOL_DIAMETER = 0.04318;
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 100;
+        public static final double kP = 80;
         public static final double kI = 0.0;
-        public static final double kD = 0.22;
+        public static final double kD = 1;
         public static final double kDt = 0.02;
 
         public static final double kS = 0.0;
-        public static final double kV = 14.3;
-        public static final double kG = 0.7;
+        public static final double kV = 12.1;
+        public static final double kG = 1;
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.18; //cm
+        public static final double L2 = 0.2; //cm
         public static final double L3 = 0.325;  //cm   
-        public static final double SOURCE = 0.17;
+        public static final double SOURCE = 0.193;
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
         public static final double ALGAE_HEIGHT_HIGH_START = 0.32;
@@ -98,10 +98,10 @@ public final class Constants {
         public static final double kV = 31;
         public static final double kG = 0;
 
-        public static final double L0_ANGLE = 10; //degrees
+        public static final double L0_ANGLE = 3; //degrees
         public static final double L1_ANGLE = 36.475; //degrees
-        public static final double L2_ANGLE = 69.26; //degrees
-        public static final double L3_ANGLE = 78.5; //degrees
+        public static final double L2_ANGLE = 65.26; //degrees
+        public static final double L3_ANGLE = 70.5; //degrees
         public static final double HANG_ANGLE = 90;
         public static final double SOURCE_ANGLE = 62.139; //degrees
         public static final double ALGAE_ANGLE_LOW_START = 40;
@@ -126,7 +126,7 @@ public final class Constants {
         public static final double SOURCE_ANGLE = 31;
         public static final double L1_ANGLE = 14.727;
         public static final double L3_ANGLE = 86;
-        public static final double L2_ANGLE = 74.727;
+        public static final double L2_ANGLE = 76.727;
         public static final double ALGAE_ANGLE_LOW_START = 47.86;
         public static final double ALGAE_ANGLE_LOW_END = 38.87;
         public static final double ALGAE_ANGLE_HIGH_START = 47.86;

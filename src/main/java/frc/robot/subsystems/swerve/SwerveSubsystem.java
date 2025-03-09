@@ -95,7 +95,6 @@ public class SwerveSubsystem extends SubsystemBase {
   public PIDController translationSwervePidController;
 
   public SwerveController controller;
-  public SwerveDrivePoseEstimator mt1Estimator;
   public enum branchSide{
     leftBranch,
     rightBranch
@@ -147,9 +146,9 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
-    swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
+    swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
         true,
@@ -161,17 +160,18 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
-    // visionEnabled = true;
-    if (visionEnabled && !SwerveDriveTelemetry.isSimulation) {
+    if (visionEnabled) {
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
+      
       swerveDrive.stopOdometryThread();
+      swerveDrive.updateOdometry();
+
     }
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
-    mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
   }
 
@@ -183,24 +183,22 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
     swerveDrive = new SwerveDrive(driveCfg,
-        controllerCfg,
+        controllerCfg,     
         Constants.SwerveConstants.MAX_SPEED,
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
             Rotation2d.fromDegrees(0)));
   }
 
+    
   public void updateVision() {
     swerveDrive.updateOdometry();
-    mt1Estimator.update(getHeading(), swerveDrive.getModulePositions());
-    updatemt1();
-    if (this.getFieldVelocity().vxMetersPerSecond  < 0.1 && this.getFieldVelocity().vyMetersPerSecond < 0.1){
+    if (Math.abs(this.getFieldVelocity().vxMetersPerSecond)  < 0.1 && Math.abs(this.getFieldVelocity().vyMetersPerSecond) < 0.1){
       LimelightHelpers.SetIMUMode("limelight", 1);
     } else{
       LimelightHelpers.SetIMUMode("limelight", 2);
     }
     Boolean doRejectUpdate = false;
-    Pose2d mt1Pose = mt1Estimator.getEstimatedPosition();
-    LimelightHelpers.SetRobotOrientation("limelight", getHeading().getDegrees() , 0, 0, 0, 0,
+    LimelightHelpers.SetRobotOrientation("limelight",getHeading().getDegrees() , 0, 0, 0, 0,
         0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 720) // if our angular velocity
@@ -221,34 +219,6 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  public void updatemt1(){
-    boolean doRejectUpdate2 = false;
-    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
-      {
-        if(mt1.rawFiducials[0].ambiguity > .7)
-        {
-          doRejectUpdate2 = true;
-        }
-        if(mt1.rawFiducials[0].distToCamera > 3)
-        {
-          doRejectUpdate2 = true;
-        }
-      }
-      if(mt1.tagCount == 0)
-      {
-        doRejectUpdate2 = true;
-      }
-
-      if(!doRejectUpdate2)
-      {
-            mt1Estimator.setVisionMeasurementStdDevs(VecBuilder.fill( Double.MAX_VALUE, Double.MAX_VALUE, Constants.VisionConstants.STDTheta));
-            mt1Estimator.addVisionMeasurement(
-            mt1.pose,
-            mt1.timestampSeconds);
-
-      } 
-  }
 
   @Override
   public void periodic() {
@@ -327,8 +297,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
   }
-
-  
 
   /**
    * Get the path follower with events.
@@ -719,7 +687,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return The yaw angle
    */
   public Rotation2d getHeading() {
-    return this.swerveDrive.getYaw();
+    return getPose().getRotation();
   }
 
   /**

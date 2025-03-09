@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
 
-  private final IdleMode elevatorIdleMode = IdleMode.kCoast;
+  private final IdleMode elevatorIdleMode = IdleMode.kBrake;
 
   public enum Setpoint {
     kRest,
@@ -98,6 +98,8 @@ public class Elevator extends SubsystemBase {
     pivotMotorOne.getConfigurator().apply(pivotConfig);
     
     m_request = new MotionMagicExpoVoltage(0);
+
+    pivotMotorOne.setPosition(0);
 
     // Elevator motor configuration
     SparkMaxConfig elevatorFollow = new SparkMaxConfig();

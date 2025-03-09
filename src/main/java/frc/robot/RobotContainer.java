@@ -68,12 +68,12 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> -driver.getLeftY(),
-    () -> -driver.getLeftX()) // Axis which give the desired translational angle and speed.
+    () -> driver.getLeftY(),
+    () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
   .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.95)           // Scaled controller translation axis
-  .allianceRelativeControl(false);  // Alliance relative controls.
+  .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative
@@ -96,21 +96,6 @@ public class RobotContainer {
       .deadband(0.05)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
-
-    SwerveInputStream sourcePointA = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driver.getLeftY(),
-    () -> driver.getLeftX(),
-    () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), 2.2165681500327))
-    .deadband(0.05)
-    .scaleTranslation(0.8)
-    .allianceRelativeControl(true);
-
-    
-    SwerveInputStream sourcePointB = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driver.getLeftY(),
-    () -> driver.getLeftX(),
-    () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), -2.2165681500327))
-    .deadband(0.05)
-    .scaleTranslation(0.8)
-    .allianceRelativeControl(true);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -155,7 +140,6 @@ public class RobotContainer {
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-      drivetrain.resetOdometry(new Pose2d(3,3, new Rotation2d())  );
       drivetrain.visionEnabled = false;
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -172,18 +156,18 @@ public class RobotContainer {
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
     //low reef algae removal
     operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
-    //high reef algae removIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIZOOOOOOO   9999999999999O9al
+    //high reef algae removal
     operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
     operator.povUp().whileTrue(m_endEffector.spin(0.65));
-    operator.povLeft().whileTrue(m_endEffector.spin(0.2));
+    operator.povLeft().whileTrue(m_endEffector.spin(0.3));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
 
-    driver.L2().toggleOnTrue(drivetrain.driveFieldOriented(sourcePointA));
-    driver.R2().toggleOnTrue(drivetrain.driveFieldOriented(sourcePointB));
+    driver.L2().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    driver.L1().onTrue(m_hang.setpoint());
+    driver.R2().onTrue(m_elevator.setElevator(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
 
-
-    driver.cross().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 
@@ -194,14 +178,14 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return drivetrain.driveFieldOriented(SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> 1,
-    () -> 0) // Axis which give the desired translational angle and speed.
-  .withControllerRotationAxis(() -> 0) // Axis which give the desired angular velocity.
-  .deadband(0.05)                  // Controller deadband
-  .scaleTranslation(0.8)           // Scaled controller translation axis
-  .allianceRelativeControl(true));
-  // return autoChooser.getSelected();
+  //   return drivetrain.driveFieldOriented(SwerveInputStream.of(drivetrain.getSwerveDrive(),
+  //   () -> 1,
+  //   () -> 0) // Axis which give the desired translational angle and speed.
+  // .withControllerRotationAxis(() -> 0) // Axis which give the desired angular velocity.
+  // .deadband(0.05)                  // Controller deadband
+  // .scaleTranslation(0.8)           // Scaled controller translation axis
+  // .allianceRelativeControl(true));
+  return autoChooser.getSelected();
     }
 
 
