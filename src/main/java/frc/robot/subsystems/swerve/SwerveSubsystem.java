@@ -149,7 +149,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
                                              // angle.
-    swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
+    swerveDrive.setCosineCompensator(false);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
         true,
@@ -162,7 +162,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
     // visionEnabled = true;
-    if (visionEnabled) {
+    if (visionEnabled && !SwerveDriveTelemetry.isSimulation) {
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       swerveDrive.stopOdometryThread();
@@ -344,11 +344,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public ChassisSpeeds setPointChassisSpeeds(Pose2d pose){
     var speeds = new ChassisSpeeds(translationSwervePidController.calculate(this.getPose().getX(), pose.getX()), translationSwervePidController.calculate(this.getPose().getY(), pose.getY()), controller.headingCalculate(this.getHeading().getRadians(),this.getHeading().getRadians()));
+    SmartDashboard.putNumber("xvel", translationSwervePidController.calculate(this.getPose().getX(), pose.getX()));
     return speeds;
   }
 
   public Command autoAlign(Pose2d pose){
-    if (pose.getTranslation().getDistance(this.getPose().getTranslation()) < SwerveConstants.PPTolerance){
+
       try
       {
         return driveWithSetpointGenerator(() -> {
@@ -360,11 +361,6 @@ public class SwerveSubsystem extends SubsystemBase {
         DriverStation.reportError(e.toString(), true);
       }
       return Commands.none();
-
-    }
-    else{
-    return driveToPose(pose);
-    }
   }
 
   /**

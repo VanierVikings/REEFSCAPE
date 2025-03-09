@@ -155,6 +155,7 @@ public class RobotContainer {
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      drivetrain.resetOdometry(new Pose2d(3,3, new Rotation2d())  );
       drivetrain.visionEnabled = false;
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -162,7 +163,7 @@ public class RobotContainer {
 
     driver.circle().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
-    driver.cross().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
+    //driver.cross().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
     operator.leftTrigger().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
     operator.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
@@ -181,7 +182,7 @@ public class RobotContainer {
     driver.R2().toggleOnTrue(drivetrain.driveFieldOriented(sourcePointB));
 
 
-    driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.cross().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
