@@ -88,7 +88,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * Enable vision odometry updates while driving.
    */
   public boolean visionEnabled = true;
-  /**
+
+  public SwerveDrivePoseEstimator mt1Estimator;  /**
    * PhotonVision class to keep an accurate odometry.
    */
 
@@ -146,13 +147,11 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
-    swerveDrive.setAngularVelocityCompensation(true,
-        true,
-        0.1); // Correct for skew that gets worse as angular velocity increases. Start with a
+    swerveDrive.setAngularVelocityCompensation(false, false, 0); // Correct for skew that gets worse as angular velocity increases. Start with a
               // coefficient of 0.1.
     swerveDrive.setModuleEncoderAutoSynchronize(false,
         1); // Enable if you want to resynchronize your absolute encoders and motor encoders
@@ -160,18 +159,18 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
+    mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
     if (visionEnabled) {
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
       
       swerveDrive.stopOdometryThread();
-      swerveDrive.updateOdometry();
 
     }
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
     generatePoseArray();
   }
 
@@ -191,33 +190,33 @@ public class SwerveSubsystem extends SubsystemBase {
 
     
   public void updateVision() {
+    boolean doRejectUpdate = false;
     swerveDrive.updateOdometry();
-    if (Math.abs(this.getFieldVelocity().vxMetersPerSecond)  < 0.1 && Math.abs(this.getFieldVelocity().vyMetersPerSecond) < 0.1){
-      LimelightHelpers.SetIMUMode("limelight", 1);
-    } else{
-      LimelightHelpers.SetIMUMode("limelight", 2);
-    }
-    Boolean doRejectUpdate = false;
-    LimelightHelpers.SetRobotOrientation("limelight",getHeading().getDegrees() , 0, 0, 0, 0,
-        0);
+    LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 720) // if our angular velocity
-                                                                                            // is greater than 720
-                                                                                            // degrees per second,
-                                                                                            // ignore vision updates
+     
+    // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+    if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
     {
       doRejectUpdate = true;
     }
-    if (mt2.tagCount == 0) {
+    if(mt2.tagCount == 0)
+    {
       doRejectUpdate = true;
     }
-    if (!doRejectUpdate) {
-      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(Constants.VisionConstants.STDdevX, Constants.VisionConstants.STDdevY, Double.MAX_VALUE));
+    if(!doRejectUpdate)
+    {
+      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
       swerveDrive.addVisionMeasurement(
           mt2.pose,
           mt2.timestampSeconds);
     }
   }
+
+
+
+
+
 
 
   @Override

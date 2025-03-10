@@ -54,7 +54,7 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController operator = new CommandXboxController(1);
-  final CommandPS5Controller driver = new CommandPS5Controller(0);
+  final CommandXboxController driver = new CommandXboxController(0);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
   private final static Climb m_hang = new Climb();
@@ -71,8 +71,8 @@ public class RobotContainer {
     () -> driver.getLeftY(),
     () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
-  .deadband(0.05)                  // Controller deadband
-  .scaleTranslation(0.95)           // Scaled controller translation axis
+  .deadband(0.1)                  // Controller deadband
+  .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
   /**
@@ -145,7 +145,7 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driver.circle().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
+    driver.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
     //driver.cross().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
@@ -162,9 +162,9 @@ public class RobotContainer {
     operator.povLeft().whileTrue(m_endEffector.spin(0.3));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
 
-    driver.L2().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    driver.L1().onTrue(m_hang.setpoint());
-    driver.R2().onTrue(m_elevator.setElevator(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
+    driver.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    driver.leftBumper().onTrue(m_hang.setpoint());
+    driver.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
 
     driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
