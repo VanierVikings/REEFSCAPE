@@ -90,7 +90,6 @@ public class SwerveSubsystem extends SubsystemBase {
   public boolean visionEnabled = true;
 
 
-
   public PIDController translationSwervePidController;
 
   public SwerveController controller;
@@ -145,7 +144,7 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    swerveDrive.setHeadingCorrection(true); // Heading correction should only be used while controlling the robot via
+    swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via
                                              // angle.
     swerveDrive.setCosineCompensator(true);// !SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for
                                             // simulations since it causes discrepancies not seen in real life.
@@ -190,7 +189,9 @@ public class SwerveSubsystem extends SubsystemBase {
     LimelightHelpers.SetIMUMode("limelight", 0);
     boolean doRejectUpdate = false;
     swerveDrive.updateOdometry();
-    LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(
+      
+    "limelight", swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates

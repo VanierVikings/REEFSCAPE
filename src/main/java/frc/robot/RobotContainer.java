@@ -68,11 +68,10 @@ public class RobotContainer {
    * by angular velocity.
    */
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivetrain.getSwerveDrive(),
-    () -> driver.getLeftY(),
-    () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
+    () -> -driver.getLeftY(),
+    () -> -driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
-  .deadband(0.3
-  )                  // Controller deadband
+  .deadband(0.005)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
@@ -91,10 +90,10 @@ public class RobotContainer {
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false);
 
-  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> driver.getLeftY(),
-      () -> driver.getLeftX(),
+  SwerveInputStream reefPoint = new SwerveInputStream(drivetrain.getSwerveDrive(), () -> -driver.getLeftY(),
+      () -> -driver.getLeftX(),
       () -> drivetrain.controller.headingCalculate(drivetrain.getHeading().getRadians(), drivetrain.getNearestReefPose().getRotation().getRadians()))
-      .deadband(0.05)
+      .deadband(0.005)
       .scaleTranslation(0.8)
       .allianceRelativeControl(true);
 
@@ -141,6 +140,7 @@ public class RobotContainer {
 
     if (RobotBase.isSimulation()) {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+      drivetrain.resetOdometry(new Pose2d(3,3,new Rotation2d()));
       drivetrain.visionEnabled = false;
     } else {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
@@ -165,13 +165,8 @@ public class RobotContainer {
 
     operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
 
-
-    driver.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    driver.leftBumper().onTrue(m_hang.setpoint());
-    driver.rightTrigger().onTrue(m_elevator.setElevator(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
-
-    driver.povLeft().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driver.povRight().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.driveToPose(drivetrain.getBranchPose(branchSide.rightBranch))));
 
   }
 

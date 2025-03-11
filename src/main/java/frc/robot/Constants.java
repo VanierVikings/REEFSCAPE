@@ -23,7 +23,7 @@ public final class Constants {
         public static final double translationkI = 0.0;
         public static final double translationkD = 0.0;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-        public static final PIDConstants autoDrivePID = new PIDConstants(4.8, 0.0, 0.0);
+        public static final PIDConstants autoDrivePID = new PIDConstants(5, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(5.0, 0.0, 0.0);
         public static final double WHEEL_LOCK_TIME = 10; // seconds
         public static final double StatorCurrentLimitDrive = 100;
