@@ -87,11 +87,9 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = false;
+  public boolean visionEnabled = true;
 
-  public SwerveDrivePoseEstimator mt1Estimator;  /**
-   * PhotonVision class to keep an accurate odometry.
-   */
+
 
   public PIDController translationSwervePidController;
 
@@ -159,7 +157,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
     // over the internal encoder and push the offsets onto it. Throws warning if not
     // possible
-    mt1Estimator = new SwerveDrivePoseEstimator(getKinematics(), getHeading(), swerveDrive.getModulePositions(), swerveDrive.getPose());
     if (visionEnabled) {
       // Stop the odometry thread if we are using vision that way we can synchronize
       // updates better.
@@ -190,6 +187,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     
   public void updateVision() {
+    LimelightHelpers.SetIMUMode("limelight", 0);
     boolean doRejectUpdate = false;
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation("limelight", swerveDrive.getOdometryHeading().getDegrees(), 0, 0, 0, 0, 0);
@@ -214,16 +212,12 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
 
-
-
-
-
-
   @Override
   public void periodic() {
     if (visionEnabled){
       updateVision();
     }
+    SmartDashboard.putNumber("Current Heading", swerveDrive.getOdometryHeading().getDegrees());
   }
 
   @Override
