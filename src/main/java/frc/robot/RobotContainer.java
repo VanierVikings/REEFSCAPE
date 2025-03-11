@@ -71,7 +71,8 @@ public class RobotContainer {
     () -> driver.getLeftY(),
     () -> driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
-  .deadband(0.1)                  // Controller deadband
+  .deadband(0.3
+  )                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 
@@ -147,12 +148,12 @@ public class RobotContainer {
 
     driver.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
-    //driver.cross().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
+    driver.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
 
     operator.leftTrigger().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
-    operator.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
-    operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
-    operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
+    operator.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
+    operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
+    operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
     //low reef algae removal
     operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
@@ -161,6 +162,9 @@ public class RobotContainer {
     operator.povUp().whileTrue(m_endEffector.spin(0.65));
     operator.povLeft().whileTrue(m_endEffector.spin(0.3));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
+
+    operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
+
 
     driver.leftTrigger().onTrue(m_elevator.setPivot(Setpoint.kHang));
     driver.leftBumper().onTrue(m_hang.setpoint());

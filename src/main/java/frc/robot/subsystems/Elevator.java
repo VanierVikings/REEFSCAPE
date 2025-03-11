@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase {
   final MotionMagicVelocityVoltage pivotRequest = new MotionMagicVelocityVoltage(0);
   private final TrapezoidProfile.Constraints elevatorConstraints = new TrapezoidProfile.Constraints(
       ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCELERATION);
-  private final ProfiledPIDController elevatorController = new ProfiledPIDController(ElevatorConstants.kP,
+  public final ProfiledPIDController elevatorController = new ProfiledPIDController(ElevatorConstants.kP,
       ElevatorConstants.kI, ElevatorConstants.kD, elevatorConstraints, ElevatorConstants.kDt);
   private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS,
       ElevatorConstants.kG, ElevatorConstants.kV);

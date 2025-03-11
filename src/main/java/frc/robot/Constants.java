@@ -58,20 +58,20 @@ public final class Constants {
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 80;
+        public static final double kP = 90;
         public static final double kI = 0.0;
         public static final double kD = 1;
         public static final double kDt = 0.02;
 
         public static final double kS = 0.0;
-        public static final double kV = 12.1;
+        public static final double kV = 14.5;
         public static final double kG = 1;
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
         public static final double L2 = 0.2; //cm
         public static final double L3 = 0.325;  //cm   
-        public static final double SOURCE = 0.193;
+        public static final double SOURCE = 0.17575;
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
         public static final double ALGAE_HEIGHT_HIGH_START = 0.32;
