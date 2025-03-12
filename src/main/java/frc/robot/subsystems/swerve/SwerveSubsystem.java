@@ -20,21 +20,17 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,25 +40,15 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.swerve.LimelightHelpers.PoseEstimate;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.attribute.PosixFileAttributes;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -93,7 +79,8 @@ public class SwerveSubsystem extends SubsystemBase {
   public boolean visionEnabled = false;
 
 
-  public PIDController translationSwervePidController;
+  public PIDController tXController;
+  public PIDController tYController;
 
   public SwerveController controller;
   public enum branchSide{
@@ -111,10 +98,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private int aprilID = 0;
 
-  private HashMap<Integer, int[]> additionalOffsets = new HashMap<Integer, int[]>();
-
-
-
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -122,27 +105,21 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
-    // objects being created.
+    // objects being created. 
+    boolean blueAlliance = false;
+    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
+                                                                      Meter.of(4)),
+                                                    Rotation2d.fromDegrees(0))
+                                       : new Pose2d(new Translation2d(Meter.of(16),
+                                                                      Meter.of(4)),
+                                                    Rotation2d.fromDegrees(180));
 
-    additionalOffsets.put(6, new int[] {0, 0});
-    additionalOffsets.put(7, new int[] {0, 0});
-    additionalOffsets.put(8, new int[] {0, 0});
-    additionalOffsets.put(9, new int[] {0, 0});
-    additionalOffsets.put(10, new int[] {0, 0});
-    additionalOffsets.put(11, new int[] {0, 0});
-    additionalOffsets.put(17, new int[] {0, 0});
-    additionalOffsets.put(18, new int[] {0, 0});
-    additionalOffsets.put(19, new int[] {0, 0});
-    additionalOffsets.put(20, new int[] {0, 0});
-    additionalOffsets.put(21, new int[] {0, 0});
-    additionalOffsets.put(22, new int[] {0, 0});    
+                                                  
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
+
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED);
-      // Alternative method if you don't want to supply the conversion factor via JSON
-      // files.
-      // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
-      // angleConversionFactor, driveConversionFactor);
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED, startingPose);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -165,11 +142,19 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.stopOdometryThread();
 
     }
-    translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
+    tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
+
+    for (int i = 0; i < leftBranchPosesBlue.length; i++) {
+      swerveDrive.field.getObject("LB" + i).setPose(leftBranchPosesBlue[i]);
+      swerveDrive.field.getObject("RB" + i).setPose(rightBranchPosesBlue[i]);
+      swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
+      swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
+    }
   }
 
   /**
@@ -194,15 +179,13 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
       
-    "limelight", swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees(), 0, 0, 0, 0, 0);
+    "limelight", Math.toDegrees(swerveDrive.getGyro().getRotation3d().getAngle()), 0, 0, 0, 0, 0);
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
     {
       doRejectUpdate = true;
-
     }
- 
     if(mt2.tagCount == 0)
     {
       doRejectUpdate = true;
@@ -309,7 +292,13 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public Command autoAlign(Pose2d pose){
-      return Commands.none();
+    DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
+    return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveToPosePID(() -> pose));
+  }
+
+  public Command driveToPosePID(Supplier<Pose2d> pose){
+    ChassisSpeeds speed = new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.get().getX()), tYController.calculate(getPose().getY(), pose.get().getY()), controller.headingCalculate(getHeading().getRadians(), pose.get().getRotation().getRadians()));
+    return driveWithSetpointGeneratorFieldRelative(() -> speed);
   }
 
   /**
@@ -828,19 +817,13 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void generatePoseArray() {
-    Pose2d lOrgBlue = new Pose2d(3.194, 4.185, new Rotation2d(0));
-    Pose2d rOrgBlue = new Pose2d(3.194, 3.864, new Rotation2d(0));
+    Pose2d lOrgBlue = new Pose2d(3.194, 4.19, new Rotation2d(0));
+    Pose2d rOrgBlue = new Pose2d(3.194, 3.87, new Rotation2d(0));
     Translation2d centerBlue = new Translation2d(4.497, 4.025);
 
-    Pose2d lOrgRed = new Pose2d();
-    Pose2d rOrgRed = new Pose2d();
-    Translation2d centerRed = new Translation2d();
-
-    if (isRedAlliance()) {
-      lOrgRed = FlippingUtil.flipFieldPose(lOrgBlue);
-      rOrgRed = FlippingUtil.flipFieldPose(rOrgBlue);
-      centerRed = FlippingUtil.flipFieldPosition(centerBlue);
-    }
+    Pose2d lOrgRed = FlippingUtil.flipFieldPose(lOrgBlue);
+    Pose2d rOrgRed = FlippingUtil.flipFieldPose(rOrgBlue);
+    Translation2d centerRed = FlippingUtil.flipFieldPosition(centerBlue);
 
     for (int i = 0; i < 6; i += 1) {
       var rotAngle = Rotation2d.fromDegrees(60 * i);
