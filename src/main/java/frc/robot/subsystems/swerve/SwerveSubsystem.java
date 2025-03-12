@@ -23,9 +23,12 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -87,7 +90,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = true;
+  public boolean visionEnabled = false;
 
 
   public PIDController translationSwervePidController;
@@ -133,7 +136,6 @@ public class SwerveSubsystem extends SubsystemBase {
     additionalOffsets.put(20, new int[] {0, 0});
     additionalOffsets.put(21, new int[] {0, 0});
     additionalOffsets.put(22, new int[] {0, 0});    
-
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED);
@@ -198,6 +200,7 @@ public class SwerveSubsystem extends SubsystemBase {
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
     {
       doRejectUpdate = true;
+
     }
 
     if (mt2 != null){
@@ -308,24 +311,7 @@ public class SwerveSubsystem extends SubsystemBase {
     return new PathPlannerAuto(pathName);
   }
 
-  public ChassisSpeeds setPointChassisSpeeds(Pose2d pose){
-    var speeds = new ChassisSpeeds(translationSwervePidController.calculate(this.getPose().getX(), pose.getX()), translationSwervePidController.calculate(this.getPose().getY(), pose.getY()), controller.headingCalculate(this.getHeading().getRadians(),this.getHeading().getRadians()));
-    SmartDashboard.putNumber("xvel", translationSwervePidController.calculate(this.getPose().getX(), pose.getX()));
-    return speeds;
-  }
-
   public Command autoAlign(Pose2d pose){
-
-      try
-      {
-        return driveWithSetpointGenerator(() -> {
-          return ChassisSpeeds.fromFieldRelativeSpeeds(setPointChassisSpeeds(pose), getHeading());
-  
-        });
-      } catch (Exception e)
-      {
-        DriverStation.reportError(e.toString(), true);
-      }
       return Commands.none();
   }
 
@@ -445,7 +431,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Returns a Command that drives the swerve drive to a specific distance at a
    * given speed.
    *
-   * @param distanceInMeters       the distance to drive in meters
+   * @param distanceInMeters       t distance to drive in meters
    * @param speedInMetersPerSecond the speed at which to drive in meters per
    *                               second
    * @return a Command that drives the swerve drive to a specific distance at a
@@ -845,9 +831,9 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void generatePoseArray() {
-    Pose2d lOrgBlue = new Pose2d(3.16, 4.18, new Rotation2d(0));
-    Pose2d rOrgBlue = new Pose2d(3.16, 3.86, new Rotation2d(0));
-    Translation2d centerBlue = new Translation2d(4.47, 4.060);
+    Pose2d lOrgBlue = new Pose2d(3.194, 4.185, new Rotation2d(0));
+    Pose2d rOrgBlue = new Pose2d(3.194, 3.864, new Rotation2d(0));
+    Translation2d centerBlue = new Translation2d(4.497, 4.025);
 
     Pose2d lOrgRed = new Pose2d();
     Pose2d rOrgRed = new Pose2d();
@@ -867,6 +853,7 @@ public class SwerveSubsystem extends SubsystemBase {
       rightBranchPosesRed[i] = rOrgRed.rotateAround(centerRed, rotAngle);
     }
   }
+
 
   public Command reefPointSetpointGen() {
     return driveWithSetpointGeneratorFieldRelative(() -> new ChassisSpeeds(
