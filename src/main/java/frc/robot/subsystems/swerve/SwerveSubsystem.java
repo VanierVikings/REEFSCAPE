@@ -186,20 +186,24 @@ public class SwerveSubsystem extends SubsystemBase {
 
     
   public void updateVision() {
+    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     LimelightHelpers.SetIMUMode("limelight", 0);
     boolean doRejectUpdate = false;
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
       
     "limelight", swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
     {
       doRejectUpdate = true;
     }
-    if(mt2.tagCount == 0)
+
+    if (mt2 != null){
+      doRejectUpdate = true;
+      
+    } else if(mt2.tagCount == 0)
     {
       doRejectUpdate = true;
     }
