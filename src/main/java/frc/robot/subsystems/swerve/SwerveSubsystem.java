@@ -168,7 +168,7 @@ public class SwerveSubsystem extends SubsystemBase {
     translationSwervePidController = new PIDController(SwerveConstants.translationkP, SwerveConstants.translationkP, SwerveConstants.translationkD);
     controller = swerveDrive.getSwerveController();
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyro));
+    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
   }
 
@@ -202,11 +202,8 @@ public class SwerveSubsystem extends SubsystemBase {
       doRejectUpdate = true;
 
     }
-
-    if (mt2 != null){
-      doRejectUpdate = true;
-      
-    } else if(mt2.tagCount == 0)
+ 
+    if(mt2.tagCount == 0)
     {
       doRejectUpdate = true;
     }
