@@ -19,7 +19,7 @@ public final class Constants {
 
     public static final class SwerveConstants {
         public static final double alignmentTolerance = 1; //meters
-        public static final double kP = 10;
+        public static final double kP = 5;
         public static final double kI = 0.0;
         public static final double kD = 0.01;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);

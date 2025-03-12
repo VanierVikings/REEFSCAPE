@@ -9,6 +9,12 @@
           "data": {
             "pathName": "to reef"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL1"
+          }
         }
       ]
     }

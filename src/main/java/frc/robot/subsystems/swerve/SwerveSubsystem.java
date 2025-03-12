@@ -48,7 +48,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import org.json.simple.parser.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -76,7 +75,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = false;
+  public boolean visionEnabled = true;
 
 
   public PIDController tXController;
@@ -106,20 +105,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveSubsystem(File directory) {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created. 
-    boolean blueAlliance = false;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(0))
-                                       : new Pose2d(new Translation2d(Meter.of(16),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(180));
-
-                                                  
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
 
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED, startingPose);
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -149,12 +139,12 @@ public class SwerveSubsystem extends SubsystemBase {
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
 
-    for (int i = 0; i < leftBranchPosesBlue.length; i++) {
-      swerveDrive.field.getObject("LB" + i).setPose(leftBranchPosesBlue[i]);
-      swerveDrive.field.getObject("RB" + i).setPose(rightBranchPosesBlue[i]);
-      swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
-      swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
-    }
+    // for (int i = 0; i < leftBranchPosesBlue.length; i++) {
+    //   swerveDrive.field.getObject("LB" + i).setPose(leftBranchPosesBlue[i]);
+    //   swerveDrive.field.getObject("RB" + i).setPose(rightBranchPosesBlue[i]);
+    //   swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
+    //   swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
+    // }
   }
 
   /**
@@ -179,7 +169,7 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
       
-    "limelight", Math.toDegrees(swerveDrive.getGyro().getRotation3d().getAngle()), 0, 0, 0, 0, 0);
+    "limelight", Math.toDegrees(swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees()), 0, 0, 0, 0, 0);
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
@@ -293,13 +283,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command autoAlign(Pose2d pose){
     DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
-    return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveToPosePID(() -> pose));
+    Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), controller.headingCalculate(getPose().getRotation().getRadians(), pose.getRotation().getRadians()));
+    return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveWithSetpointGeneratorFieldRelative(speed));
   }
 
-  public Command driveToPosePID(Supplier<Pose2d> pose){
-    ChassisSpeeds speed = new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.get().getX()), tYController.calculate(getPose().getY(), pose.get().getY()), controller.headingCalculate(getHeading().getRadians(), pose.get().getRotation().getRadians()));
-    return driveWithSetpointGeneratorFieldRelative(() -> speed);
-  }
 
   /**
    * Use PathPlanner Path finding to go to a point on the field.

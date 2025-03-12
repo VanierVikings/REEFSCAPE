@@ -114,6 +114,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotorConfig = new SparkMaxConfig();
     elevatorMotorConfig
     .smartCurrentLimit(ElevatorConstants.ELEVATOR_CURRENT_LIMIT)
+    .inverted(false)
     .idleMode(elevatorIdleMode);
 
     elevatorLimitSwitch = elevatorMotorOne.getForwardLimitSwitch();
