@@ -80,6 +80,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public PIDController tXController;
   public PIDController tYController;
+  public PIDController rotationController;
 
   public SwerveController controller;
   public enum branchSide{
@@ -135,6 +136,8 @@ public class SwerveSubsystem extends SubsystemBase {
     controller = swerveDrive.getSwerveController();
     tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
     tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    rotationController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    
     setupPathPlanner();
     RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
@@ -169,7 +172,7 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
       
-    "limelight", Math.toDegrees(swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees()), 0, 0, 0, 0, 0);
+    "limelight", swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees(), 0, 0, 0, 0, 0);
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
@@ -283,9 +286,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command autoAlign(Pose2d pose){
     DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
-    Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), controller.headingCalculate(getPose().getRotation().getRadians(), pose.getRotation().getRadians()));
+    Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), rotationController.calculate(getPose().getRotation().getDegrees(), pose.getRotation().getDegrees()));
     return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveWithSetpointGeneratorFieldRelative(speed));
   }
+
+  
 
 
   /**
