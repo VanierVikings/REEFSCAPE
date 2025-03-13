@@ -102,7 +102,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the trigger bindings
-    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.5)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.4).withTimeout(1))); 
+    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.25)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.2).withTimeout(0.5))); 
     NamedCommands.registerCommand("scoreL2", m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
     NamedCommands.registerCommand("scoreL3", m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
     NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(1)));  

@@ -128,7 +128,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // possible
     if (visionEnabled) {
       // Stop the odometry thread if we are using vision that way we can synchronize
-      // updates better.
+      // updates better.  
       
       swerveDrive.stopOdometryThread();
 
@@ -136,10 +136,9 @@ public class SwerveSubsystem extends SubsystemBase {
     controller = swerveDrive.getSwerveController();
     tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
     tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
-    rotationController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    rotationController = new PIDController(0.17, SwerveConstants.kI, 0.05);
     
     setupPathPlanner();
-    RobotModeTriggers.autonomous().onTrue(Commands.runOnce(this::zeroGyroWithAlliance));
     generatePoseArray();
 
     // for (int i = 0; i < leftBranchPosesBlue.length; i++) {
@@ -286,6 +285,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command autoAlign(Pose2d pose){
     DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
+    SmartDashboard.putNumber("Setpoint Rot", pose.getRotation().getDegrees());
     Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), rotationController.calculate(getPose().getRotation().getDegrees(), pose.getRotation().getDegrees()));
     return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveWithSetpointGeneratorFieldRelative(speed));
   }
