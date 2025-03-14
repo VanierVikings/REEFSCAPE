@@ -108,6 +108,8 @@ public final class Constants {
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
         public static final double ALGAE_ANGLE_HIGH_START = 50;
         public static final double ALGAE_ANGLE_HIGH_END = 93.60;
+        public static final double CLIMB_ANGLE = 0; //degrees
+
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
     }
@@ -126,7 +128,7 @@ public final class Constants {
         public static final double SOURCE_ANGLE = 31;
         public static final double L1_ANGLE = 14.727;
         public static final double L3_ANGLE = 86;
-        public static final double L2_ANGLE = 76.727;
+        public static final double L2_ANGLE = 80.727;
         public static final double ALGAE_ANGLE_LOW_START = 47.86;
         public static final double ALGAE_ANGLE_LOW_END = 38.87;
         public static final double ALGAE_ANGLE_HIGH_START = 47.86;

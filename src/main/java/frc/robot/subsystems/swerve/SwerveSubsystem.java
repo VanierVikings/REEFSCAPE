@@ -171,9 +171,10 @@ public class SwerveSubsystem extends SubsystemBase {
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
       
-    "limelight", swerveDrive.getGyro().getRotation3d().toRotation2d().getDegrees(), 0, 0, 0, 0, 0);
+    "limelight", getHeading().getDegrees(), 0, 0, 0, 0, 0);
      
     // if our angular velocity is greater than 360 degrees per second, ignore vision updates
+    if (mt2 != null){
     if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
     {
       doRejectUpdate = true;
@@ -190,6 +191,7 @@ public class SwerveSubsystem extends SubsystemBase {
           mt2.timestampSeconds);
     }
   }
+  }
 
 
   @Override
@@ -197,7 +199,7 @@ public class SwerveSubsystem extends SubsystemBase {
     if (visionEnabled){
       updateVision();
     }
-    SmartDashboard.putNumber("Current Heading", swerveDrive.getOdometryHeading().getDegrees());
+    SmartDashboard.putNumber("Current Heading",  getHeading().getDegrees());
   }
 
   @Override

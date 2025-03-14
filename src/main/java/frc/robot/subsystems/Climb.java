@@ -51,7 +51,7 @@ public Climb(){
 }
 
 public Command setpoint() {
-    return this.run(() -> target = 1);
+    return this.run(() -> target = 80);
 }
 
 @Override

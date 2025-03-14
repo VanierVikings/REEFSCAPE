@@ -26,6 +26,7 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem.branchSide;
 
 import java.io.File;
+import java.lang.System.Logger.Level;
 import java.util.Set;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -102,11 +103,11 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Configure the trigger bindings
-    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.25)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.2).withTimeout(0.5))); 
+    NamedCommands.registerCommand("scoreL1", m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.25)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)).andThen(m_endEffector.spin(0.4).withTimeout(0.5))); 
     NamedCommands.registerCommand("scoreL2", m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
     NamedCommands.registerCommand("scoreL3", m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)).andThen(m_endEffector.spin(0.7).withTimeout(1)));
-    NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(1)));  
-    NamedCommands.registerCommand("rest", m_elevator.setPivot(Setpoint.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest)));
+    NamedCommands.registerCommand("scoreSource", m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)).andThen(m_endEffector.spin(0.7).withTimeout(2.5)));  
+    NamedCommands.registerCommand("rest", m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
     autoChooser = AutoBuilder.buildAutoChooser();  
     configureBindings();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -146,19 +147,19 @@ public class RobotContainer {
       drivetrain.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
-    driver.x().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
+    driver.rightBumper().toggleOnTrue(driveFieldOrientedAnglularVelocityRP);
 
-    driver.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyro));
+    driver.a().onTrue(drivetrain.runOnce(drivetrain::zeroGyroWithAlliance));
 
     operator.leftTrigger().onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
     operator.leftBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
-    operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
-    operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
+    operator.rightBumper().onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
+    operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
     //low reef algae removal
-    operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
+    operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
     //high reef algae removal
-    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
+    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
     operator.povUp().whileTrue(m_endEffector.spin(0.65));
     operator.povLeft().whileTrue(m_endEffector.spin(0.3));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
@@ -167,6 +168,10 @@ public class RobotContainer {
 
     driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    driver.y().onTrue(m_hang.setpoint());
+    driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimb)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
+
 
   }
 

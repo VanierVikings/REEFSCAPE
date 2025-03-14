@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid to Far Left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Far Left to Source"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreSource"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source to Close Left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

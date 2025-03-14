@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
@@ -53,6 +54,7 @@ public class Elevator extends SubsystemBase {
   private final IdleMode elevatorIdleMode = IdleMode.kBrake;
 
   public enum Setpoint {
+    kClimb,
     kRest,
     kLevel1,
     kLevel2,
@@ -77,9 +79,11 @@ public class Elevator extends SubsystemBase {
     pivotMotorTwo.setControl(new Follower(PivotConstants.motorOneID, true));
 
     pivotConfig = new TalonFXConfiguration();
+    pivotConfig.ClosedLoopGeneral.ContinuousWrap = true;
     pivotConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     pivotConfig.Feedback.SensorToMechanismRatio = (4*3*34/18*52/18*46/12);
     var slot0Configs = pivotConfig.Slot0;
+
 
     slot0Configs.kS = PivotConstants.kS;
     slot0Configs.kV = PivotConstants.kV;
@@ -91,10 +95,13 @@ public class Elevator extends SubsystemBase {
     
     var motionMagicConfigs = pivotConfig.MotionMagic;
 
+    // pivotCurrentLimitConfigs.StatorCurrentLimit = 160;
+
     motionMagicConfigs.MotionMagicCruiseVelocity = PivotConstants.MAX_VELOCITY; // Target cruise velocity of 80 rps
     motionMagicConfigs.MotionMagicAcceleration = PivotConstants.MAX_ACCELERATION; // Target acceleration of 160 rps/s (0.5 seconds)
     motionMagicConfigs.MotionMagicJerk = 30; // ??? what even is this. "jerk is the rate of change of acceleration", so like ramprate?
-    
+
+
     pivotMotorOne.getConfigurator().apply(pivotConfig);
     
     m_request = new MotionMagicExpoVoltage(0);
@@ -143,6 +150,9 @@ public class Elevator extends SubsystemBase {
         () -> {
           double angle = PivotConstants.L0_ANGLE/360;
           switch (setpoint) {
+            case kClimb:
+              // limitConfigs.StatorCurrentLimit = 120;
+              angle = PivotConstants.CLIMB_ANGLE/360;
             case kRest:
               angle = PivotConstants.L0_ANGLE/360;
               break;
