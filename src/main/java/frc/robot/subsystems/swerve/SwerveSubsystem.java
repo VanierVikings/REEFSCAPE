@@ -15,6 +15,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+import com.revrobotics.spark.config.SmartMotionConfigAccessor;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -27,6 +28,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.ExponentialProfile;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -36,16 +38,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import org.json.simple.parser.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -75,12 +74,12 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public boolean visionEnabled = true;
+  public boolean visionEnabled = !SwerveDriveTelemetry.isSimulation;
 
 
-  public PIDController tXController;
-  public PIDController tYController;
-  public PIDController rotationController;
+  public ProfiledPIDController tXController;
+  public ProfiledPIDController tYController;
+  public ProfiledPIDController rotationController;
 
   public SwerveController controller;
   public enum branchSide{
@@ -134,10 +133,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     }
     controller = swerveDrive.getSwerveController();
-    tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
-    tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
-    rotationController = new PIDController(0.17, SwerveConstants.kI, 0.05);
-    
+    tXController = new ProfiledPIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD, new Constraints(1200, 4800));
+    tYController = new ProfiledPIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD, new Constraints(1200, 4800));
+    rotationController = new ProfiledPIDController(0.17, SwerveConstants.kI, 0.05, new Constraints(2400, 4800));
+
     setupPathPlanner();
     generatePoseArray();
 
@@ -147,6 +146,9 @@ public class SwerveSubsystem extends SubsystemBase {
     //   swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
     //   swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
     // }
+    SmartDashboard.putData("tXController", tXController);
+    SmartDashboard.putData("tXController", tYController);
+    SmartDashboard.putData("rotationController", rotationController);
   }
 
   /**
@@ -170,27 +172,25 @@ public class SwerveSubsystem extends SubsystemBase {
     boolean doRejectUpdate = false;
     swerveDrive.updateOdometry();
     LimelightHelpers.SetRobotOrientation(
-      
-    "limelight", getHeading().getDegrees(), 0, 0, 0, 0, 0);
-     
-    // if our angular velocity is greater than 360 degrees per second, ignore vision updates
-    if (mt2 != null){
-    if(Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360)
-    {
-      doRejectUpdate = true;
+
+        "limelight", getHeading().getDegrees(), 0, 0, 0, 0, 0);
+
+    // if our angular velocity is greater than 360 degrees per second, ignore vision
+    // updates
+    if (mt2 != null) {
+      if (Math.abs(swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond)) > 360) {
+        doRejectUpdate = true;
+      }
+      if (mt2.tagCount == 0) {
+        doRejectUpdate = true;
+      }
+      if (!doRejectUpdate) {
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+        swerveDrive.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
     }
-    if(mt2.tagCount == 0)
-    {
-      doRejectUpdate = true;
-    }
-    if(!doRejectUpdate)
-    {
-      swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-      swerveDrive.addVisionMeasurement(
-          mt2.pose,
-          mt2.timestampSeconds);
-    }
-  }
   }
 
 
@@ -199,7 +199,9 @@ public class SwerveSubsystem extends SubsystemBase {
     if (visionEnabled){
       updateVision();
     }
-    SmartDashboard.putNumber("Current Heading",  getHeading().getDegrees());
+    SmartDashboard.putNumber("txController Setpoint", tXController.getSetpoint().position);
+    SmartDashboard.putNumber("tYController Setpoint", tYController.getSetpoint().position);
+
   }
 
   @Override
@@ -287,13 +289,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command autoAlign(Pose2d pose){
     DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
-    SmartDashboard.putNumber("Setpoint Rot", pose.getRotation().getDegrees());
     Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), rotationController.calculate(getPose().getRotation().getDegrees(), pose.getRotation().getDegrees()));
-    return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveWithSetpointGeneratorFieldRelative(speed));
+    return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveFieldOriented(speed));
   }
-
-  
-
 
   /**
    * Use PathPlanner Path finding to go to a point on the field.
@@ -811,7 +809,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void generatePoseArray() {
-    Pose2d lOrgBlue = new Pose2d(3.194, 4.19, new Rotation2d(0));
+    Pose2d lOrgBlue = new Pose2d(3.194, 4.225, new Rotation2d(0));
     Pose2d rOrgBlue = new Pose2d(3.194, 3.87, new Rotation2d(0));
     Translation2d centerBlue = new Translation2d(4.497, 4.025);
 

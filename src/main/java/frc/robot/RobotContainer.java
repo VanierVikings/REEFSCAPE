@@ -80,9 +80,7 @@ public class RobotContainer {
    * Clone's the angular velocity input stream and converts it to a fieldRelative
    * input stream.
    */
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(driver::getRightX,
-      driver::getRightY)
-      .headingWhile(true);
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(() -> Math.cos(Math.PI/3), () -> Math.sin(Math.PI/3)).headingWhile(true);
 
   /**
    * Clone's the angular velocity input stream and converts it to a robotRelative
@@ -130,7 +128,7 @@ public class RobotContainer {
    * Flight joysticks}.
    */
   private void configureBindings() {
-    Command driveAngleVel = drivetrain.driveFieldOriented(driveDirectAngle);
+    Command driveAngle = drivetrain.driveFieldOriented(driveDirectAngle);
     Command driveFieldOrientedAnglularVelocity = drivetrain.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedAnglularVelocityRP = drivetrain.driveFieldOriented(reefPoint);
     Command driveFieldOrientedDirectAngle = drivetrain.driveFieldOriented(driveDirectAngle);
@@ -166,11 +164,12 @@ public class RobotContainer {
 
     operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
 
-    driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
-    driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    driver.y().onTrue(m_hang.setpoint());
-    driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimb)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
+    driver.y().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.b().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+
+    // driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    // driver.y().onTrue(m_hang.setpoint());
+    // driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimb)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
 
 
   }

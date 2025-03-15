@@ -96,7 +96,7 @@ public final class Constants {
         public static final double kA = 0;
         public static final double kS = 0;
         public static final double kV = 31;
-        public static final double kG = 0;
+        public static final double kG = 0; 
 
         public static final double L0_ANGLE = 3; //degrees
         public static final double L1_ANGLE = 36.475; //degrees

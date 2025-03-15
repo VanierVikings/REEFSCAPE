@@ -135,7 +135,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorController.setTolerance(0.0001);
 
-    
+    SmartDashboard.putData("Elevator Controller", elevatorController);
   }
 
   public void moveToSetpoint() {
@@ -184,7 +184,6 @@ public class Elevator extends SubsystemBase {
               angle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
               break;
           }
-          
           pivotMotorOne.setControl(m_request.withPosition(angle));
         });
   }
