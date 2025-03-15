@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Mid to Far Left"
+            "pathName": "B to 3"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Far Left to Source"
+            "pathName": "3 to Source"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source to Close Left"
+            "pathName": "Source to 2"
           }
         },
         {
