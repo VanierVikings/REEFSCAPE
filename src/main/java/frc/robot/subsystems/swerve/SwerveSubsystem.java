@@ -41,10 +41,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
+import pabeles.concurrency.ConcurrencyOps.NewInstance;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.ironmaple.simulation.SimulatedArena;
 import org.json.simple.parser.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -106,8 +110,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
     // objects being created. 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-
-
     try {
       swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED);
     } catch (Exception e) {
