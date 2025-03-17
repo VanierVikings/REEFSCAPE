@@ -15,6 +15,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorOutputStatusValue;
@@ -37,6 +38,7 @@ public class Elevator extends SubsystemBase {
   private final TalonFX pivotMotorOne;
   private final TalonFX pivotMotorTwo;
   private final MotionMagicExpoVoltage m_request;
+  private final MotionMagicVoltage climb_request;
   private final TalonFXConfiguration pivotConfig;
   final MotionMagicVelocityVoltage pivotRequest = new MotionMagicVelocityVoltage(0);
   private final TrapezoidProfile.Constraints elevatorConstraints = new TrapezoidProfile.Constraints(
@@ -105,6 +107,7 @@ public class Elevator extends SubsystemBase {
     pivotMotorOne.getConfigurator().apply(pivotConfig);
     
     m_request = new MotionMagicExpoVoltage(0);
+    climb_request = new MotionMagicVoltage(0);
 
     pivotMotorOne.setPosition(0);
 
@@ -151,8 +154,8 @@ public class Elevator extends SubsystemBase {
           double angle = PivotConstants.L0_ANGLE/360;
           switch (setpoint) {
             case kClimb:
-              // limitConfigs.StatorCurrentLimit = 120;
-              angle = PivotConstants.CLIMB_ANGLE/360;
+            pivotMotorOne.setControl(climb_request.withPosition(PivotConstants.HANG_ANGLE/360));
+              break;
             case kRest:
               angle = PivotConstants.L0_ANGLE/360;
               break;
@@ -184,7 +187,9 @@ public class Elevator extends SubsystemBase {
               angle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
               break;
           }
+          if(setpoint != Setpoint.kClimb){
           pivotMotorOne.setControl(m_request.withPosition(angle));
+          }
         });
   }
 
