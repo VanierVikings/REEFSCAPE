@@ -72,7 +72,7 @@ public class RobotContainer {
     () -> -driver.getLeftY(),
     () -> -driver.getLeftX()) // Axis which give the desired translational angle and speed.
   .withControllerRotationAxis(() -> -driver.getRightX()) // Axis which give the desired angular velocity.
-  .deadband(0.005)                  // Controller deadband
+  .deadband(0.05)                  // Controller deadband
   .scaleTranslation(0.8)           // Scaled controller translation axis
   .allianceRelativeControl(true);  // Alliance relative controls.
 

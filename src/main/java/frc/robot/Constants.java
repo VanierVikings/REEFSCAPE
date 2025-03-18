@@ -94,7 +94,8 @@ public final class Constants {
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double kA = 80;
+        public static final double kA = 80
+        ;
         public static final double kS = 0;
         public static final double kV = 31;
         public static final double kG = 0; 
@@ -109,7 +110,7 @@ public final class Constants {
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
         public static final double ALGAE_ANGLE_HIGH_START = 50;
         public static final double ALGAE_ANGLE_HIGH_END = 93.60;
-        public static final double CLIMB_ANGLE = -5; //degrees
+        public static final double CLIMB_ANGLE = -10; //degrees
 
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
