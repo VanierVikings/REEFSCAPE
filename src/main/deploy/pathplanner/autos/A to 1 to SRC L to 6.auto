@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C to 3"
+            "pathName": "A to 1"
           }
         },
         {
@@ -19,19 +19,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "rest"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "3 to Source"
+            "pathName": "1 to SRC L"
           }
         },
         {
@@ -47,21 +41,21 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "rest"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Source to 2"
+            "pathName": "SRC L to 6"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "scoreL2"
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         }
       ]

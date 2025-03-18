@@ -135,7 +135,6 @@ public final class Constants {
         public static final double ALGAE_ANGLE_HIGH_START = 47.86;
         public static final double ALGAE_ANGLE_HIGH_END = 31.36;
 
-
         public static final int WRIST_CURRENT_LIMIT = 40; //amps
         public static final int SHOOTER_CURRENT_LIMIT = 40; //amps
     }
@@ -146,7 +145,6 @@ public final class Constants {
         public static final double conversionFactor = 4.5;
         public static final double hanging = 120;
         public static final double rest = 3;
-
     }
 
 }

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "A to 3"
+            "pathName": "B to 3"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "3 to Source"
+            "pathName": "3 to SRC L"
           }
         },
         {
@@ -55,7 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source to 2"
+            "pathName": "SRC L to 2"
           }
         },
         {

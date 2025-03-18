@@ -172,7 +172,6 @@ public class RobotContainer {
     driver.y().onTrue(m_hang.setpoint());
     driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimbDown)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
 
-
   }
 
   /**
@@ -181,14 +180,6 @@ public class RobotContainer {
    * @return the command to run in autus
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-  //   return drivetrain.driveFieldOriented(SwerveInputStream.of(drivetrain.getSwerveDrive(),
-  //   () -> 1,
-  //   () -> 0) // Axis which give the desired translational angle and speed.
-  // .withControllerRotationAxis(() -> 0) // Axis which give the desired angular velocity.
-  // .deadband(0.05)                  // Controller deadband
-  // .scaleTranslation(0.8)           // Scaled controller translation axis
-  // .allianceRelativeControl(true));
   return autoChooser.getSelected();
     }
 
