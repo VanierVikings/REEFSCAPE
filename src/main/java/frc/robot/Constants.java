@@ -58,7 +58,8 @@ public final class Constants {
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 90;
+        public static final double kP = 85;
+
         public static final double kI = 0.0;
         public static final double kD = 1;
         public static final double kDt = 0.02;
@@ -70,7 +71,7 @@ public final class Constants {
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
         public static final double L2 = 0.2; //cm
-        public static final double L3 = 0.325;  //cm   
+        public static final double L3 = 0.315;  //cm   
         public static final double SOURCE = 0.174;
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
@@ -93,7 +94,7 @@ public final class Constants {
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double kA = 0;
+        public static final double kA = 80;
         public static final double kS = 0;
         public static final double kV = 31;
         public static final double kG = 0; 
@@ -108,7 +109,7 @@ public final class Constants {
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
         public static final double ALGAE_ANGLE_HIGH_START = 50;
         public static final double ALGAE_ANGLE_HIGH_END = 93.60;
-        public static final double CLIMB_ANGLE = 0; //degrees
+        public static final double CLIMB_ANGLE = -5; //degrees
 
         
         public static final int PIVOT_CURRENT_LIMIT = 40; //amps
@@ -127,8 +128,8 @@ public final class Constants {
         public static final double L0_ANGLE = 7;
         public static final double SOURCE_ANGLE = 31;
         public static final double L1_ANGLE = 14.727;
-        public static final double L3_ANGLE = 86;
-        public static final double L2_ANGLE = 80.727;
+        public static final double L2_ANGLE = 80;
+        public static final double L3_ANGLE = 81;
         public static final double ALGAE_ANGLE_LOW_START = 47.86;
         public static final double ALGAE_ANGLE_LOW_END = 38.87;
         public static final double ALGAE_ANGLE_HIGH_START = 47.86;

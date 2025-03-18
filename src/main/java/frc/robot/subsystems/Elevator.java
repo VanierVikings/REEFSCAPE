@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
   private final IdleMode elevatorIdleMode = IdleMode.kBrake;
 
   public enum Setpoint {
-    kClimb,
+    kClimbDown,
     kRest,
     kLevel1,
     kLevel2,
@@ -153,41 +153,51 @@ public class Elevator extends SubsystemBase {
         () -> {
           double angle = PivotConstants.L0_ANGLE/360;
           switch (setpoint) {
-            case kClimb:
-            pivotMotorOne.setControl(climb_request.withPosition(PivotConstants.HANG_ANGLE/360));
+            case kClimbDown:
+              pivotMotorOne.setControl(climb_request.withPosition(PivotConstants.CLIMB_ANGLE/360));
               break;
+      
             case kRest:
               angle = PivotConstants.L0_ANGLE/360;
               break;
+            
             case kLevel1:
               angle = PivotConstants.L1_ANGLE/360;
               break;
+          
             case kLevel2:
               angle = PivotConstants.L2_ANGLE/360;
               break;
+          
             case kLevel3:
               angle = PivotConstants.L3_ANGLE/360;
               break;
+          
             case kHang:
               angle = PivotConstants.HANG_ANGLE/360;
               break;
+          
             case kSource:
               angle = PivotConstants.SOURCE_ANGLE/360;
               break;
+            
             case KAlgaeLowStart:
               angle = PivotConstants.ALGAE_ANGLE_LOW_START/360;
               break;
+            
             case KAlgaeLowEnd:
               angle = PivotConstants.ALGAE_ANGLE_LOW_END/360;              
             break;
+          
             case KAlgaeHighStart:
               angle = PivotConstants.ALGAE_ANGLE_HIGH_START/360;   
               break;
+            
             case KAlgaeHighEnd:
               angle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
               break;
           }
-          if(setpoint != Setpoint.kClimb){
+          if(setpoint != Setpoint.kClimbDown){
           pivotMotorOne.setControl(m_request.withPosition(angle));
           }
         });

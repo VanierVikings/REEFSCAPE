@@ -23,6 +23,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -167,6 +168,37 @@ public class SwerveSubsystem extends SubsystemBase {
             Rotation2d.fromDegrees(0)));
   }
 
+  public void mt1HeadingUpdate(){
+    boolean doRejectUpdate = false;
+    LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+    LimelightHelpers.SetRobotOrientation(
+        "limelight", getHeading().getDegrees(), 0, 0, 0, 0, 0);
+    if (mt1 !=null ){
+      if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1)
+      {
+        if(mt1.rawFiducials[0].ambiguity > .7)
+        {
+          doRejectUpdate = true;
+        }
+        if(mt1.rawFiducials[0].distToCamera > 3)
+        {
+          doRejectUpdate = true;
+        }
+      }
+      if(mt1.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+
+      if(!doRejectUpdate)
+      {
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(9999999,9999999,0.7));
+        swerveDrive.addVisionMeasurement(
+            mt1.pose,
+            mt1.timestampSeconds);
+      }
+    }
+  }
     
   public void updateVision() {
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
@@ -198,6 +230,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isAutonomous() || DriverStation.isDisabled()){
+      mt1HeadingUpdate();
+    }
     if (visionEnabled){
       updateVision();
     }

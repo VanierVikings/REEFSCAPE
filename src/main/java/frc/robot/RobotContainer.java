@@ -155,6 +155,7 @@ public class RobotContainer {
     operator.rightTrigger().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
     operator.b().onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
     //low reef algae removal
+
     operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
     //high reef algae removal
     operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
@@ -164,12 +165,12 @@ public class RobotContainer {
 
     operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
 
-    driver.y().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
-    driver.b().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
+    driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
 
-    // driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    // driver.y().onTrue(m_hang.setpoint());
-    // driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimb)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
+    driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
+    driver.y().onTrue(m_hang.setpoint());
+    driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimbDown)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
 
 
   }
