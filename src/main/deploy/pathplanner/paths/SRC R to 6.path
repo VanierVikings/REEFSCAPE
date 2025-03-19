@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.5675,
-        "y": 3.210852272727272
+        "x": 1.2027138157894735,
+        "y": 0.9171875
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.6344318181818185,
-        "y": 3.7597159090909082
+        "x": 2.126398026315789,
+        "y": 1.3982730263157896
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "SRC R"
     },
     {
       "anchor": {
-        "x": 5.728806818181819,
-        "y": 4.006704545454545
+        "x": 3.831549657534247,
+        "y": 2.8905607876712325
       },
       "prevControl": {
-        "x": 6.387443181818183,
-        "y": 3.869488636363635
+        "x": 2.869378604902668,
+        "y": 2.399853550829127
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "6"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -178.9390883097358
+    "rotation": 57.09475707701213
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 179.38394009160075
+    "rotation": -130.15599962491933
   },
   "useDefaultConstraints": true
 }

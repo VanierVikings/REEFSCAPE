@@ -1,0 +1,85 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F to 5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 to SRC R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreSource"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SRC R to 6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.3
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
