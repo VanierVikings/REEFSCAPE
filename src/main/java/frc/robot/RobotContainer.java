@@ -161,8 +161,6 @@ public class RobotContainer {
     operator.povUp().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
     operator.y().whileTrue(m_endEffector.spin(0.65));
     operator.a().whileTrue(m_endEffector.spin(-1));
-    operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
-    operator.povLeft().whileTrue(m_endEffector.spin(0.3));
 
     driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));

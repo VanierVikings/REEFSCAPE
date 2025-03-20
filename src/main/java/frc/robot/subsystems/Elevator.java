@@ -152,7 +152,7 @@ public class Elevator extends SubsystemBase {
     return this.runOnce(
         () -> {
           double angle = PivotConstants.L0_ANGLE/360;
-          switch (setpoint) {
+          switch (setpoint) { 
             case kClimbDown:
               pivotMotorOne.setControl(climb_request.withPosition(PivotConstants.CLIMB_ANGLE/360));
               break;
