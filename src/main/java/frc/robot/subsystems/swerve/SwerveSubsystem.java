@@ -26,10 +26,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.ExponentialProfile;
@@ -51,17 +48,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import org.ironmaple.simulation.SimulatedArena;
 import org.json.simple.parser.*;
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -90,9 +79,8 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Enable vision odometry updates while driving.
    */
-  public PhotonCamera camera;
   public boolean visionEnabled = !SwerveDriveTelemetry.isSimulation;
-  public PhotonPoseEstimator photonPoseEstimator;
+
 
   public ProfiledPIDController tXController;
   public ProfiledPIDController tYController;
@@ -161,10 +149,6 @@ public class SwerveSubsystem extends SubsystemBase {
     //   swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
     //   swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
     // }
-    // camera = new PhotonCamera("photonvision");
-    // Transform3d robotToCam = new Transform3d(new Translation3d(0.119308, 0.0, 0.117016), new Rotation3d(0,-20,0)); //Cam mounted facing forward, 0.119308 a meter forward of center, 0.117016 a meter up from center.
-    // photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
-    // photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
     SmartDashboard.putData("tXController", tXController);
     SmartDashboard.putData("tXController", tYController);
     SmartDashboard.putData("rotationController", rotationController);
@@ -184,7 +168,7 @@ public class SwerveSubsystem extends SubsystemBase {
             Rotation2d.fromDegrees(0)));
   }
 
-  public void visionHeadingRequest(){
+  public void mt1HeadingUpdate(){
     boolean doRejectUpdate = false;
     LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
     LimelightHelpers.SetRobotOrientation(
@@ -216,7 +200,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
     
-  public void limeLightVision() {
+  public void updateVision() {
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     LimelightHelpers.SetIMUMode("limelight", 0);
     boolean doRejectUpdate = false;
@@ -242,40 +226,15 @@ public class SwerveSubsystem extends SubsystemBase {
       }
     }
   }
-  
-  // public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-  //   var result = camera.getLatestResult();
-  //   photonPoseEstimator.setLastPose(this.getPose());
-  //   photonPoseEstimator.setReferencePose(prevEstimatedRobotPose); 
-  //   return photonPoseEstimator.update(result);
-  // }
-  
-  // public void photonEstimator(){
-  //   var visionEst = getEstimatedGlobalPose(swerveDrive.getPose());
-  //       visionEst.ifPresent(
-  //               est -> {
-  //                   // Change our trust in the measurement based on the tags we can see
-  //                   photonPoseEstimator.addHeadingData(est.timestampSeconds, getHeading());
-  //                   var estStdDevs = (VecBuilder.fill(2, 2, 4));;
-  //                   swerveDrive.addVisionMeasurement(
-  //                           est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-
-  //               });
-  // }
 
 
   @Override
   public void periodic() {
     if (DriverStation.isAutonomous() || DriverStation.isDisabled()){
-      visionHeadingRequest();
+      mt1HeadingUpdate();
     }
     if (visionEnabled){
-      if (LimelightHelpers.getTV("limelight")){
-        limeLightVision();
-
-      } else{
-       // photonEstimator();
-      }
+      updateVision();
     }
     SmartDashboard.putNumber("txController Setpoint", tXController.getSetpoint().position);
     SmartDashboard.putNumber("tYController Setpoint", tYController.getSetpoint().position);
