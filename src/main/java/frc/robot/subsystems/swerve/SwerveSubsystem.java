@@ -161,10 +161,10 @@ public class SwerveSubsystem extends SubsystemBase {
     //   swerveDrive.field.getObject("LR" + i).setPose(leftBranchPosesRed[i]);
     //   swerveDrive.field.getObject("RR" + i).setPose(rightBranchPosesRed[i]);
     // }
-    camera = new PhotonCamera("photonvision");
-    Transform3d robotToCam = new Transform3d(new Translation3d(0.119308, 0.0, 0.117016), new Rotation3d(0,-20,0)); //Cam mounted facing forward, 0.119308 a meter forward of center, 0.117016 a meter up from center.
-    photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
-    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
+    // camera = new PhotonCamera("photonvision");
+    // Transform3d robotToCam = new Transform3d(new Translation3d(0.119308, 0.0, 0.117016), new Rotation3d(0,-20,0)); //Cam mounted facing forward, 0.119308 a meter forward of center, 0.117016 a meter up from center.
+    // photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCam);
+    // photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
     SmartDashboard.putData("tXController", tXController);
     SmartDashboard.putData("tXController", tYController);
     SmartDashboard.putData("rotationController", rotationController);
@@ -243,25 +243,25 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
   
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-    var result = camera.getLatestResult();
-    photonPoseEstimator.setLastPose(this.getPose());
-    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose); 
-    return photonPoseEstimator.update(result);
-  }
+  // public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+  //   var result = camera.getLatestResult();
+  //   photonPoseEstimator.setLastPose(this.getPose());
+  //   photonPoseEstimator.setReferencePose(prevEstimatedRobotPose); 
+  //   return photonPoseEstimator.update(result);
+  // }
   
-  public void photonEstimator(){
-    var visionEst = getEstimatedGlobalPose(swerveDrive.getPose());
-        visionEst.ifPresent(
-                est -> {
-                    // Change our trust in the measurement based on the tags we can see
-                    photonPoseEstimator.addHeadingData(est.timestampSeconds, getHeading());
-                    var estStdDevs = (VecBuilder.fill(2, 2, 4));;
-                    swerveDrive.addVisionMeasurement(
-                            est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+  // public void photonEstimator(){
+  //   var visionEst = getEstimatedGlobalPose(swerveDrive.getPose());
+  //       visionEst.ifPresent(
+  //               est -> {
+  //                   // Change our trust in the measurement based on the tags we can see
+  //                   photonPoseEstimator.addHeadingData(est.timestampSeconds, getHeading());
+  //                   var estStdDevs = (VecBuilder.fill(2, 2, 4));;
+  //                   swerveDrive.addVisionMeasurement(
+  //                           est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
 
-                });
-  }
+  //               });
+  // }
 
 
   @Override
@@ -274,7 +274,7 @@ public class SwerveSubsystem extends SubsystemBase {
         limeLightVision();
 
       } else{
-        photonEstimator();
+       // photonEstimator();
       }
     }
     SmartDashboard.putNumber("txController Setpoint", tXController.getSetpoint().position);

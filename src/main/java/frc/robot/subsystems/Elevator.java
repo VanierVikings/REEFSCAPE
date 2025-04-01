@@ -52,6 +52,7 @@ public class Elevator extends SubsystemBase {
   private final RelativeEncoder elevatorEncoder;
   private final SparkMaxConfig elevatorMotorConfig;
   private final SparkLimitSwitch elevatorLimitSwitch;
+  public double desiredAngle;
 
   private final IdleMode elevatorIdleMode = IdleMode.kBrake;
 
@@ -70,6 +71,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Elevator() {
+    desiredAngle = PivotConstants.L0_ANGLE/360;
     pivotEncoder = new DutyCycleEncoder(1,360,0);
     elevatorController.setGoal(ElevatorConstants.L0);
 
@@ -151,44 +153,40 @@ public class Elevator extends SubsystemBase {
   public Command setPivot(Setpoint setpoint) {
     return this.runOnce(
         () -> {
-          double angle = PivotConstants.L0_ANGLE/360;
           switch (setpoint) { 
             case kClimbDown:
               pivotMotorOne.setControl(climb_request.withPosition(PivotConstants.CLIMB_ANGLE/360));
               break;
             case kRest:
-              angle = PivotConstants.L0_ANGLE/360;
+            desiredAngle = PivotConstants.L0_ANGLE/360;
               break;
             case kLevel1:
-              angle = PivotConstants.L1_ANGLE/360;
+            desiredAngle = PivotConstants.L1_ANGLE/360;
               break;
             case kLevel2:
-              angle = PivotConstants.L2_ANGLE/360;
+            desiredAngle = PivotConstants.L2_ANGLE/360;
               break;
             case kLevel3:
-              angle = PivotConstants.L3_ANGLE/360;
+            desiredAngle = PivotConstants.L3_ANGLE/360;
               break;
             case kHang:
-              angle = PivotConstants.HANG_ANGLE/360;
+            desiredAngle = PivotConstants.HANG_ANGLE/360;
               break;
             case kSource:
-              angle = PivotConstants.SOURCE_ANGLE/360;
+            desiredAngle = PivotConstants.SOURCE_ANGLE/360;
               break;
             case KAlgaeLowStart:
-              angle = PivotConstants.ALGAE_ANGLE_LOW_START/360;
+            desiredAngle = PivotConstants.ALGAE_ANGLE_LOW_START/360;
               break;
             case KAlgaeLowEnd:
-              angle = PivotConstants.ALGAE_ANGLE_LOW_END/360;              
+            desiredAngle = PivotConstants.ALGAE_ANGLE_LOW_END/360;              
               break;
             case KAlgaeHighStart:
-              angle = PivotConstants.ALGAE_ANGLE_HIGH_START/360;   
+            desiredAngle = PivotConstants.ALGAE_ANGLE_HIGH_START/360;   
               break;
             case KAlgaeHighEnd:
-              angle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
+            desiredAngle = PivotConstants.ALGAE_ANGLE_HIGH_END/360;   
               break;
-          }
-          if(setpoint != Setpoint.kClimbDown){
-          pivotMotorOne.setControl(m_request.withPosition(angle));
           }
         });
   }
@@ -236,6 +234,8 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    pivotMotorOne.setControl(m_request.withPosition(desiredAngle));
+
     rezeroElevator();
     moveToSetpoint();
     SmartDashboard.putNumber("Elevator Setpoint Velocity", elevatorController.getSetpoint().velocity);
