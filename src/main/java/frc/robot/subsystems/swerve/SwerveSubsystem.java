@@ -82,9 +82,9 @@ public class SwerveSubsystem extends SubsystemBase {
   public boolean visionEnabled = !SwerveDriveTelemetry.isSimulation;
 
 
-  public ProfiledPIDController tXController;
-  public ProfiledPIDController tYController;
-  public ProfiledPIDController rotationController;
+  public PIDController tXController;
+  public PIDController tYController;
+  public PIDController rotationController;
 
   public SwerveController controller;
   public enum branchSide{
@@ -136,9 +136,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
     }
     controller = swerveDrive.getSwerveController();
-    tXController = new ProfiledPIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD, new Constraints(1200, 4800));
-    tYController = new ProfiledPIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD, new Constraints(1200, 4800));
-    rotationController = new ProfiledPIDController(0.17, SwerveConstants.kI, 0.05, new Constraints(2400, 4800));
+    tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
+    rotationController = new PIDController(0.1
+    
+    , SwerveConstants.kI, 0.006);
+    rotationController.enableContinuousInput(-180, 180);
+    rotationController.setTolerance(2);
+
 
     setupPathPlanner();
     generatePoseArray();
@@ -236,9 +241,6 @@ public class SwerveSubsystem extends SubsystemBase {
     if (visionEnabled){
       updateVision();
     }
-    SmartDashboard.putNumber("txController Setpoint", tXController.getSetpoint().position);
-    SmartDashboard.putNumber("tYController Setpoint", tYController.getSetpoint().position);
-
   }
 
   @Override
@@ -327,7 +329,9 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command autoAlign(Pose2d pose){
     DoubleSupplier distance = () -> pose.getTranslation().getDistance(getPose().getTranslation());
     Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(tXController.calculate(getPose().getX(), pose.getX()), tYController.calculate(getPose().getY(), pose.getY()), rotationController.calculate(getPose().getRotation().getDegrees(), pose.getRotation().getDegrees()));
+    // Supplier<ChassisSpeeds> speed = () -> new ChassisSpeeds(0, 0, rotationController.calculate(getPose().getRotation().getDegrees(), pose.getRotation().getDegrees()));
     return driveToPose(pose).until(() -> distance.getAsDouble() < SwerveConstants.alignmentTolerance).andThen(driveFieldOriented(speed));
+    // return driveFieldOriented(speed);
   }
 
   /**
@@ -341,7 +345,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command driveToPose(Pose2d pose) {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        swerveDrive.getMaximumChassisVelocity(), 4.0,
+        2, 2.0,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
     // Since AutoBuilder is configured, we can use it to build pathfinding commands

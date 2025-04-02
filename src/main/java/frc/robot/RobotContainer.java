@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.HangConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem.branchSide;
@@ -58,7 +57,6 @@ public class RobotContainer {
   final CommandXboxController driver = new CommandXboxController(0);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
-  private final static Climb m_hang = new Climb();
   private final SendableChooser<Command> autoChooser;
   // The robot's subsystems and commands are defined here...
   final SwerveSubsystem drivetrain = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -164,10 +162,6 @@ public class RobotContainer {
 
     driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
-
-    driver.x().onTrue(m_elevator.setPivot(Setpoint.kHang));
-    driver.y().onTrue(m_hang.setpoint());
-    driver.b().onTrue((m_elevator.setPivot(Setpoint.kClimbDown)).andThen(m_elevator.setElevator(Setpoint.kLevel2)));
 
   }
 
