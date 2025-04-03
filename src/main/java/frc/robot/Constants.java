@@ -72,7 +72,8 @@ public final class Constants {
         public static final double L1 = 0.096; //cm
         public static final double L2 = 0.2; //cm
         public static final double L3 = 0.315;  //cm   
-        public static final double SOURCE = 0.174;
+        public static final double SOURCE = 0.155;
+
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
         public static final double ALGAE_HEIGHT_HIGH_START = 0.33;
