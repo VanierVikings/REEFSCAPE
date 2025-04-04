@@ -70,7 +70,8 @@ public final class Constants {
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.205; //cm
+        public static final double L2 = 0.196
+        ; //cm
         public static final double L3 = 0.315;  //cm   
         public static final double SOURCE = 0.155;
 
@@ -95,8 +96,7 @@ public final class Constants {
         public static final double kD = 0.0;
         public static final double kDt = 0.02;
 
-        public static final double kA = 80
-        ;
+        public static final double kA = 80;
         public static final double kS = 0;
         public static final double kV = 31;
         public static final double kG = 0; 
@@ -104,7 +104,7 @@ public final class Constants {
         public static final double L0_ANGLE = 15; //degrees
         public static final double L1_ANGLE = 36.475; //degrees
         public static final double L2_ANGLE = 65.26; //degrees
-        public static final double L3_ANGLE = 75; //degrees
+        public static final double L3_ANGLE = 70.5; //degrees
         public static final double HANG_ANGLE = 90;
         public static final double SOURCE_ANGLE = 60; //degrees
         public static final double ALGAE_ANGLE_LOW_START = 40;

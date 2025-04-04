@@ -138,7 +138,7 @@ public class SwerveSubsystem extends SubsystemBase {
     controller = swerveDrive.getSwerveController();
     tXController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
     tYController = new PIDController(SwerveConstants.kP, SwerveConstants.kI, SwerveConstants.kD);
-    rotationController = new PIDController(0.1
+    rotationController = new PIDController(0.22
     
     , SwerveConstants.kI, 0.006);
     rotationController.enableContinuousInput(-180, 180);
@@ -850,8 +850,8 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void generatePoseArray() {
-    Pose2d lOrgBlue = new Pose2d(3.17, 4.18, new Rotation2d(0));
-    Pose2d rOrgBlue = new Pose2d(3.17, 3.86, new Rotation2d(0));
+    Pose2d lOrgBlue = new Pose2d(3.17, 4.17, new Rotation2d(0));
+    Pose2d rOrgBlue = new Pose2d(3.17, 3.84, new Rotation2d(0));
     Translation2d centerBlue = new Translation2d(4.497, 4.025);
 
     Pose2d lOrgRed = FlippingUtil.flipFieldPose(lOrgBlue);

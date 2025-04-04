@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Center to 4"
+            "pathName": "(L2) F to 5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL2"
           }
         },
         {
@@ -17,21 +23,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "scoreL1"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "rest"
+            "pathName": "(L2) 5 to SRC R"
           }
         }
       ]

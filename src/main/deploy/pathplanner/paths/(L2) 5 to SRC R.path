@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.166700819672132,
-        "y": 2.904149590163935
+        "x": 5.33452868852459,
+        "y": 2.940112704918032
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.686273188093184,
-        "y": 1.788031169111303
+        "x": 9.674077868855,
+        "y": -0.5993852459016398
       },
       "isLocked": false,
-      "linkedName": "5"
+      "linkedName": "(L2) 5"
     },
     {
       "anchor": {
@@ -28,7 +28,24 @@
       "linkedName": "SRC R"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.3122750899640137,
+      "rotationDegrees": 122.29953366467393
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 80.83810434388792
+    },
+    {
+      "waypointRelativePos": 0.6593362654937996,
+      "rotationDegrees": 68.96754828945717
+    },
+    {
+      "waypointRelativePos": 0.758496601359458,
+      "rotationDegrees": 54.08857334028578
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
