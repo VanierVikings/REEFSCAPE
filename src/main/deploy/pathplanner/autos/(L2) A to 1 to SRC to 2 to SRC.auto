@@ -13,6 +13,18 @@
         {
           "type": "named",
           "data": {
+            "name": "LEFTautoAlign"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.15
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "scoreL2"
           }
         },
@@ -20,6 +32,12 @@
           "type": "wait",
           "data": {
             "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "rest"
           }
         },
         {
@@ -37,19 +55,37 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "SRC L to 2"
+            "waitTime": 0.1
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "scoreL1"
+            "name": "rest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SRC L to 1 (AUTOALIGN)"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "RIGHTautoAlign"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.15
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "scoreL2"
           }
         },
         {
@@ -59,9 +95,15 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "rest"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "2 to SRC L"
+            "pathName": "1 to SRC L"
           }
         }
       ]
