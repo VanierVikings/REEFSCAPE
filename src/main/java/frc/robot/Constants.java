@@ -18,8 +18,8 @@ public final class Constants {
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
 
     public static final class SwerveConstants {
-        public static final double alignmentTolerance = 1; //meters
-        public static final double kP = 2;
+        public static final double alignmentTolerance = 0.1; //meters
+        public static final double kP = 4;
         public static final double kI = 0.0;
         public static final double kD = 0.01;
         public static final double MAX_SPEED  = Units.feetToMeters(14.5);
@@ -70,14 +70,14 @@ public final class Constants {
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.2; //cm
+        public static final double L2 = 0.205; //cm
         public static final double L3 = 0.315;  //cm   
         public static final double SOURCE = 0.155;
 
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
-        public static final double ALGAE_HEIGHT_HIGH_START = 0.33;
-        public static final double ALGAE_HEIGHT_HIGH_END = 0.33;
+        public static final double ALGAE_HEIGHT_HIGH_START = 0.3;
+        public static final double ALGAE_HEIGHT_HIGH_END = 0.3;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
 
@@ -104,12 +104,12 @@ public final class Constants {
         public static final double L0_ANGLE = 15; //degrees
         public static final double L1_ANGLE = 36.475; //degrees
         public static final double L2_ANGLE = 65.26; //degrees
-        public static final double L3_ANGLE = 70.5; //degrees
+        public static final double L3_ANGLE = 75; //degrees
         public static final double HANG_ANGLE = 90;
         public static final double SOURCE_ANGLE = 60; //degrees
         public static final double ALGAE_ANGLE_LOW_START = 40;
         public static final double ALGAE_ANGLE_LOW_END = 91.67;
-        public static final double ALGAE_ANGLE_HIGH_START = 45;
+        public static final double ALGAE_ANGLE_HIGH_START = 50;
         public static final double ALGAE_ANGLE_HIGH_END = 80;
         public static final double CLIMB_ANGLE = -15; //degrees
 

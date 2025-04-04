@@ -345,7 +345,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public Command driveToPose(Pose2d pose) {
     // Create the constraints to use while pathfinding
     PathConstraints constraints = new PathConstraints(
-        2, 2.0,
+        2.5, 2.5,
         swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(720));
 
     // Since AutoBuilder is configured, we can use it to build pathfinding commands
@@ -846,12 +846,12 @@ public class SwerveSubsystem extends SubsystemBase {
       finalPose = getPose().nearest(Arrays.asList(isRedAlliance() ? rightBranchPosesRed : rightBranchPosesBlue));
     }
 
-    return finalPose;
+    return finalPose; 
   }
 
   public void generatePoseArray() {
-    Pose2d lOrgBlue = new Pose2d(3.194, 4.225, new Rotation2d(0));
-    Pose2d rOrgBlue = new Pose2d(3.194, 3.87, new Rotation2d(0));
+    Pose2d lOrgBlue = new Pose2d(3.17, 4.18, new Rotation2d(0));
+    Pose2d rOrgBlue = new Pose2d(3.17, 3.86, new Rotation2d(0));
     Translation2d centerBlue = new Translation2d(4.497, 4.025);
 
     Pose2d lOrgRed = FlippingUtil.flipFieldPose(lOrgBlue);

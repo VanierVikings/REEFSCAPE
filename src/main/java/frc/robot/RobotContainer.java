@@ -159,10 +159,13 @@ public class RobotContainer {
     //low reef algae removal
     operator.a().onTrue(m_elevator.setPivot(Setpoint.KAlgaeLowStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeLowEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeLowEnd)))));
     //high reef algae removal
-    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighEnd)))));
-    
+    operator.y().onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.4)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3).andThen(Commands.waitSeconds(0.15)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_endEffector.setPosition(SetpointEE.kRest)))));
+    //operator.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
+
+
     operator.povUp().whileTrue(m_endEffector.spin(0.65));
     operator.povDown().whileTrue(m_endEffector.spin(-1));
+
 
     //Manual elevator control
     operator.povLeft().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position + 0.001)));
