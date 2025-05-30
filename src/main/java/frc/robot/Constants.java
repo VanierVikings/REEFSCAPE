@@ -50,23 +50,22 @@ public final class Constants {
         public static final int motorOneID = 9; //used
         public static final int motorTwoID = 10; //used
 
-        public static final double MAX_VELOCITY = 0.7;
+        public static final double MAX_VELOCITY = 0.45; //0.7 for comp
         //public static final double MAX_VELOCITY = 0.75806630731;
-        public static final double MAX_ACCELERATION = 11;
+        public static final double MAX_ACCELERATION = 5; // 11 for comp
         ///public static final double MAX_ACCELERATION = 0.8717762534;
         public static final double SPOOL_DIAMETER = 0.04318;
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 85;
-
+        public static final double kP = 10; //85
         public static final double kI = 0.0;
-        public static final double kD = 1;
-        public static final double kDt = 0.02;
+        public static final double kD = 0; //1
+        public static final double kDt = 0.02;//period
 
         public static final double kS = 0.0;
-        public static final double kV = 14.5;
-        public static final double kG = 1;
+        public static final double kV = 13.5 ;
+        public static final double kG = 0.19;
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
@@ -88,8 +87,8 @@ public final class Constants {
         public static final int motorOneID = 11; //used
         public static final int motorTwoID = 12; //used
 
-        public static final double MAX_VELOCITY = 0.4;
-        public static final double MAX_ACCELERATION = 4;
+        public static final double MAX_VELOCITY = 0.29; //0.4 for comp
+        public static final double MAX_ACCELERATION = 2.3; // 4 for comp
 
         public static final double kP = 200;
         public static final double kI = 0.0;
