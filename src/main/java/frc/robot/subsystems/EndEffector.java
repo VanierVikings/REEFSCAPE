@@ -20,8 +20,8 @@ import frc.robot.Constants.EndEffectorConstants;
 public class EndEffector extends SubsystemBase {
     private final SparkMax wristMotor;
     private final SparkMax shooterMotor;
-    private final RelativeEncoder wristEncoder;
-    private final SparkClosedLoopController wristClosedLoopController;
+    public final RelativeEncoder wristEncoder;
+    private  final SparkClosedLoopController wristClosedLoopController;
     private double target;
 
     public enum SetpointEE {
@@ -108,10 +108,18 @@ public class EndEffector extends SubsystemBase {
         return this.runEnd(() -> shooterMotor.set(direction), () -> shooterMotor.set(0));
     }
 
+    // public SparkClosedLoopController getWristController(){
+    //     return wristClosedLoopController;
+    // }
+
+    public double getCurrentTarget(){
+        return target;
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Wrist Encoder", wristEncoder.getPosition());
-        SmartDashboard.putNumber("Wrist Setpoint", target);
+        SmartDashboard.putNumber("Wrist Setpoint Position", target);
         wristClosedLoopController.setReference(target, ControlType.kPosition);
     }
 }

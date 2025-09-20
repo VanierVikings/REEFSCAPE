@@ -22,7 +22,7 @@ public final class Constants {
         public static final double kP = 4;
         public static final double kI = 0.0;
         public static final double kD = 0.01;
-        public static final double MAX_SPEED  = Units.feetToMeters(6); //14.5
+        public static final double MAX_SPEED  = Units.feetToMeters(14.5); //14.5
         public static final PIDConstants autoDrivePID = new PIDConstants(6.0, 0.0, 0.0);
         public static final PIDConstants autoRotationPID = new PIDConstants(8, 0.0, 0.4);
         public static final double WHEEL_LOCK_TIME = 10; // seconds
@@ -50,17 +50,17 @@ public final class Constants {
         public static final int motorOneID = 9; //used
         public static final int motorTwoID = 10; //used
 
-        public static final double MAX_VELOCITY = 0.45; //0.7 for comp
+        public static final double MAX_VELOCITY = 0.5; //0.7 for comp
         //public static final double MAX_VELOCITY = 0.75806630731;
-        public static final double MAX_ACCELERATION = 5; // 11 for comp
+        public static final double MAX_ACCELERATION = 7; // 11 for comp
         ///public static final double MAX_ACCELERATION = 0.8717762534;
         public static final double SPOOL_DIAMETER = 0.04318;
         public static final double GEAR_RATIO = 0.0625;
         public static final double ENCODER_TO_METERS = SPOOL_DIAMETER * Math.PI * GEAR_RATIO; //distance per pulse
        
-        public static final double kP = 10; //85
+        public static final double kP = 80;//85
         public static final double kI = 0.0;
-        public static final double kD = 0; //1
+        public static final double kD = 7; //1
         public static final double kDt = 0.02;//period
 
         public static final double kS = 0.0;
@@ -69,8 +69,7 @@ public final class Constants {
 
         public static final double L0 = 0.01; //cm
         public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.196
-        ; //cm
+        public static final double L2 = 0.196; //cm
         public static final double L3 = 0.315;  //cm   
         public static final double SOURCE = 0.155;
 
@@ -90,9 +89,9 @@ public final class Constants {
         public static final double MAX_VELOCITY = 0.29; //0.4 for comp
         public static final double MAX_ACCELERATION = 2.3; // 4 for comp
 
-        public static final double kP = 200;
+        public static final double kP = 210;
         public static final double kI = 0.0;
-        public static final double kD = 0.0;
+        public static final double kD = 0.1;
         public static final double kDt = 0.02;
 
         public static final double kA = 80;
@@ -121,7 +120,7 @@ public final class Constants {
         public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0.05;
+        public static final double WRIST_KP = 0.1;
         public static final double WRIST_KD = 0;
 
         public static final double WRIST_ENCODER_TO_DEGREES = 5.72727272; //degrees

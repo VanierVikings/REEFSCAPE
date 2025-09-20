@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -55,6 +56,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController operator = new CommandXboxController(1);
   final CommandXboxController driver = new CommandXboxController(0);
+  final CommandGenericHID opBoard = new CommandGenericHID(2);
   private final static Elevator m_elevator = new Elevator();
   private final static EndEffector m_endEffector = new EndEffector();
   private final SendableChooser<Command> autoChooser;
@@ -164,17 +166,39 @@ public class RobotContainer {
     //operator.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
 
 
-    operator.povUp().whileTrue(m_endEffector.spin(0.65));
-    operator.povDown().whileTrue(m_endEffector.spin(-1));
+    // operator.povUp().whileTrue(m_endEffector.spin(0.65));
+    // operator.povDown().whileTrue(m_endEffector.spin(-1));
 
 
     //Manual elevator control
     operator.povLeft().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position + 0.001)));
     operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
+    operator.povUp().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()+ 0.01)));
+    operator.povDown().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()- 0.01)));
+    
+    // operator.povUp().whileTrue(m_endEffector.run(()-> m_endEffector.getWristController().setReference(m_endEffector.getCurrentTarget())));
+
 
     driver.leftTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.leftBranch))));
     driver.rightTrigger().whileTrue(drivetrain.defer(() -> drivetrain.autoAlign(drivetrain.getBranchPose(branchSide.rightBranch))));
+    
+    opBoard.button(1).onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
+    opBoard.button(2).onTrue(m_elevator.setPivot(Setpoint.kLevel2).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel2)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL2)));
+    opBoard.button(3).onTrue(m_elevator.setPivot(Setpoint.kLevel1).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel1)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL1)));
+    opBoard.button(4).onTrue(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kRest)).andThen(Commands.waitSeconds(0.35).andThen(m_elevator.setPivot(Setpoint.kRest))));
 
+    
+    opBoard.button(5).onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.4)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.15)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_endEffector.setPosition(SetpointEE.kRest)))));
+    opBoard.button(6).onTrue(m_elevator.setPivot(Setpoint.KAlgaeHighStart).andThen(Commands.waitSeconds(0.4)).andThen(m_elevator.setElevator(Setpoint.KAlgaeHighStart)).andThen(Commands.waitSeconds(0.2)).andThen(m_endEffector.setPosition(SetpointEE.kRest).andThen(Commands.waitSeconds(0.15)).andThen(m_elevator.setPivot(Setpoint.KAlgaeHighEnd).andThen(Commands.waitSeconds(0.1)).andThen(m_endEffector.setPosition(SetpointEE.kRest)))));
+    
+    opBoard.button(7).onTrue(m_elevator.setPivot(Setpoint.kSource).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kSource)).andThen(Commands.waitSeconds(0.5)).andThen(m_endEffector.setPosition(SetpointEE.kSource)));
+
+    opBoard.button(8).whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
+    opBoard.button(9).whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position + 0.001)));
+    
+    opBoard.button(10).whileTrue(m_endEffector.spin(-1));
+    opBoard.button(11).whileTrue(m_endEffector.spin(0.65));
+    
   }
 
   /**
