@@ -166,15 +166,15 @@ public class RobotContainer {
     //operator.y().onTrue(m_elevator.setPivot(Setpoint.kLevel3).andThen(Commands.waitSeconds(0.2)).andThen(m_elevator.setElevator(Setpoint.kLevel3)).andThen(Commands.waitSeconds(0.25)).andThen(m_endEffector.setPosition(SetpointEE.kPlaceL3)));
 
 
-    // operator.povUp().whileTrue(m_endEffector.spin(0.65));
-    // operator.povDown().whileTrue(m_endEffector.spin(-1));
+    operator.povUp().whileTrue(m_endEffector.spin(0.45));
+    operator.povDown().whileTrue(m_endEffector.spin(-1));
 
 
     //Manual elevator control
     operator.povLeft().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position + 0.001)));
     operator.povRight().whileTrue(m_elevator.run(() -> m_elevator.elevatorController.setGoal(m_elevator.elevatorController.getGoal().position - 0.001)));
-    operator.povUp().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()+ 0.01)));
-    operator.povDown().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()- 0.01)));
+    // operator.povUp().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()+ 0.01)));
+    // operator.povDown().whileTrue(m_endEffector.run(() -> m_endEffector.wristEncoder.setPosition(m_endEffector.getCurrentTarget()- 0.01)));
     
     // operator.povUp().whileTrue(m_endEffector.run(()-> m_endEffector.getWristController().setReference(m_endEffector.getCurrentTarget())));
 

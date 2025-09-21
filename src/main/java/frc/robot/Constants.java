@@ -68,15 +68,15 @@ public final class Constants {
         public static final double kG = 0.19;
 
         public static final double L0 = 0.01; //cm
-        public static final double L1 = 0.096; //cm
-        public static final double L2 = 0.196; //cm
-        public static final double L3 = 0.315;  //cm   
-        public static final double SOURCE = 0.155;
+        public static final double L1 = 0.085; //cm
+        public static final double L2 = 0.21; //cm
+        public static final double L3 = 0.336;  //cm   
+        public static final double SOURCE = 0.17;
 
         public static final double ALGAE_HEIGHT_LOW_START = 0.17;
         public static final double ALGAE_HEIGHT_LOW_END = 0.19;
-        public static final double ALGAE_HEIGHT_HIGH_START = 0.3;
-        public static final double ALGAE_HEIGHT_HIGH_END = 0.3;
+        public static final double ALGAE_HEIGHT_HIGH_START = 0.34;
+        public static final double ALGAE_HEIGHT_HIGH_END = 0.34;
 
         public static final int ELEVATOR_CURRENT_LIMIT = 40; //amps
 
@@ -89,6 +89,7 @@ public final class Constants {
         public static final double MAX_VELOCITY = 0.29; //0.4 for comp
         public static final double MAX_ACCELERATION = 2.3; // 4 for comp
 
+        
         public static final double kP = 210;
         public static final double kI = 0.0;
         public static final double kD = 0.1;
@@ -120,8 +121,8 @@ public final class Constants {
         public static final int wristMotorID = 14; //used
 
         public static final double WRIST_KI = 0;
-        public static final double WRIST_KP = 0.1;
-        public static final double WRIST_KD = 0;
+        public static final double WRIST_KP = 0.25;
+        public static final double WRIST_KD = 0.01;
 
         public static final double WRIST_ENCODER_TO_DEGREES = 5.72727272; //degrees
 
@@ -135,7 +136,7 @@ public final class Constants {
         public static final double ALGAE_ANGLE_HIGH_START = 65;
         public static final double ALGAE_ANGLE_HIGH_END = 65;
 
-        public static final int WRIST_CURRENT_LIMIT = 40; //amps
+        public static final int WRIST_CURRENT_LIMIT = 40; //amps        
         public static final int SHOOTER_CURRENT_LIMIT = 40; //amps
     }
 
