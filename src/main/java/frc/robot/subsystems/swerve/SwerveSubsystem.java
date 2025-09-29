@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveSubsystem.coralSide;
 import pabeles.concurrency.ConcurrencyOps.NewInstance;
 
 import java.io.File;
@@ -92,12 +93,24 @@ public class SwerveSubsystem extends SubsystemBase {
     rightBranch
   }
 
+  public enum coralSide{
+        leftCoral,
+        rightCoral
+    }
+
   
   public Pose2d[] leftBranchPosesBlue = new Pose2d[6];
   public Pose2d[] rightBranchPosesBlue = new Pose2d[6];
 
   public Pose2d[] leftBranchPosesRed = new Pose2d[6];
   public Pose2d[] rightBranchPosesRed = new Pose2d[6];
+
+
+  public Pose2d leftStationBlue = new Pose2d(1.332, 7.128, new Rotation2d(2.26893));
+    public Pose2d rightStationBlue = new Pose2d(1.332, 0.990, new Rotation2d(-2.26893));
+
+    public Pose2d leftStationRed = FlippingUtil.flipFieldPose(leftStationBlue);
+    public Pose2d rightStationRed = FlippingUtil.flipFieldPose(leftStationBlue);
 
 
   private int aprilID = 0;
@@ -848,6 +861,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
     return finalPose; 
   }
+
+  public Pose2d getCoralPose(coralSide cs) {
+        Pose2d finalPose = new Pose2d();
+        if(cs == coralSide.leftCoral) {
+            finalPose = isRedAlliance() ? leftStationRed : leftStationBlue;
+        }
+        else{
+            finalPose = isRedAlliance() ? rightStationRed : rightStationBlue;
+        }
+
+        return finalPose;
+    }
 
   public void generatePoseArray() {
     Pose2d lOrgBlue = new Pose2d(3.17, 4.17, new Rotation2d(0));
